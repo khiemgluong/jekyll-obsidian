@@ -1,0 +1,21 @@
+/* assets/css/file_tree.css */
+.file-tree-node {
+    margin-left: 20px;
+  }
+  
+  .file-tree-node.directory {
+    font-weight: bold;
+  }
+  
+  .file-tree-node.file {
+    color: gray;
+  }
+  
+  .file-tree-node .children {
+    margin-left: 20px;
+    display: none;
+  }
+  
+  .file-tree-node.directory:hover > .children {
+    display: block;
+  }
