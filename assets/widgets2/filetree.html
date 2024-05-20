@@ -1,0 +1,54 @@
+<div id="myWidget">
+    <!-- Your widget content goes here -->
+    <h1>Hello, Widget!</h1>
+    <div id="fileTree"></div>
+</div>
+<script src="./filetree.ts"></script>
+
+<script lang="ts">
+    const tree = {
+        label: "USA", children: [
+            {
+                label: "Florida", children: [
+                    { label: "Jacksonville" },
+                    {
+                        label: "Orlando", children: [
+                            { label: "Disney World" },
+                            { label: "Universal Studio" },
+                            { label: "Sea World" },
+                        ]
+                    },
+                    { label: "Miami" },
+                ]
+            },
+            {
+                label: "California", children: [
+                    { label: "San Francisco" },
+                    { label: "Los Angeles" },
+                    { label: "Sacramento" },
+                ]
+            },
+        ],
+    }
+
+    function createFileTree(element, tree) {
+        const ul = document.createElement('ul');
+        tree.forEach(item => {
+            const li = document.createElement('li');
+            const label = document.createElement('span');
+            label.textContent = item.label;
+            li.appendChild(label);
+            if (item.children) {
+                const nestedTree = createFileTree(document.createElement('div'), item.children);
+                li.appendChild(nestedTree);
+            }
+            ul.appendChild(li);
+        });
+        element.appendChild(ul);
+    }
+
+    const fileTreeElement = document.getElementById('fileTree');
+    createFileTree(fileTreeElement, [tree]);
+
+    console.log("Widget loaded!");
+</script>
