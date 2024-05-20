@@ -13,7 +13,7 @@ module Jekyll
       priority :lowest
 
       def generate(site)
-        source_dir = site.config["file_tree_source"] || site.source
+        source_dir = site.config["obsidian_vault"] || site.source
         obsidian_files = collect_files(source_dir)
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
@@ -64,8 +64,11 @@ module Jekyll
           entry_path = File.join(dir, entry)
           puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
+            next if entry.start_with?("assets") || entry.start_with?(".obsidian")
             { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
           else
+            next unless entry.end_with?(".md", ".canvas")
+            next if File.zero?(entry_path) || File.empty?(entry_path)
             { name: entry, type: "file", path: File.join(path, entry) }
           end
         end
