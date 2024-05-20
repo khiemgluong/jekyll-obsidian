@@ -1,0 +1,80 @@
+<body>
+    <!-- Your widget content goes here -->
+    <div id="fileTree"></div>
+</body>
+<!-- <script src="./filetree.js"></script> -->
+
+<script lang="ts">
+    const tree = {
+        label: "USA", children: [
+            {
+                label: "Florida", children: [
+                    { label: "Jacksonville" },
+                    {
+                        label: "Orlando", children: [
+                            { label: "Disney World" },
+                            { label: "Universal Studio" },
+                            { label: "Sea World" },
+                        ]
+                    },
+                    { label: "Miami" },
+                ]
+            },
+            {
+                label: "California", children: [
+                    { label: "San Francisco" },
+                    { label: "Los Angeles" },
+                    { label: "Sacramento" },
+                ]
+            },
+        ],
+    }
+
+    function createFileTree(element, tree) {
+        const ul = document.createElement('ul');
+        element.appendChild(ul);
+
+        tree.children.forEach(child => {
+            const li = document.createElement('li');
+            ul.appendChild(li);
+
+            const button = document.createElement('button');
+            button.textContent = child.label;
+            li.appendChild(button);
+
+            if (child.children) {
+                var expanded = false;
+                button.addEventListener('click', () => {
+                    expanded = !expanded;
+                    if (expanded) {
+                        // Check if the child nodes have already been created
+                        if (!li.querySelector('ul')) {
+                            createFileTree(li, child);
+                        }
+                    } else {
+                        const nestedUl = li.querySelector('ul');
+                        if (nestedUl) {
+                            li.removeChild(nestedUl); // Corrected line
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    const fileTreeElement = document.getElementById('fileTree');
+    createFileTree(fileTreeElement, tree);
+
+    console.log("Widget loaded!");
+</script>
+
+<style>
+    ul {
+        list-style-type: none;
+        padding-left: 20px;
+    }
+
+    ul ul {
+        padding-left: 40px;
+    }
+</style>

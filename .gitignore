@@ -15,3 +15,5 @@ frontend/dist
 .rspec_status
 /*.gem
 Gemfile.lock
+
+/assets/widgets/*/
