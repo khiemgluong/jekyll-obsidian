@@ -1,5 +1,6 @@
 # lib/jekyll/obsidian.rb
 # frozen_string_literal: true
+require "jekyll"
 
 require_relative "obsidian/version"
 
