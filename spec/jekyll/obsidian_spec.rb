@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 require "tmpdir"
 
@@ -13,16 +14,11 @@ RSpec.describe Jekyll::Obsidian do
   # end
 end
 
-# spec/jekyll/obsidian_spec.rb
-
-require "spec_helper"
-require "tmpdir"
-
 RSpec.describe Jekyll::Obsidian::FileTreeGenerator do
   it "generates a file tree" do
     Dir.mktmpdir do |dir|
       site = double("site")
-      allow(site).to receive(:config).and_return({ "file_tree_source" => dir })
+      allow(site).to receive(:config).and_return({"file_tree_source" => dir})
       allow(site).to receive(:source).and_return(dir)
       allow(site).to receive(:data).and_return({})
 
