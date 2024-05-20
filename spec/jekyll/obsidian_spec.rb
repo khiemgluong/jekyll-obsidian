@@ -21,6 +21,7 @@ RSpec.describe Jekyll::Obsidian::FileTreeGenerator do
       allow(site).to receive(:config).and_return({"file_tree_source" => dir})
       allow(site).to receive(:source).and_return(dir)
       allow(site).to receive(:data).and_return({})
+      allow(site).to receive(:dest).and_return(dir) 
 
       generator = Jekyll::Obsidian::FileTreeGenerator.new
       expect { generator.generate(site) }.not_to raise_error

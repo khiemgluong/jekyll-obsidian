@@ -6,7 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
-/assets/widgets/
 #node_modules
 build/bin
 node_modules
@@ -15,4 +14,4 @@ frontend/dist
 # rspec failure tracking
 .rspec_status
 /*.gem
-
+Gemfile.lock

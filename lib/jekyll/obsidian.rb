@@ -46,7 +46,8 @@ module Jekyll
           result = FileUtils.cp(file_tree_css, obsidian_dir)
           puts "Copy result for file_tree.css: #{result}"
         else
-          puts "Error: #{file_tree_css} does not exist"; puts site.dest
+          puts "Error: #{file_tree_css} does not exist"
+          puts site.dest
         end
       end
 
@@ -58,9 +59,9 @@ module Jekyll
           next if entry == "." || entry == ".." || entry.start_with?("_")
           path = File.join(dir, entry)
           tree << if File.directory?(path)
-            { name: entry, type: "directory", children: generate_file_tree(path) }
+            {name: entry, type: "directory", children: generate_file_tree(path)}
           else
-            { name: entry, type: "file" }
+            {name: entry, type: "file"}
           end
         end
         tree
