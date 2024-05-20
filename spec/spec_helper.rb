@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require "spec_helper"
+
+require "jekyll"
 require "jekyll/obsidian"
 
 RSpec.configure do |config|
@@ -12,8 +13,4 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
-  RSpec.describe Jekyll::Obsidian::FileTreeGenerator do
-    it "generates a file tree" do
-      # Your test code here
-    end
 end
