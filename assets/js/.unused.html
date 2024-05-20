@@ -1,0 +1,75 @@
+<html>
+<div id="file-tree">
+    <ul>
+        {% for item in site.data.obsidian_files %}
+        <li>
+            <button data-type="{{ item.type }}" data-path="{{ item.path }}" data-name="{{ item.name }}">
+                {{ item.name }}
+            </button>
+            {% if item.type == 'dir' %}
+            <ul id="{{ item.name }}" style="display: none;">
+                {% include _obsidian/file_tree_item.html children=item.children %}
+            </ul>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script lang="text/javascript">
+    function createFileTree(element, tree) {
+        const ul = document.createElement('ul');
+        element.appendChild(ul);
+
+        tree.children.forEach(child => {
+            const li = document.createElement('li');
+            ul.appendChild(li);
+
+            const button = document.createElement('button');
+            button.textContent = child.label;
+            li.appendChild(button);
+
+            if (child.children) {
+                var expanded = false;
+                button.addEventListener('click', () => {
+                    expanded = !expanded;
+                    if (expanded) {
+                        // Check if the child nodes have already been created
+                        if (!li.querySelector('ul')) {
+                            createFileTree(li, child);
+                        }
+                    } else {
+                        const nestedUl = li.querySelector('ul');
+                        if (nestedUl) {
+                            li.removeChild(nestedUl); // Corrected line
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function toggleChildren(id) {
+        const element = document.getElementById(id);
+        if (element.style.display === 'none') {
+            element.style.display = 'block';
+        } else {
+            element.style.display = 'none';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('#file-tree button').forEach(button => {
+            button.addEventListener('click', () => {
+                const type = button.getAttribute('data-type');
+                const path = button.getAttribute('data-path');
+                const name = button.getAttribute('data-name');
+                if (type === 'dir') {
+                    toggleChildren(name);
+                } else {
+                    console.log(path);
+                }
+            });
+        });
+    });
+</script>
+</html>

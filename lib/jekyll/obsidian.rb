@@ -14,8 +14,9 @@ module Jekyll
 
       def generate(site)
         source_dir = site.config["file_tree_source"] || site.source
-        file_tree = generate_file_tree(source_dir)
-        site.data["file_tree"] = file_tree
+        obsidian_files = collect_files(source_dir)
+        site.data["obsidian_files"] = obsidian_files
+        site.data["obsidian_files_json"] = obsidian_files.to_json
         obsidian_dir = File.join(File.dirname(site.dest), "_obsidian")
 
         project_root = File.expand_path("../..", File.dirname(__FILE__))
@@ -56,19 +57,19 @@ module Jekyll
 
       private
 
-      def generate_file_tree(dir)
-        tree = []
+      def collect_files(dir, path = "")
+        _files = []
         Dir.entries(dir).each do |entry|
           next if entry == "." || entry == ".." || entry.start_with?("_")
-          path = File.join(dir, entry)
-          puts "file path: #{path}"  # print the path
-          tree << if File.directory?(path)
-            { name: entry, type: "dir", children: generate_file_tree(path) }
+          entry_path = File.join(dir, entry)
+          puts "file path: #{entry_path}"  # print the path
+          _files << if File.directory?(entry_path)
+            { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
           else
-            { name: entry, type: "file" }
+            { name: entry, type: "file", path: File.join(path, entry) }
           end
         end
-        tree
+        _files
       end
     end
   end

@@ -1,55 +1,37 @@
 <body>
     <!-- Your widget content goes here -->
     <div id="fileTree"></div>
+    <div id="file-tree">
+        <ul>
+            {% for item in site.data.obsidian_files_json %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
 </body>
-<!-- <script src="./filetree.js"></script> -->
 
 <script lang="ts">
-    const tree = {
-        label: "USA", children: [
-            {
-                label: "Florida", children: [
-                    { label: "Jacksonville" },
-                    {
-                        label: "Orlando", children: [
-                            { label: "Disney World" },
-                            { label: "Universal Studio" },
-                            { label: "Sea World" },
-                        ]
-                    },
-                    { label: "Miami" },
-                ]
-            },
-            {
-                label: "California", children: [
-                    { label: "San Francisco" },
-                    { label: "Los Angeles" },
-                    { label: "Sacramento" },
-                ]
-            },
-        ],
-    }
-
-    function createFileTree(element, tree) {
+    function buildFileTree(element, tree) {
         const ul = document.createElement('ul');
         element.appendChild(ul);
 
-        tree.children.forEach(child => {
+        tree.forEach(child => {
             const li = document.createElement('li');
             ul.appendChild(li);
 
             const button = document.createElement('button');
-            button.textContent = child.label;
+            button.textContent = child.name;
             li.appendChild(button);
 
-            if (child.children) {
+            if (child.type === 'dir') {
                 var expanded = false;
                 button.addEventListener('click', () => {
                     expanded = !expanded;
                     if (expanded) {
                         // Check if the child nodes have already been created
                         if (!li.querySelector('ul')) {
-                            createFileTree(li, child);
+                            buildFileTree(li, child.children);
                         }
                     } else {
                         const nestedUl = li.querySelector('ul');
@@ -58,14 +40,31 @@
                         }
                     }
                 });
+            } else if (child.type === 'file') {
+                button.addEventListener('click', () => {
+                    console.log(child.path);
+                });
             }
         });
     }
+
+    var obsidianFilesJson = '{{ site.data.obsidian_files_json | escape }}';
+    var parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const rootElement = document.getElementById('fileTree');
+        buildFileTree(rootElement, parsedObsidianFilesJson);
+    });
+
 
     const fileTreeElement = document.getElementById('fileTree');
     createFileTree(fileTreeElement, tree);
 
     console.log("Widget loaded!");
+</script>
+
+<script lang="text/javascript">
+
 </script>
 
 <style>
