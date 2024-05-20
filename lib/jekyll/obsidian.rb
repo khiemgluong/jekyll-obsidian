@@ -17,7 +17,7 @@ module Jekyll
         obsidian_files = collect_files(source_dir)
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
-        obsidian_dir = File.join(File.dirname(site.dest), "_obsidian")
+        obsidian_dir = File.join(File.dirname(site.dest), "_includes", "_obsidian")
 
         project_root = File.expand_path("../..", File.dirname(__FILE__))
         assets_dir = File.join(project_root, "assets")

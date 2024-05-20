@@ -1,7 +1,9 @@
 <body>
     <!-- Your widget content goes here -->
-    <div id="file-tree"></div>
-
+    <div class="container">
+        <div id="file-tree"></div>
+        <div id="file-reader"></div>
+    </div>
 </body>
 
 <script lang="text/javascript">
@@ -88,5 +90,10 @@
 
     ul ul {
         padding-left: 20px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: row;
     }
 </style>
