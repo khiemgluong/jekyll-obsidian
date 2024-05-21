@@ -19,9 +19,10 @@ module Jekyll
           puts "\e[31mError: obsidian_vault is not set in the config.yml\e[0m"
           exit(1)
         end
+        enable_backlinks = site.config["enable_backlinks"] || true
         obsidian_files = collect_files(source_dir)
         backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
-        # save_backlinks_to_json(site.dest, backlinks)
+        save_backlinks_to_json(site.dest, backlinks)
 
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
@@ -86,13 +87,11 @@ module Jekyll
         _files
       end
 
-      def build_backlinks(rootdir, _files, root_files)
-        processed_links = Set.new
-
+      def build_backlinks(rootdir, _files, root_files, jsonlinks = {})
         _files.each do |file|
           if file[:type] == "dir"
             puts "Directory: #{file[:name]}, Path: #{file[:path]}"
-            build_backlinks(rootdir, file[:children], root_files)
+            build_backlinks(rootdir, file[:children], root_files, jsonlinks)
           elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path)
@@ -110,17 +109,17 @@ module Jekyll
             puts "File: #{file[:name]}, Path: #{entry_path}"
             links = content.scan(/\[\[(.*?)\]\]/).flatten
 
+            jsonlinks[file[:name]] ||= { "path" => entry_path, "backlinks" => [], "backlink_paths" => [] }
+
             links.each do |link|
               lowercase_link = link.downcase
-              if processed_links.include?(lowercase_link)
-                # puts "Skipping duplicate backlink: #{link}"
-                next
-              end
-
               matched_entry = find_matching_entry(root_files, lowercase_link)
               if matched_entry
+                unless jsonlinks[file[:name]]["backlinks"].include?(link)
+                  jsonlinks[file[:name]]["backlinks"] << link
+                  jsonlinks[file[:name]]["backlink_paths"] << File.join(rootdir, matched_entry[:path])
+                end
                 puts "Backlink: #{link}, Path: #{File.join(rootdir, matched_entry[:path])}"
-                processed_links.add(lowercase_link)
               else
                 puts "Backlink: #{link}, No matching file found"
               end
@@ -129,6 +128,7 @@ module Jekyll
             puts "Skipping non-markdown file: #{file[:name]}"
           end
         end
+        jsonlinks
       end
 
       def find_matching_entry(files, lowercase_link)
