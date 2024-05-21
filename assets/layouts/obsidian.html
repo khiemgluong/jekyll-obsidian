@@ -22,30 +22,34 @@
 </html>
 
 <style>
-    body {
-        background-color: #363636;
-    }
-
     .page-content {
         display: flex;
-        flex-direction: column;
-        min-height: 100vh;
+        height: 100%;
+        padding: 15px 0;
+        max-height: 98vh;
     }
 
     #obsidian {
-        flex-grow: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: row;
+        display: inherit;
+        width: 100%;
+        height: 100%;
+        max-height: 88vh;
     }
 
     #file-tree {
-        flex: 0 0 20%;
-        /* This means the element will not grow or shrink and will always take up 20% of the container's width */
+        width: 20%;
+        overflow-y: auto;
+        max-height: 100vh;
     }
 
     #file-read {
         flex: 1;
-        /* This means the element will take up the remaining space in the container */
+        overflow-y: auto;
+        max-height: 100vh;
+    }
+
+    #file-tree::-webkit-scrollbar,
+    #file-read::-webkit-scrollbar {
+        display: none;
     }
 </style>

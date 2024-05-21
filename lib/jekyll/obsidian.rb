@@ -109,17 +109,17 @@ module Jekyll
             puts "File: #{file[:name]}, Path: #{entry_path}"
             links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-            jsonlinks[file[:name]] ||= { "path" => entry_path, "backlinks" => [], "backlink_paths" => [] }
+            jsonlinks[file[:name]] ||= { "path" => file[:path], "backlink_words" => [], "backlink_paths" => [] }
 
             links.each do |link|
               lowercase_link = link.downcase
               matched_entry = find_matching_entry(root_files, lowercase_link)
               if matched_entry
-                unless jsonlinks[file[:name]]["backlinks"].include?(link)
-                  jsonlinks[file[:name]]["backlinks"] << link
-                  jsonlinks[file[:name]]["backlink_paths"] << File.join(rootdir, matched_entry[:path])
+                unless jsonlinks[file[:name]]["backlink_words"].include?(link)
+                  jsonlinks[file[:name]]["backlink_words"] << link
+                  jsonlinks[file[:name]]["backlink_paths"] << matched_entry[:path]
                 end
-                puts "Backlink: #{link}, Path: #{File.join(rootdir, matched_entry[:path])}"
+                puts "Backlink: #{link}, Path: #{ matched_entry[:path]}"
               else
                 puts "Backlink: #{link}, No matching file found"
               end
