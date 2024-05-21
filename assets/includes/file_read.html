@@ -1,13 +1,18 @@
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.4/purify.min.js"></script>
+</head>
+
 <body>
     <div id="file-read">
         <!-- File read content here -->
     </div>
 </body>
 
+
 <script>
     // Add event listener for fileSelected event
     document.addEventListener('fileSelected', function (event) {
-        // Handle selected file path
         var selectedFilePath = event.detail;
 
         // Fetch file content based on selected file path
@@ -22,12 +27,15 @@
             .then(content => {
                 console.log('File content:', content);
                 console.log('File size:', content.length);
-                // Update file pane content
-                document.getElementById('file-read').textContent = content;
+
+                const md = window.markdownit();
+                const htmlContent = md.render(content);
+                const cleanHtmlContent = DOMPurify.sanitize(htmlContent);
+
+                document.getElementById('file-read').innerHTML = cleanHtmlContent;
             })
             .catch(error => {
                 console.error('Error fetching file:', error);
             });
     });
 </script>
-

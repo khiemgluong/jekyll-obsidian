@@ -23,12 +23,15 @@ module Jekyll
         site.data["obsidian_files_json"] = obsidian_files.to_json
 
         obsidian_dir = File.join(File.dirname(site.dest), "_includes", "_obsidian")
+        FileUtils.mkdir_p(obsidian_dir) unless File.directory?(obsidian_dir)
+
         layouts_dir = File.join(File.dirname(site.dest), "_layouts")
+        FileUtils.mkdir_p(layouts_dir) unless File.directory?(layouts_dir)
+
 
         project_root = File.expand_path("../..", File.dirname(__FILE__))
         assets_dir = File.join(project_root, "assets")
         puts assets_dir
-        FileUtils.mkdir_p(obsidian_dir) unless File.directory?(obsidian_dir)
         puts "obsidian: " + obsidian_dir
 
         file_read = File.join(assets_dir, "includes", "file_read.html")
