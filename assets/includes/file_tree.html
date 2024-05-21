@@ -43,7 +43,7 @@
                 button.addEventListener('click', () => {
                     console.log(child.path);
                     var vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
-                    var event = new CustomEvent('fileSelected', { detail: vaultpath + child.path });
+                    var event = new CustomEvent('obisidianFileSelected', { detail: vaultpath + child.path });
                     document.dispatchEvent(event);
                 });
             }
