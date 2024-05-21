@@ -20,7 +20,7 @@ module Jekyll
           exit(1)
         end
         obsidian_files = collect_files(source_dir)
-        backlinks = build_backlinks(source_dir, obsidian_files)
+        backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
         # save_backlinks_to_json(site.dest, backlinks)
 
         site.data["obsidian_files"] = obsidian_files
@@ -68,11 +68,11 @@ module Jekyll
 
       private
 
-      def collect_files(dir, path = "")
+      def collect_files(rootdir, path = "")
         _files = []
-        Dir.entries(dir).each do |entry|
+        Dir.entries(rootdir).each do |entry|
           next if entry == "." || entry == ".." || entry.start_with?("_")
-          entry_path = File.join(dir, entry)
+          entry_path = File.join(rootdir, entry)
           puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
             next if entry.start_with?("assets") || entry.start_with?(".obsidian")
@@ -86,93 +86,55 @@ module Jekyll
         _files
       end
 
-      def build_backlinks(dir, _files)
-  _files.each do |file|
-    if file[:type] == "dir"
-      puts "Directory: #{file[:name]}, Path: #{file[:path]}"
-      build_backlinks(dir, file[:children])
-    elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
-      entry_path = File.join(dir, file[:path])
-      next if File.zero?(entry_path)
+      def build_backlinks(rootdir, _files, root_files)
+        _files.each do |file|
+          if file[:type] == "dir"
+            puts "Directory: #{file[:name]}, Path: #{file[:path]}"
+            build_backlinks(rootdir, file[:children], root_files)
+          elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
+            entry_path = File.join(rootdir, file[:path])
+            next if File.zero?(entry_path)
 
-      begin
-        content = File.read(entry_path)
-      rescue Errno::ENOENT
-        puts "Error reading file: #{entry_path} - No such file or directory"
-        next
-      rescue Errno::EACCES
-        puts "Error reading file: #{entry_path} - Permission denied"
-        next
+            begin
+              content = File.read(entry_path)
+            rescue Errno::ENOENT
+              puts "Error reading file: #{entry_path} - No such file or directory"
+              next
+            rescue Errno::EACCES
+              puts "Error reading file: #{entry_path} - Permission denied"
+              next
+            end
+
+            puts "File: #{file[:name]}, Path: #{entry_path}"
+            links = content.scan(/\[\[(.*?)\]\]/).flatten
+
+            links.each do |link|
+              lowercase_link = link.downcase
+              matched_entry = find_matching_entry(root_files, lowercase_link)
+              if matched_entry
+                puts "Backlink: #{link}, Path: #{File.join(rootdir, matched_entry[:path])}"
+              else
+                puts "Backlink: #{link}, No matching file found"
+              end
+            end
+          else
+            puts "Skipping non-markdown file: #{file[:name]}"
+          end
+        end
       end
 
-      puts "File: #{file[:name]}, Path: #{entry_path}"
-      links = content.scan(/\[\[(.*?)\]\]/).flatten
-      links.each do |link|
-        puts "Backlink found: #{link}"
+      def find_matching_entry(files, lowercase_link)
+        files.each do |file|
+          if file[:type] == "dir"
+            result = find_matching_entry(file[:children], lowercase_link)
+            return result if result
+          elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
+            file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
+            return file if file_name_without_extension == lowercase_link
+          end
+        end
+        nil
       end
-    else
-      puts "Skipping non-markdown file: #{file[:name]}"
-    end
-  end
-end
-
-      # def build_backlinks(dir, _files)
-      #   backlinks = {}
-
-      #   _files.each do |file|
-      #     if file[:type] == "dir"
-      #       puts "Directory: #{file[:name]}, Path: #{file[:path]}"
-      #       child_backlinks = build_backlinks(dir, file[:children])
-      #       backlinks.merge!(child_backlinks) { |key, oldval, newval| oldval + newval }
-      #     elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
-      #       entry_path = File.join(dir, file[:path])
-      #       next if File.zero?(entry_path)
-
-      #       begin
-      #         content = File.read(entry_path)
-      #       rescue Errno::ENOENT
-      #         puts "Error reading file: #{entry_path} - No such file or directory"
-      #         next
-      #       rescue Errno::EACCES
-      #         puts "Error reading file: #{entry_path} - Permission denied"
-      #         next
-      #       end
-
-      #       links = content.scan(/\[\[(.*?)\]\]/).flatten
-
-      #       links.each do |link|
-      #         link_without_extension = link.gsub(/\.\w+$/, "")
-      #         linked_file = _files.find { |f| f[:name].sub(/\.\w+$/, "") == link_without_extension }
-
-      #         if linked_file
-      #           backlinks[linked_file[:name]] ||= { "path" => File.join(dir, linked_file[:path]), "backlink_words" => [], "backlink_paths" => [] }
-      #           backlink_info = { word: link, file: file[:name], path: entry_path }
-              
-      #           # Always add the backlink word and path to ensure completeness
-      #           backlinks[linked_file[:name]]["backlink_words"] << backlink_info[:word]
-      #           backlinks[linked_file[:name]]["backlink_paths"] << backlink_info[:path]
-              
-      #           puts "Backlink word: #{backlink_info[:word]}, File: #{backlink_info[:file]}, Path: #{backlink_info[:path]}"
-      #         end
-      #       end
-      #     else
-      #       puts "Skipping non-markdown file: #{file[:name]}"
-      #     end
-      #   end
-
-      #   backlinks
-      # end
-
-      # def save_backlinks_to_json(sitedest, backlinks)
-      #   data_dir = File.join(File.dirname(sitedest), "_data")
-      #   FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
-      #   json_file_path = File.join(data_dir, "backlinks.json")
-      #   puts "json_file_path: #{json_file_path}"
-
-      #   File.open(json_file_path, "w") do |file|
-      #     file.write(JSON.pretty_generate(backlinks))
-      #   end
-      # end
     end
   end
 end
