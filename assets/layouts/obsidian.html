@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: " en" }}">
+
+{%- include head.html -%}
+
+<body>
+    {%- include header.html -%}
+
+    <main class="page-content" aria-label="Content">
+        <div id="obsidian">
+            {% include _obsidian/file_tree.html %}
+            {% include _obsidian/file_read.html %}
+        </div>
+    </main>
+    <!-- {%- include footer.html -%} -->
+</body>
+
+</html>
+
+<style>
+    body {
+        background-color: #363636;
+    }
+
+    .page-content {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    #obsidian {
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: row;
+    }
+
+    #file-tree {
+        flex: 0 0 20%;
+        /* This means the element will not grow or shrink and will always take up 20% of the container's width */
+    }
+
+    #file-read {
+        flex: 1;
+        /* This means the element will take up the remaining space in the container */
+    }
+</style>

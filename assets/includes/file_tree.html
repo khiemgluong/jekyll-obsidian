@@ -1,9 +1,5 @@
 <body>
-    <!-- Your widget content goes here -->
-    <div class="container">
-        <div id="file-tree"></div>
-        <div id="file-reader"></div>
-    </div>
+    <div id="file-tree"></div>
 </body>
 
 <script lang="text/javascript">
@@ -46,11 +42,13 @@
                 li.classList.add('file');
                 button.addEventListener('click', () => {
                     console.log(child.path);
+                    var vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
+                    var event = new CustomEvent('fileSelected', { detail: vaultpath + child.path });
+                    document.dispatchEvent(event);
                 });
             }
         });
     }
-
 
     var obsidianFilesJson = '{{ site.data.obsidian_files_json | escape }}';
     var parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
@@ -85,15 +83,10 @@
 <style>
     ul {
         list-style-type: none;
-        padding-left: 10px;
+        padding-left: 5px;
     }
 
     ul ul {
-        padding-left: 20px;
-    }
-
-    .container {
-        display: flex;
-        flex-direction: row;
+        padding-left: 10px;
     }
 </style>
