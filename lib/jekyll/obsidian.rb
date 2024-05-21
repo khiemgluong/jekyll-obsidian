@@ -87,6 +87,8 @@ module Jekyll
       end
 
       def build_backlinks(rootdir, _files, root_files)
+        processed_links = Set.new
+
         _files.each do |file|
           if file[:type] == "dir"
             puts "Directory: #{file[:name]}, Path: #{file[:path]}"
@@ -110,9 +112,15 @@ module Jekyll
 
             links.each do |link|
               lowercase_link = link.downcase
+              if processed_links.include?(lowercase_link)
+                # puts "Skipping duplicate backlink: #{link}"
+                next
+              end
+
               matched_entry = find_matching_entry(root_files, lowercase_link)
               if matched_entry
                 puts "Backlink: #{link}, Path: #{File.join(rootdir, matched_entry[:path])}"
+                processed_links.add(lowercase_link)
               else
                 puts "Backlink: #{link}, No matching file found"
               end
@@ -134,6 +142,17 @@ module Jekyll
           end
         end
         nil
+      end
+
+      def save_backlinks_to_json(sitedest, backlinks)
+        data_dir = File.join(File.dirname(sitedest), "_data")
+        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+        json_file_path = File.join(data_dir, "backlinks.json")
+        puts "json_file_path: #{json_file_path}"
+
+        File.open(json_file_path, "w") do |file|
+          file.write(JSON.pretty_generate(backlinks))
+        end
       end
     end
   end
