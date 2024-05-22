@@ -5,16 +5,17 @@
 
 <body>
     <div id="file-read">
-        <!-- File read content here -->
+        <div id="file-title"></div>
+        <div id="file-content"></div>
     </div>
 </body>
 
 <script>
     document.addEventListener('obisidianFileSelected', function (event) {
         var selectedFilePath = event.detail;
-
-        // Fetch file content based on selected file path
-        console.log("selectedFilePath: " + selectedFilePath)
+        var selectedFileName = selectedFilePath.split('/').pop();
+        // console.log("selectedFilePath: " + selectedFilePath)
+        console.log("selectedFilePath FileNameOnly: " + selectedFileName);
         fetch(selectedFilePath)
             .then(response => {
                 if (!response.ok) {
@@ -23,17 +24,27 @@
                 return response.text();
             })
             .then(content => {
-                console.log('File content:', content);
                 console.log('File size:', content.length);
 
                 const md = window.markdownit();
                 const htmlContent = md.render(content);
                 const cleanHtmlContent = DOMPurify.sanitize(htmlContent);
 
-                document.getElementById('file-read').innerHTML = cleanHtmlContent;
+                document.getElementById('file-title').textContent = selectedFileName;
+                document.getElementById('file-content').innerHTML = cleanHtmlContent;
             })
             .catch(error => {
                 console.error('Error fetching file:', error);
             });
     });
 </script>
+
+<style>
+ 
+
+    #file-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 1em;
+    }
+</style>

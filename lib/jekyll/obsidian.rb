@@ -19,10 +19,15 @@ module Jekyll
           puts "\e[31mError: obsidian_vault is not set in the config.yml\e[0m"
           exit(1)
         end
-        enable_backlinks = site.config["enable_backlinks"] || true
         obsidian_files = collect_files(source_dir)
-        backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
-        save_backlinks_to_json(site.dest, backlinks)
+        enable_backlinks = site.config["obsidian_backlinks"]
+        if enable_backlinks || enable_backlinks.nil?
+          puts "Building backlinks..."
+          backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
+          save_backlinks_to_json(site.dest, backlinks)
+        else 
+          puts "Backlinks disabled"
+        end
 
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
@@ -37,7 +42,6 @@ module Jekyll
         assets_dir = File.join(project_root, "assets")
         puts assets_dir
         puts "obsidian: " + obsidian_dir
-
         file_read = File.join(assets_dir, "includes", "file_read.html")
         file_tree = File.join(assets_dir, "includes", "file_tree.html")
         layouts = File.join(assets_dir, "layouts", "obsidian.html")
@@ -74,7 +78,7 @@ module Jekyll
         Dir.entries(rootdir).each do |entry|
           next if entry == "." || entry == ".." || entry.start_with?("_")
           entry_path = File.join(rootdir, entry)
-          puts "file path: #{entry_path}"  # print the path
+          # puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
             next if entry.start_with?("assets") || entry.start_with?(".obsidian")
             { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
@@ -90,7 +94,7 @@ module Jekyll
       def build_backlinks(rootdir, _files, root_files, jsonlinks = {})
         _files.each do |file|
           if file[:type] == "dir"
-            puts "Directory: #{file[:name]}, Path: #{file[:path]}"
+            # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
             build_backlinks(rootdir, file[:children], root_files, jsonlinks)
           elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
             entry_path = File.join(rootdir, file[:path])
@@ -119,7 +123,7 @@ module Jekyll
                   jsonlinks[file[:name]]["backlink_words"] << link
                   jsonlinks[file[:name]]["backlink_paths"] << matched_entry[:path]
                 end
-                puts "Backlink: #{link}, Path: #{ matched_entry[:path]}"
+                # puts "Backlink: #{link}, Path: #{matched_entry[:path]}"
               else
                 puts "Backlink: #{link}, No matching file found"
               end
@@ -148,7 +152,6 @@ module Jekyll
         data_dir = File.join(File.dirname(sitedest), "_data")
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "backlinks.json")
-        puts "json_file_path: #{json_file_path}"
 
         File.open(json_file_path, "w") do |file|
           file.write(JSON.pretty_generate(backlinks))

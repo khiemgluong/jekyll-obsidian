@@ -7,6 +7,7 @@
 </head>
 
 {%- include head.html -%}
+
 <body>
     {%- include header.html -%}
 
@@ -46,6 +47,9 @@
         flex: 1;
         overflow-y: auto;
         max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     #file-tree::-webkit-scrollbar,
