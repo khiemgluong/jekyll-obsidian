@@ -13,8 +13,13 @@
 
     <main class="page-content" aria-label="Content">
         <div id="obsidian">
-            {% include _obsidian/file_tree.html %}
-            {% include _obsidian/file_read.html %}
+            <div id="sidebar">
+                {% include _obsidian/sidebar.html -%}
+            </div>
+            <div id="explorer">
+                {% include _obsidian/explorer.html %}
+            </div>
+            {% include _obsidian/fileread.html %}
         </div>
     </main>
     <!-- {%- include footer.html -%} -->
@@ -35,6 +40,20 @@
         width: 100%;
         height: 100%;
         max-height: 88vh;
+    }
+
+    #obsidian #sidebar {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 5%;
+        background-color: aqua;
+    }
+
+    #obsidian #explorer {
+        overflow-y: auto;
+        max-height: 100vh;
+        width: 20%;
     }
 
     #file-tree::-webkit-scrollbar,
