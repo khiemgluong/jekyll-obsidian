@@ -25,7 +25,7 @@ module Jekyll
           puts "Building backlinks..."
           backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
           save_backlinks_to_json(site.dest, backlinks)
-        else 
+        else
           puts "Backlinks disabled"
         end
 
@@ -41,37 +41,29 @@ module Jekyll
         project_root = File.expand_path("../..", File.dirname(__FILE__))
         assets_dir = File.join(project_root, "assets")
         puts assets_dir
-        puts "obsidian: " + obsidian_dir
-        file_read = File.join(assets_dir, "includes", "file_read.html")
-        file_tree = File.join(assets_dir, "includes", "file_tree.html")
-        layouts = File.join(assets_dir, "layouts", "obsidian.html")
+        explorer = File.join(assets_dir, "includes", "explorer.html")
+        filereadr = File.join(assets_dir, "includes", "filereadr.html")
+        sidebar = File.join(assets_dir, "includes", "sidebar.html")
 
-        if File.exist?(file_read)
-          result = FileUtils.cp(file_read, obsidian_dir)
-          puts "Copy result for file_read.html: #{result}"
-        else
-          puts "Error: #{file_read} does not exist"
-          exit
-        end
+        layout = File.join(assets_dir, "layouts", "obsidian.html")
 
-        if File.exist?(file_tree)
-          result = FileUtils.cp(file_tree, obsidian_dir)
-          puts "Copy result for file_tree.js: #{result}"
-        else
-          puts "Error: #{file_tree} does not exist"
-          exit
-        end
+        copy_file_to_dir(sidebar, obsidian_dir)
+        copy_file_to_dir(filereadr, obsidian_dir)
+        copy_file_to_dir(explorer, obsidian_dir)
 
-        if File.exist?(layouts)
-          result = FileUtils.cp(layouts, layouts_dir)
-          puts "Copy result for layouts.css: #{result}"
-        else
-          puts "Error: #{layouts} does not exist"
-          puts site.dest
-        end
+        copy_file_to_dir(layout, layouts_dir)
       end
 
       private
+
+      def copy_file_to_dir(file, dir)
+        if File.exist?(file)
+          FileUtils.cp(file, dir)
+        else
+          puts "Error: #{file} does not exist"
+          exit
+        end
+      end
 
       def collect_files(rootdir, path = "")
         _files = []
@@ -80,12 +72,12 @@ module Jekyll
           entry_path = File.join(rootdir, entry)
           # puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
-            next if entry.start_with?("assets") || entry.start_with?(".obsidian")
-            { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
+            next if entry.start_with?("assets", ".obsidian")
+            {name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry))}
           else
             next unless entry.end_with?(".md", ".canvas")
             next if File.zero?(entry_path) || File.empty?(entry_path)
-            { name: entry, type: "file", path: File.join(path, entry) }
+            {name: entry, type: "file", path: File.join(path, entry)}
           end
         end
         _files
@@ -96,7 +88,7 @@ module Jekyll
           if file[:type] == "dir"
             # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
             build_backlinks(rootdir, file[:children], root_files, jsonlinks)
-          elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
+          elsif file[:type] == "file" && (file[:name].end_with?(".md", ".canvas"))
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path)
 
@@ -113,7 +105,7 @@ module Jekyll
             puts "File: #{file[:name]}, Path: #{entry_path}"
             links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-            jsonlinks[file[:name]] ||= { "path" => file[:path], "backlink_words" => [], "backlink_paths" => [] }
+            jsonlinks[file[:name]] ||= {"path" => file[:path], "backlink_words" => [], "backlink_paths" => []}
 
             links.each do |link|
               lowercase_link = link.downcase
@@ -140,7 +132,7 @@ module Jekyll
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
-          elsif file[:type] == "file" && (file[:name].end_with?(".md") || file[:name].end_with?(".canvas"))
+          elsif file[:type] == "file" && (file[:name].end_with?(".md", ".canvas"))
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
             return file if file_name_without_extension == lowercase_link
           end
@@ -153,9 +145,7 @@ module Jekyll
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "backlinks.json")
 
-        File.open(json_file_path, "w") do |file|
-          file.write(JSON.pretty_generate(backlinks))
-        end
+        File.write(json_file_path, JSON.pretty_generate(backlinks))
       end
     end
   end
