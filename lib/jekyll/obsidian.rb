@@ -42,14 +42,14 @@ module Jekyll
         assets_dir = File.join(project_root, "assets")
         puts assets_dir
         explorer = File.join(assets_dir, "includes", "explorer.html")
-        filereadr = File.join(assets_dir, "includes", "filereadr.html")
+        fileread = File.join(assets_dir, "includes", "fileread.html")
         sidebar = File.join(assets_dir, "includes", "sidebar.html")
 
         layout = File.join(assets_dir, "layouts", "obsidian.html")
 
-        copy_file_to_dir(sidebar, obsidian_dir)
-        copy_file_to_dir(filereadr, obsidian_dir)
         copy_file_to_dir(explorer, obsidian_dir)
+        copy_file_to_dir(fileread, obsidian_dir)
+        copy_file_to_dir(sidebar, obsidian_dir)
 
         copy_file_to_dir(layout, layouts_dir)
       end
