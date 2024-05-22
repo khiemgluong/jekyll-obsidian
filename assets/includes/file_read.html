@@ -37,10 +37,19 @@
                 console.error('Error fetching file:', error);
             });
     });
+
+
 </script>
 
 <style>
- 
+    #file-read {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
     #file-title {
         font-size: 1.5em;

@@ -1,5 +1,8 @@
 <body>
-    <div id="file-tree"></div>
+    <div id="container">
+        <div id="vault-name">{{ site.obsidian_vault }}</div>
+        <div id="file-tree"></div>
+    </div>
 </body>
 
 <script lang="text/javascript">
@@ -17,8 +20,8 @@
 
             if (child.type === 'dir') {
                 li.classList.add('dir');
-                const svgCollapsed = '<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/></svg>';
-                const svgExpanded = '<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>';
+                const svgCollapsed = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/></svg>';
+                const svgExpanded = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>';
                 button.innerHTML = svgCollapsed + button.textContent;
 
                 var expanded = false;
@@ -81,9 +84,23 @@
 </script>
 
 <style>
+    #container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 20%;
+    }
+
+    #file-tree {
+        overflow-y: auto;
+        max-height: 100vh;
+        width: 100%;
+    }
+
     ul {
         list-style-type: none;
         padding-left: 5px;
+        margin-left: 5px;
     }
 
     ul ul {
