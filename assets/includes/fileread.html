@@ -11,18 +11,45 @@
 
 <script>
     document.addEventListener('obisidianFileSelect', function (event) {
-        var selectedFilePath = event.detail;
-        var selectedFileName = selectedFilePath.split('/').pop();
-        console.log("selectedFilePath: " + selectedFilePath);
-        var vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
+        const filePath = event.detail;
+        const selectedFileName = filePath.split('/').pop();
+        console.log("filePath: " + filePath);
+        const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
 
-        var selectedFilePathFull = vaultpath + selectedFilePath;
-        console.log("selectedFilePath Vault: " + selectedFilePathFull)
+        const selectedFilePathFull = vaultpath + filePath;
+        console.log("vault+filePath: " + selectedFilePathFull)
 
         var backlinks = '{{ site.data.backlinks | jsonify }}'
+        // console.log("Backlinks JSON string:", backlinks);
 
-        console.log("selectedFilePath FileNameOnly: " + selectedFileName);
-        fetch(vaultpath + selectedFilePath)
+        try {
+            const backlinks_parsed = JSON.parse(backlinks);
+
+            for (const parsedFilePath in backlinks_parsed) {
+                if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+                    if (parsedFilePath === filePath) {
+                        console.log("parsedFilePath === filePath");
+                        const entry = backlinks_parsed[parsedFilePath];
+                        if (entry.backlink_words && entry.backlink_words.length > 0) {
+                            entry.backlink_words.forEach(word => {
+                                console.log(filePath + " word " + word);
+                            });
+                        }
+                        if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                            entry.backlink_paths.forEach(path => {
+                                console.log(filePath + " path " + path);
+                            });
+                        }
+                        break;  // Exit the loop after finding the matching filePath
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Error parsing backlinks:", e);
+        }
+
+        console.log("FileNameOnly: " + selectedFileName);
+        fetch(selectedFilePathFull)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok: ' + response.statusText);

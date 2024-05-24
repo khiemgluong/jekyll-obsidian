@@ -25,6 +25,7 @@ module Jekyll
           puts "Building backlinks..."
           backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
           save_backlinks_to_json(site.dest, backlinks)
+          puts "Backlinks built"
         else
           puts "Backlinks disabled"
         end
@@ -146,6 +147,7 @@ module Jekyll
         json_file_path = File.join(data_dir, "backlinks.json")
 
         escaped_backlinks = {}
+        # json thinks ' is a special character, so we need to escape it
         backlinks.each do |path, data|
           escaped_path = path.tr("'", "`")
           escaped_data = {
