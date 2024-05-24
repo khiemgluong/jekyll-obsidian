@@ -6,49 +6,73 @@
 
 <body>
     <div id="file-title"></div>
-    <div id="file-content"></div>
+    <div id="file-content"> </div>
+    <div id="linked-mentions">Linked mentions</div>
+    <div id="unlinked-mentions">Unlinked mentions</div>
+
 </body>
 
 <script>
     document.addEventListener('obisidianFileSelect', function (event) {
         const filePath = event.detail;
-        const selectedFileName = filePath.split('/').pop();
         console.log("filePath: " + filePath);
+        const fileName = filePath.split('/').pop().replace(/\.[^/.]+$/, "");
+        console.log("FileName: " + fileName);
         const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
 
         const selectedFilePathFull = vaultpath + filePath;
         console.log("vault+filePath: " + selectedFilePathFull)
 
-        var backlinks = '{{ site.data.backlinks | jsonify }}'
-        // console.log("Backlinks JSON string:", backlinks);
+        const backlinks = '{{ site.data.backlinks | jsonify }}'
 
+        // console.log("Backlinks JSON string:", backlinks);
+        let enable_backlinks = '{{ site.obsidian_backlinks | escape }}';
+        if (!enable_backlinks) enable_backlinks = true;
+        console.log("Enable backlinks: " + enable_backlinks);
         try {
             const backlinks_parsed = JSON.parse(backlinks);
 
+            // for (const parsedFilePath in backlinks_parsed) {
+            //     if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+            //         if (parsedFilePath === filePath) {
+            //             console.log("parsedFilePath === filePath");
+            //             const entry = backlinks_parsed[parsedFilePath];
+            //             if (entry.backlink_words && entry.backlink_words.length > 0) {
+            //                 entry.backlink_words.forEach(word => {
+            //                     console.log(filePath + " word " + word);
+            //                 });
+            //             }
+            //             if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+            //                 entry.backlink_paths.forEach(path => {
+            //                     console.log(filePath + " path " + path);
+            //                 });
+            //             }
+            //             break;  // Exit the loop after finding the matching filePath
+            //         }
+            //     }
+            // }
+            let linked_mentions = [];
+
             for (const parsedFilePath in backlinks_parsed) {
                 if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                    if (parsedFilePath === filePath) {
-                        console.log("parsedFilePath === filePath");
-                        const entry = backlinks_parsed[parsedFilePath];
-                        if (entry.backlink_words && entry.backlink_words.length > 0) {
-                            entry.backlink_words.forEach(word => {
-                                console.log(filePath + " word " + word);
-                            });
-                        }
-                        if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                            entry.backlink_paths.forEach(path => {
-                                console.log(filePath + " path " + path);
-                            });
-                        }
-                        break;  // Exit the loop after finding the matching filePath
+                    const entry = backlinks_parsed[parsedFilePath];
+                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                        entry.backlink_paths.forEach(path => {
+                            if (path === filePath && !linked_mentions.includes(parsedFilePath)) {
+                                linked_mentions.push(parsedFilePath);
+                            }
+                        });
                     }
                 }
             }
+
+            linked_mentions.forEach(root => {
+                console.log("Linked mention root: " + root);
+            });
         } catch (e) {
             console.error("Error parsing backlinks:", e);
         }
 
-        console.log("FileNameOnly: " + selectedFileName);
         fetch(selectedFilePathFull)
             .then(response => {
                 if (!response.ok) {
@@ -63,7 +87,7 @@
                 const htmlContent = md.render(content);
                 const cleanHtmlContent = DOMPurify.sanitize(htmlContent);
 
-                document.getElementById('file-title').textContent = selectedFileName;
+                document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = cleanHtmlContent;
             })
             .catch(error => {
@@ -81,5 +105,13 @@
         margin-bottom: 0.4em;
     }
 
-    #file-content {}
+
+    #linked-mentions {
+        font-size: 1.2em;
+        width: 100%;
+        margin-top: 8rem;
+        margin-bottom: 0.4em;
+        padding: 0.4em 0;
+        border-top: 1px solid #e0e0e0;
+    }
 </style>
