@@ -13,7 +13,8 @@
             ul.appendChild(li);
 
             const button = document.createElement('button');
-            button.textContent = child.name;
+            const decodedString = he.decode(child.name);
+            button.textContent = decodedString;
             li.appendChild(button);
 
             if (child.type === 'dir') {
@@ -50,12 +51,14 @@
                 });
             } else if (child.type === 'file') {
                 li.classList.add('file');
+                const decodedPath = he.decode(child.path);
+
                 button.addEventListener('click', () => {
-                    console.log(child.path);
-                    var event = new CustomEvent('obisidianFileSelect', { detail: child.path });
+                    var event = new CustomEvent('obisidianFileSelect', { detail: decodedPath });
                     document.dispatchEvent(event);
                 });
-                button.textContent = child.name.replace(/\.[^/.]+$/, "");
+                const fileName = child.name.replace(/\.[^/.]+$/, "")
+                button.textContent = he.decode(fileName);
             }
         });
     }

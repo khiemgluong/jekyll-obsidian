@@ -88,7 +88,7 @@ module Jekyll
           if file[:type] == "dir"
             # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
             build_backlinks(rootdir, file[:children], root_files, jsonlinks)
-          elsif file[:type] == "file" && (file[:name].end_with?(".md", ".canvas"))
+          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path)
 
@@ -105,15 +105,15 @@ module Jekyll
             puts "File: #{file[:name]}, Path: #{entry_path}"
             links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-            jsonlinks[file[:name]] ||= {"path" => file[:path], "backlink_words" => [], "backlink_paths" => []}
+            jsonlinks[file[:path]] ||= {"backlink_words" => [], "backlink_paths" => []}
 
             links.each do |link|
               lowercase_link = link.downcase
               matched_entry = find_matching_entry(root_files, lowercase_link)
               if matched_entry
-                unless jsonlinks[file[:name]]["backlink_words"].include?(link)
-                  jsonlinks[file[:name]]["backlink_words"] << link
-                  jsonlinks[file[:name]]["backlink_paths"] << matched_entry[:path]
+                unless jsonlinks[file[:path]]["backlink_words"].include?(link)
+                  jsonlinks[file[:path]]["backlink_words"] << link
+                  jsonlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
                 end
                 # puts "Backlink: #{link}, Path: #{matched_entry[:path]}"
               else
@@ -132,7 +132,7 @@ module Jekyll
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
-          elsif file[:type] == "file" && (file[:name].end_with?(".md", ".canvas"))
+          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
             return file if file_name_without_extension == lowercase_link
           end
@@ -145,7 +145,16 @@ module Jekyll
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "backlinks.json")
 
-        File.write(json_file_path, JSON.pretty_generate(backlinks))
+        escaped_backlinks = {}
+        backlinks.each do |path, data|
+          escaped_path = path.tr("'", "`")
+          escaped_data = {
+            "backlink_words" => data["backlink_words"].map { |word| word.tr("'", "`") },
+            "backlink_paths" => data["backlink_paths"].map { |path| path.tr("'", "`") }
+          }
+          escaped_backlinks[escaped_path] = escaped_data
+        end
+        File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
       end
     end
   end
