@@ -52,8 +52,7 @@
                 li.classList.add('file');
                 button.addEventListener('click', () => {
                     console.log(child.path);
-                    var vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
-                    var event = new CustomEvent('obisidianFileSelected', { detail: vaultpath + child.path });
+                    var event = new CustomEvent('obisidianFileSelect', { detail: child.path });
                     document.dispatchEvent(event);
                 });
                 button.textContent = child.name.replace(/\.[^/.]+$/, "");

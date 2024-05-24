@@ -9,12 +9,19 @@
 </body>
 
 <script>
-    document.addEventListener('obisidianFileSelected', function (event) {
+    document.addEventListener('obisidianFileSelect', function (event) {
         var selectedFilePath = event.detail;
         var selectedFileName = selectedFilePath.split('/').pop();
-        // console.log("selectedFilePath: " + selectedFilePath)
+        console.log("selectedFilePath: " + selectedFilePath);
+        var vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
+
+        var selectedFilePathFull = vaultpath + selectedFilePath;
+        console.log("selectedFilePath Vault: " + selectedFilePathFull)
+
+        var backlinks = '{{ site.data.backlinks | jsonify }}'
+
         console.log("selectedFilePath FileNameOnly: " + selectedFileName);
-        fetch(selectedFilePath)
+        fetch(vaultpath + selectedFilePath)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok: ' + response.statusText);
