@@ -13,6 +13,76 @@
 </body>
 
 <script>
+    function matchBacklinks(backlinks_parsed) {
+        for (const parsedFilePath in backlinks_parsed) {
+            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+                if (parsedFilePath === filePath) {
+                    console.log("parsedFilePath === filePath");
+                    const entry = backlinks_parsed[parsedFilePath];
+                    if (entry.backlink_words && entry.backlink_words.length > 0) {
+                        entry.backlink_words.forEach(word => {
+                            console.log(filePath + " word " + word);
+                        });
+                    }
+                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                        entry.backlink_paths.forEach(path => {
+                            console.log(filePath + " path " + path);
+                        });
+                    }
+                    break;  // Exit the loop after finding the matching filePath
+                }
+            }
+        }
+    }
+
+    function matchLinkedMentions(backlinks_parsed) {
+        let linked_mentions = [];
+        for (const parsedFilePath in backlinks_parsed) {
+            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+                const entry = backlinks_parsed[parsedFilePath];
+                if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                    entry.backlink_paths.forEach(path => {
+                        if (path === filePath && !linked_mentions.includes(parsedFilePath)) {
+                            linked_mentions.push(parsedFilePath);
+                        }
+                    });
+                }
+            }
+        }
+        linked_mentions.forEach(root => {
+            console.log("Linked mention root: " + root);
+        });
+    }
+
+    function generateBacklinks(cleanHtmlContent, backlinksArray) {
+        const siteUrl = '{{ site.url | escape }}';
+        console.log("siteUrl: " + siteUrl);
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = cleanHtmlContent;
+
+        // Find and replace all placeholder text with button elements
+        backlinksArray.forEach(backlink => {
+            const innerText = backlink.slice(2, -2);
+            const [linkText, linkURL] = innerText.includes('|') ? innerText.split('|') : [innerText, `${siteUrl}/${encodeURIComponent(innerText)}`];
+            const placeholder = `BACKLINK_PLACEHOLDER_${linkText.replace(/ /g, '_')}`;
+            const buttonElement = createBacklinkButton(linkText, linkURL);
+            // Replace the placeholder with the button element
+            tempContainer.innerHTML = tempContainer.innerHTML.replace(placeholder, buttonElement.outerHTML);
+        });
+        return tempContainer;
+    }
+    function createBacklinkButton(linkText, linkURL) {
+        const buttonElement = document.createElement('button');
+        buttonElement.textContent = linkText;
+        buttonElement.classList.add('btn');
+        buttonElement.addEventListener('click', () => {
+            console.log(`URL: ${linkURL}`);
+        });
+        return buttonElement;
+    }
+</script>
+
+<script>
     document.addEventListener('obisidianFileSelect', function (event) {
         const filePath = event.detail;
         console.log("filePath: " + filePath);
@@ -32,25 +102,6 @@
         try {
             const backlinks_parsed = JSON.parse(backlinks);
 
-            // for (const parsedFilePath in backlinks_parsed) {
-            //     if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-            //         if (parsedFilePath === filePath) {
-            //             console.log("parsedFilePath === filePath");
-            //             const entry = backlinks_parsed[parsedFilePath];
-            //             if (entry.backlink_words && entry.backlink_words.length > 0) {
-            //                 entry.backlink_words.forEach(word => {
-            //                     console.log(filePath + " word " + word);
-            //                 });
-            //             }
-            //             if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-            //                 entry.backlink_paths.forEach(path => {
-            //                     console.log(filePath + " path " + path);
-            //                 });
-            //             }
-            //             break;  // Exit the loop after finding the matching filePath
-            //         }
-            //     }
-            // }
             let linked_mentions = [];
 
             for (const parsedFilePath in backlinks_parsed) {
@@ -81,14 +132,28 @@
                 return response.text();
             })
             .then(content => {
-                console.log('File size:', content.length);
+                const backlinksArr = content.match(/\[\[([^\]]+)\]\]/g);
+                if (backlinksArr) {
+                    if (backlinksArr) {
+                        backlinksArr.forEach(backlink => {
+                            const innerText = backlink.slice(2, -2);
+                            const [linkText, linkURL] = innerText.includes('|') ? innerText.split('|') : [innerText, `http://127.0.0.1:4000/path/to/${encodeURIComponent(innerText)}.md`];
+                            const placeholder = `BACKLINK_PLACEHOLDER_${linkText.replace(/ /g, '_')}`;
+                            content = content.replace(backlink, placeholder);
+                        });
+                    }
+                }
 
+                // Render the markdown content
                 const md = window.markdownit();
-                const htmlContent = md.render(content);
-                const cleanHtmlContent = DOMPurify.sanitize(htmlContent);
+                let htmlContent = md.render(content);
+                let cleanHtmlContent = DOMPurify.sanitize(htmlContent);
+
+                // Create a temporary container to manipulate the HTML content
+                const finalHtmlContent = generateBacklinks(cleanHtmlContent, backlinksArr);
 
                 document.getElementById('file-title').textContent = fileName;
-                document.getElementById('file-content').innerHTML = cleanHtmlContent;
+                document.getElementById('file-content').innerHTML = finalHtmlContent.innerHTML;
             })
             .catch(error => {
                 console.error('Error fetching file:', error);
