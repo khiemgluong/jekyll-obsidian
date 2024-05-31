@@ -54,23 +54,6 @@
         });
     }
 
-    function generateBacklinks(cleanHtmlContent, backlinksArray) {
-        const siteUrl = '{{ site.url | escape }}';
-        console.log("siteUrl: " + siteUrl);
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = cleanHtmlContent;
-
-        // Find and replace all placeholder text with button elements
-        backlinksArray.forEach(backlink => {
-            const innerText = backlink.slice(2, -2);
-            const [linkText, linkURL] = innerText.includes('|') ? innerText.split('|') : [innerText, `${siteUrl}/${encodeURIComponent(innerText)}`];
-            const placeholder = `BACKLINK_PLACEHOLDER_${linkText.replace(/ /g, '_')}`;
-            const buttonElement = createBacklinkButton(linkText, linkURL);
-            // Replace the placeholder with the button element
-            tempContainer.innerHTML = tempContainer.innerHTML.replace(placeholder, buttonElement.outerHTML);
-        });
-        return tempContainer;
-    }
     function createBacklinkButton(linkText, linkURL) {
         const buttonElement = document.createElement('button');
         buttonElement.textContent = linkText;
@@ -132,28 +115,37 @@
                 return response.text();
             })
             .then(content => {
-                const backlinksArr = content.match(/\[\[([^\]]+)\]\]/g);
-                if (backlinksArr) {
-                    if (backlinksArr) {
-                        backlinksArr.forEach(backlink => {
-                            const innerText = backlink.slice(2, -2);
-                            const [linkText, linkURL] = innerText.includes('|') ? innerText.split('|') : [innerText, `http://127.0.0.1:4000/path/to/${encodeURIComponent(innerText)}.md`];
-                            const placeholder = `BACKLINK_PLACEHOLDER_${linkText.replace(/ /g, '_')}`;
-                            content = content.replace(backlink, placeholder);
-                        });
-                    }
-                }
 
-                // Render the markdown content
                 const md = window.markdownit();
                 let htmlContent = md.render(content);
                 let cleanHtmlContent = DOMPurify.sanitize(htmlContent);
 
-                // Create a temporary container to manipulate the HTML content
-                const finalHtmlContent = generateBacklinks(cleanHtmlContent, backlinksArr);
+                const backlinksBtns = document.createElement('div');
+                backlinksBtns.innerHTML = htmlContent;
+
+                const backlinksArr = content.match(/\[\[([^\]]+)\]\]/g);
+                if (backlinksArr) {
+                    backlinksArr.forEach(backlink => {
+                        const innerText = backlink.slice(2, -2);
+                        const button = document.createElement('button');
+                        button.textContent = innerText;
+                        button.className = 'backlink';
+
+                        backlinksBtns.innerHTML = backlinksBtns.innerHTML.replace(backlink, button.outerHTML);
+                    });
+
+                }
 
                 document.getElementById('file-title').textContent = fileName;
-                document.getElementById('file-content').innerHTML = finalHtmlContent.innerHTML;
+                document.getElementById('file-content').innerHTML = backlinksBtns.innerHTML;
+
+                backlinksBtns.remove();
+
+                document.querySelectorAll('.backlink').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        console.log(event.target.textContent);
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error fetching file:', error);
