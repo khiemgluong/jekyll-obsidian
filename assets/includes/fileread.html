@@ -1,22 +1,69 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.4/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.4/purify.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script> -->
+
+    <style>
+        .backlink,
+        .linked-mentions.title {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .backlink {
+            color: rgb(0, 153, 255);
+        }
+
+        #file-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 0.8em;
+            margin-bottom: 0.4em;
+        }
+
+
+        #linked-mentions {
+            font-size: 1.2em;
+            width: 100%;
+            margin-top: 8rem;
+            margin-bottom: 0.4em;
+            padding: 0.4em 0;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .linked-mentions.title {
+            font-size: .85em;
+        }
+    </style>
 </head>
 
 <body>
     <div id="file-title"></div>
     <div id="file-content"> </div>
-    <div id="linked-mentions">Linked mentions</div>
+    <ul id="linked-mentions">Linked mentions</ul>
     <div id="unlinked-mentions">Unlinked mentions</div>
 
 </body>
 
 <script>
+    function extractFilenameFromPath(filePath) {
+        return filePath.split('/').pop().replace(/\.[^/.]+$/, "");
+    }
+</script>
 
+<script>
     function loadFile(filePath) {
+        let enable_backlinks = '{{ site.obsidian_backlinks | escape }}';
+        if (enable_backlinks === null ||
+            enable_backlinks === '' ||
+            enable_backlinks === undefined)
+            enable_backlinks = true;
+        if (enable_backlinks === false) return;
         console.log("filePath: " + filePath);
-        const fileName = filePath.split('/').pop().replace(/\.[^/.]+$/, "");
+        const fileName = extractFilenameFromPath(filePath);
         console.log("FileName: " + fileName);
         const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
 
@@ -25,30 +72,12 @@
 
         const backlinks = '{{ site.data.backlinks | jsonify }}'
 
-        let enable_backlinks = '{{ site.obsidian_backlinks | escape }}';
-        if (!enable_backlinks) enable_backlinks = true;
         console.log("Enable backlinks: " + enable_backlinks);
         let backlinks_parsed = null;
         try {
             backlinks_parsed = JSON.parse(backlinks);
-            let linked_mentions = [];
+            matchLinkedMentions(filePath, backlinks_parsed);
 
-            for (const parsedFilePath in backlinks_parsed) {
-                if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                    const entry = backlinks_parsed[parsedFilePath];
-                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                        entry.backlink_paths.forEach(path => {
-                            if (path === filePath && !linked_mentions.includes(parsedFilePath)) {
-                                linked_mentions.push(parsedFilePath);
-                            }
-                        });
-                    }
-                }
-            }
-
-            linked_mentions.forEach(root => {
-                console.log("Linked mention root: " + root);
-            });
         } catch (e) {
             console.error("Error parsing backlinks:", e);
         }
@@ -56,18 +85,17 @@
         fetch(selectedFilePathFull)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
+                    throw new Error('Network response: ' + response.statusText);
                 }
                 return response.text();
             })
             .then(content => {
-
                 const md = window.markdownit();
                 let htmlContent = md.render(content);
                 let cleanHtmlContent = DOMPurify.sanitize(htmlContent);
 
                 const backlinksBtns = document.createElement('div');
-                backlinksBtns.innerHTML = htmlContent;
+                backlinksBtns.innerHTML = DOMPurify.sanitize(htmlContent);
 
                 const backlinksArr = content.match(/\[\[([^\]]+)\]\]/g);
                 if (backlinksArr) {
@@ -77,9 +105,9 @@
                         button.textContent = innerText;
                         button.className = 'backlink';
 
-                        backlinksBtns.innerHTML = backlinksBtns.innerHTML.replace(backlink, button.outerHTML);
+                        backlinksBtns.innerHTML =
+                            backlinksBtns.innerHTML.replace(backlink, button.outerHTML);
                     });
-
                 }
                 document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = backlinksBtns.innerHTML;
@@ -114,13 +142,13 @@
                             console.log(filePath + " path " + path);
                         });
                     }
-                    break;  // Exit the loop after finding the matching filePath
+                    break;
                 }
             }
         }
     }
 
-    function matchLinkedMentions(backlinks_parsed) {
+    function matchLinkedMentions(filePath, backlinks_parsed) {
         let linked_mentions = [];
         for (const parsedFilePath in backlinks_parsed) {
             if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
@@ -134,18 +162,33 @@
                 }
             }
         }
-        linked_mentions.forEach(root => {
-            console.log("Linked mention root: " + root);
+        linked_mentions.forEach(linkedMentionPath => {
+            console.log("Linked mention root: " + linkedMentionPath);
+            const li = document.createElement('li');
+            const fileName = extractFilenameFromPath(linkedMentionPath);
+            // li.textContent = fileName;
+            const linkedMentions = document.getElementById('linked-mentions');
+            linkedMentions.appendChild(li);
+            li.classList.add('linked-mentions', 'title');
+
+            const button = document.createElement('button');
+            const decodedString = he.decode(fileName);
+
+            button.textContent = decodedString;
+            button.innerHTML =
+                DOMPurify.sanitize(getSVGArrow(false) + button.textContent);
+            li.appendChild(button);
+
+            // console.log("appended child: " + fileName);
         });
     }
 
     function findButtonBacklink(buttonString, backlinks_parsed) {
-
         for (const parsedFilePath in backlinks_parsed) {
             if (parsedFilePath.endsWith('/')) {
                 parsedFilePath = parsedFilePath.slice(0, -1);
             }
-            const fileName = parsedFilePath.split('/').pop().replace(/\.[^/.]+$/, "").replace(/`/g, "'");
+            const fileName = extractFilenameFromPath(parsedFilePath).replace(/`/g, "'");
             if (fileName === buttonString) {
                 console.log("Parsed file path name : " + parsedFilePath);
             }
@@ -167,42 +210,10 @@
     document.addEventListener('DOMContentLoaded', () => {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         console.log("file read loaded: " + homepage);
-        if (homepage)
-            loadFile('/' + homepage);
+        if (homepage) loadFile('/' + homepage);
     });
 
     document.addEventListener('obisidianFileSelect', function (event) {
-        const filePath = event.detail;
-        loadFile(filePath);
+        loadFile(event.detail);
     });
-
 </script>
-
-<style>
-    .backlink {
-        background: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        cursor: pointer;
-        color: rgb(0, 153, 255);
-        /* Optional: Add a color to make it look like a link */
-    }
-
-    #file-title {
-        font-size: 2em;
-        font-weight: bold;
-        margin-top: 0.8em;
-        margin-bottom: 0.4em;
-    }
-
-
-    #linked-mentions {
-        font-size: 1.2em;
-        width: 100%;
-        margin-top: 8rem;
-        margin-bottom: 0.4em;
-        padding: 0.4em 0;
-        border-top: 1px solid #e0e0e0;
-    }
-</style>

@@ -4,6 +4,60 @@
 <head>
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
         integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.4/purify.min.js"></script>
+
+    <style>
+        .page-content {
+            display: flex;
+            height: 100%;
+            padding: 0 0 15px 0;
+            max-height: 100vh;
+        }
+
+        #obsidian {
+            display: inherit;
+            width: 100%;
+            height: 100%;
+            max-height: 90vh;
+        }
+
+        #obsidian>* {
+            height: 93.5vh;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        #obsidian #sidebar {
+            display: flex;
+            width: 3%;
+            flex-direction: column;
+            align-items: flex-start;
+            background-color: #f6f6f6;
+        }
+
+        #obsidian #explorer {
+            overflow-y: auto;
+            max-height: 100vh;
+            width: 16%;
+            background-color: #f6f6f6;
+        }
+
+        #obsidian #fileread {
+            flex: 1;
+            padding: 0 8rem;
+            overflow-y: auto;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+
+        #file-tree::-webkit-scrollbar,
+        #file-read::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 </head>
 
 {%- include head.html -%}
@@ -27,56 +81,19 @@
     <!-- {%- include footer.html -%} -->
 </body>
 
+<script>
+    function getSVGArrow(expanded) {
+        if (expanded)
+            return `
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="dynamic-svg" viewBox="0 0 24 24" fill="none">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 9 7 7 7-7"/>
+                </svg>`;
+        else
+            return `
+                <svg class="dynamic-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+                </svg>`;
+    }
+</script>
+
 </html>
-
-<style>
-    .page-content {
-        display: flex;
-        height: 100%;
-        padding: 0 0 15px 0;
-        max-height: 100vh;
-    }
-
-    #obsidian {
-        display: inherit;
-        width: 100%;
-        height: 100%;
-        max-height: 90vh;
-    }
-
-    #obsidian>* {
-        height: 93.5vh;
-        border-right: 1px solid #e0e0e0;
-    }
-
-    #obsidian #sidebar {
-        display: flex;
-        width: 3%;
-        flex-direction: column;
-        align-items: flex-start;
-        background-color: #f6f6f6;
-    }
-
-    #obsidian #explorer {
-        overflow-y: auto;
-        max-height: 100vh;
-        width: 16%;
-        background-color: #f6f6f6;
-    }
-
-    #obsidian #fileread {
-        flex: 1;
-        padding: 0 8rem;
-        overflow-y: auto;
-        max-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-
-    #file-tree::-webkit-scrollbar,
-    #file-read::-webkit-scrollbar {
-        display: none;
-    }
-</style>
