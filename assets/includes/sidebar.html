@@ -1,4 +1,68 @@
 <body>
-    <div>
-        amogus</div>
+    <div id="sidebarcontainer">
+        <div class="top-container">
+            <button id="homepage">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
+                </svg>
+            </button>
+        </div>
+        <div class="bottom-container">
+            <button id="info">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
 </body>
+
+<script>
+    document.getElementById('homepage').addEventListener('click', () => {
+        const homepage = '{{ site.obsidian_homepage | escape }}'
+        if (homepage) {
+            var event = new CustomEvent('obisidianFileSelect', { detail: '/' + homepage });
+            document.dispatchEvent(event);
+            console.log("Homepage: " + homepage);
+        }
+    });
+</script>
+
+<style>
+    button {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    #sidebarcontainer {
+        display: flex;
+        flex-direction: column;
+        height: inherit;
+        width: 100%;
+    }
+
+    .top-container,
+    .bottom-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .top-container {
+        justify-content: flex-start;
+        /* Align children to the top */
+    }
+
+    .bottom-container {
+        justify-content: flex-end;
+        /* Align children to the bottom */
+    }
+</style>

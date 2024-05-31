@@ -13,61 +13,8 @@
 </body>
 
 <script>
-    function matchBacklinks(backlinks_parsed) {
-        for (const parsedFilePath in backlinks_parsed) {
-            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                if (parsedFilePath === filePath) {
-                    console.log("parsedFilePath === filePath");
-                    const entry = backlinks_parsed[parsedFilePath];
-                    if (entry.backlink_words && entry.backlink_words.length > 0) {
-                        entry.backlink_words.forEach(word => {
-                            console.log(filePath + " word " + word);
-                        });
-                    }
-                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                        entry.backlink_paths.forEach(path => {
-                            console.log(filePath + " path " + path);
-                        });
-                    }
-                    break;  // Exit the loop after finding the matching filePath
-                }
-            }
-        }
-    }
 
-    function matchLinkedMentions(backlinks_parsed) {
-        let linked_mentions = [];
-        for (const parsedFilePath in backlinks_parsed) {
-            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                const entry = backlinks_parsed[parsedFilePath];
-                if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                    entry.backlink_paths.forEach(path => {
-                        if (path === filePath && !linked_mentions.includes(parsedFilePath)) {
-                            linked_mentions.push(parsedFilePath);
-                        }
-                    });
-                }
-            }
-        }
-        linked_mentions.forEach(root => {
-            console.log("Linked mention root: " + root);
-        });
-    }
-
-    function createBacklinkButton(linkText, linkURL) {
-        const buttonElement = document.createElement('button');
-        buttonElement.textContent = linkText;
-        buttonElement.classList.add('btn');
-        buttonElement.addEventListener('click', () => {
-            console.log(`URL: ${linkURL}`);
-        });
-        return buttonElement;
-    }
-</script>
-
-<script>
-    document.addEventListener('obisidianFileSelect', function (event) {
-        const filePath = event.detail;
+    function loadFile(filePath) {
         console.log("filePath: " + filePath);
         const fileName = filePath.split('/').pop().replace(/\.[^/.]+$/, "");
         console.log("FileName: " + fileName);
@@ -78,13 +25,12 @@
 
         const backlinks = '{{ site.data.backlinks | jsonify }}'
 
-        // console.log("Backlinks JSON string:", backlinks);
         let enable_backlinks = '{{ site.obsidian_backlinks | escape }}';
         if (!enable_backlinks) enable_backlinks = true;
         console.log("Enable backlinks: " + enable_backlinks);
+        let backlinks_parsed = null;
         try {
-            const backlinks_parsed = JSON.parse(backlinks);
-
+            backlinks_parsed = JSON.parse(backlinks);
             let linked_mentions = [];
 
             for (const parsedFilePath in backlinks_parsed) {
@@ -135,14 +81,16 @@
                     });
 
                 }
-
                 document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = backlinksBtns.innerHTML;
 
                 backlinksBtns.remove();
 
                 document.querySelectorAll('.backlink').forEach(button => {
+                    const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
+                    button.style.fontSize = parentFontSize;
                     button.addEventListener('click', (event) => {
+                        findButtonBacklink(event.target.textContent, backlinks_parsed);
                         console.log(event.target.textContent);
                     });
                 });
@@ -150,11 +98,97 @@
             .catch(error => {
                 console.error('Error fetching file:', error);
             });
+    }
+    function matchBacklinks(backlinks_parsed) {
+        for (const parsedFilePath in backlinks_parsed) {
+            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+                if (parsedFilePath === filePath) {
+                    const entry = backlinks_parsed[parsedFilePath];
+                    if (entry.backlink_words && entry.backlink_words.length > 0) {
+                        entry.backlink_words.forEach(word => {
+                            console.log(filePath + " word " + word);
+                        });
+                    }
+                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                        entry.backlink_paths.forEach(path => {
+                            console.log(filePath + " path " + path);
+                        });
+                    }
+                    break;  // Exit the loop after finding the matching filePath
+                }
+            }
+        }
+    }
+
+    function matchLinkedMentions(backlinks_parsed) {
+        let linked_mentions = [];
+        for (const parsedFilePath in backlinks_parsed) {
+            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
+                const entry = backlinks_parsed[parsedFilePath];
+                if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+                    entry.backlink_paths.forEach(path => {
+                        if (path === filePath && !linked_mentions.includes(parsedFilePath)) {
+                            linked_mentions.push(parsedFilePath);
+                        }
+                    });
+                }
+            }
+        }
+        linked_mentions.forEach(root => {
+            console.log("Linked mention root: " + root);
+        });
+    }
+
+    function findButtonBacklink(buttonString, backlinks_parsed) {
+
+        for (const parsedFilePath in backlinks_parsed) {
+            if (parsedFilePath.endsWith('/')) {
+                parsedFilePath = parsedFilePath.slice(0, -1);
+            }
+            const fileName = parsedFilePath.split('/').pop().replace(/\.[^/.]+$/, "").replace(/`/g, "'");
+            if (fileName === buttonString) {
+                console.log("Parsed file path name : " + parsedFilePath);
+            }
+        }
+    }
+
+    function createBacklinkButton(linkText, linkURL) {
+        const buttonElement = document.createElement('button');
+        buttonElement.textContent = linkText;
+        buttonElement.classList.add('btn');
+        buttonElement.addEventListener('click', () => {
+            console.log(`URL: ${linkURL}`);
+        });
+        return buttonElement;
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepage = '{{ site.obsidian_homepage | escape }}'
+        console.log("file read loaded: " + homepage);
+        if (homepage)
+            loadFile('/' + homepage);
+    });
+
+    document.addEventListener('obisidianFileSelect', function (event) {
+        const filePath = event.detail;
+        loadFile(filePath);
     });
 
 </script>
 
 <style>
+    .backlink {
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        color: rgb(0, 153, 255);
+        /* Optional: Add a color to make it look like a link */
+    }
+
     #file-title {
         font-size: 2em;
         font-weight: bold;

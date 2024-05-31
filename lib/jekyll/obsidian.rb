@@ -29,6 +29,7 @@ module Jekyll
         else
           puts "Backlinks disabled"
         end
+        obsidian_homepage = site.config["obsidian_homepage"]
 
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
