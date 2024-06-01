@@ -15,7 +15,10 @@
             max-height: 100vh;
         }
 
+
         #obsidian {
+            --color-border: #e0e0e0;
+            --color-tinted: #f6f6f6;
             display: inherit;
             width: 100%;
             height: 100%;
@@ -24,7 +27,6 @@
 
         #obsidian>* {
             height: 93.5vh;
-            border-right: 1px solid #e0e0e0;
         }
 
         #obsidian #sidebar {
@@ -32,26 +34,37 @@
             width: 3%;
             flex-direction: column;
             align-items: flex-start;
-            background-color: #f6f6f6;
+            background-color: var(--color-tinted);
         }
 
         #obsidian #explorer {
             overflow-y: auto;
             max-height: 100vh;
-            width: 16%;
-            background-color: #f6f6f6;
+            width: 15%;
+            background-color: var(--color-tinted);
+        }
+
+        #obsidian #divider {
+            width: 4px;
+            border-left: 1px solid var(--color-border);
+            cursor: ew-resize;
+            position: relative;
+            transition: background-color 0.4s ease;
+        }
+
+        #obsidian #divider:hover {
+            background-color: red;
         }
 
         #obsidian #fileread {
             flex: 1;
-            padding: 0 8rem;
+            padding: 0 10rem;
             overflow-y: auto;
             max-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
         }
-
 
         #file-tree::-webkit-scrollbar,
         #file-read::-webkit-scrollbar {
@@ -73,6 +86,8 @@
             <div id="explorer">
                 {% include _obsidian/explorer.html %}
             </div>
+            <div id="divider"></div>
+
             <div id="fileread">
                 {% include _obsidian/fileread.html %}
             </div>
@@ -80,6 +95,45 @@
     </main>
     <!-- {%- include footer.html -%} -->
 </body>
+
+<!-- ----------------------------------------------------------------------- -->
+<!--                          Divider drag handler                           -->
+<!-- ----------------------------------------------------------------------- -->
+<script>
+    const divider = document.getElementById('divider');
+    const explorer = document.getElementById('explorer');
+    const fileread = document.getElementById('fileread');
+
+    let isDragging = false;
+    let startX, startWidth;
+
+    divider.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startWidth = explorer.getBoundingClientRect().width;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+
+        let offset = e.clientX - startX;
+        let newWidth = startWidth + offset;
+        let explorerWidth = newWidth / window.innerWidth * 100;
+        // Clamp width 
+        explorerWidth = Math.max(10, Math.min(explorerWidth, 55));
+        explorer.style.width = `${explorerWidth}%`;
+        fileread.style.flex = '1';
+    }
+
+    function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+</script>
+
 
 <script>
     function getSVGArrow(expanded) {
