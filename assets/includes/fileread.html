@@ -2,8 +2,8 @@
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 
     <style>
-        .backlink,
-        .linked-mentions.title {
+        #obsidian .backlink,
+        #linked-mentions .title {
             background: none;
             border: none;
             padding: 0;
@@ -11,7 +11,7 @@
             cursor: pointer;
         }
 
-        .backlink {
+        #obsidian .backlink {
             color: rgb(0, 153, 255);
         }
 
@@ -26,19 +26,49 @@
         #linked-mentions {
             font-size: 1.2em;
             width: 100%;
-            margin-top: 8rem;
-            /* margin-bottom: 0.4em; */
-            /* padding: 0.4em 0; */
+            margin: 8rem 0 0 0;
             border-top: 1px solid #e0e0e0;
         }
 
-        /* .linked-mentions.title {
-            font-size: .85em;
+        #linked-mentions ul,
+        #linked-mentions .title {
+            list-style: none;
+            padding: 0;
+            width: 95%;
         }
 
-        .linked-mentions.title button {
-            display: inline;
-        } */
+        #linked-mentions .title button {
+            font-size: .85em;
+            display: block;
+            width: auto;
+            text-align: left;
+        }
+
+        #linked-mentions button:hover {
+            background-color: #e4e4e4;
+        }
+
+        #linked-mentions button ul li.sentence {
+            width: 95%;
+            padding: 8px 5px;
+        }
+
+        #linked-mentions button ul li.sentence:first-child {
+            border: 1px solid;
+            border-top-left-radius: .6rem;
+            border-top-right-radius: .6rem;
+        }
+
+        #linked-mentions button ul li.sentence:not(:first-child) {
+            border-bottom: 1px solid;
+            border-left: 1px solid;
+            border-right: 1px solid;
+        }
+
+        #linked-mentions button ul li.sentence:last-child {
+            border-bottom-left-radius: .6rem;
+            border-bottom-right-radius: .6rem;
+        }
     </style>
 </head>
 
@@ -172,7 +202,7 @@
             const linkedPathName = extractFilenameFromPath(linkedMentionPath);
             const linkedMentions = document.getElementById('linked-mentions');
             linkedMentions.appendChild(li);
-            li.classList.add('linked-mentions', 'title');
+            li.classList.add('title');
 
             const button = document.createElement('button');
             const decodedString = he.decode(linkedPathName);
@@ -192,36 +222,29 @@
                 }
                 return response.text();
             }).then(content => {
-                // readLinkedMentionContent(content);
-                // const ul_linkedMention = document.createElement('ul');
-                // button.appendChild(ul_linkedMention);
-                // const backlinksArr = extractBacklinksFromContent(content);
-                // if (backlinksArr) {
-                //     backlinksArr.forEach(backlink => {
-                //         const cleanedBacklink = backlink.replace(/\[\[(.*?)\]\]/g, '$1');
-                //         console.log("Backlink: " + cleanedBacklink);
-                //         if (cleanedBacklink === filePathName) {
-                //             console.log("Matching file backlink: " + filePathName);
-                //             const li_linkedMention = document.createElement('li');
-                //             li_linkedMention.textContent = cleanedBacklink;
-                //             li_linkedMention.classList.add('linked-mentions', 'sentence');
-                //             ul_linkedMention.appendChild(li_linkedMention);
-                //         }
-                //     });
-                // }
-                // console.log("Content from linkedMentioned path: " + content)
+                const ul_linkedMention = document.createElement('ul');
+                button.appendChild(ul_linkedMention);
+                const backlink = `[[${filePathName}]]`;
+                console.log("backlink: " + backlink);
+                let lines = content.split('\n');
+                // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
+
+                let sentences = [];
+                lines.forEach(line => {
+                    if (line.includes(backlink)) {
+                        sentences.push(line);
+                        console.log("line: " + line);
+                        const li_linkedMention = document.createElement('li');
+                        li_linkedMention.textContent = line;
+                        li_linkedMention.classList.add('sentence');
+                        ul_linkedMention.appendChild(li_linkedMention);
+                    }
+                });
 
             }).catch(error => {
                 console.error('Error fetching file:', error);
             });
         });
-    }
-
-    function readLinkedMentionContent(linkedMentionContent) {
-        const backlinksArr = extractBacklinksFromContent(linkedMentionContent);
-        if (backlinksArr) {
-
-        }
     }
 
     function findButtonBacklink(buttonString, backlinks_parsed) {
