@@ -122,9 +122,8 @@
         let newWidth = startWidth + offset;
         let explorerWidth = newWidth / window.innerWidth * 100;
         // Clamp width 
-        explorerWidth = Math.max(10, Math.min(explorerWidth, 55));
+        explorerWidth = Math.max(10, Math.min(explorerWidth, 50));
         explorer.style.width = `${explorerWidth}%`;
-        fileread.style.flex = '1';
     }
 
     function onMouseUp() {
