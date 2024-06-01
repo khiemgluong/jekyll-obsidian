@@ -89,12 +89,14 @@
             if (child.type === 'dir') {
                 li.classList.add('dir');
 
-                button.innerHTML = DOMPurify.sanitize(getSVGArrow(false) + button.textContent);
+                button.innerHTML =
+                    DOMPurify.sanitize(getSVGArrow(false) + button.textContent);
 
                 var expanded = false;
                 button.addEventListener('click', () => {
                     expanded = !expanded;
-                    button.innerHTML = DOMPurify.sanitize(getSVGArrow(expanded) + button.textContent);
+                    button.innerHTML =
+                        DOMPurify.sanitize(getSVGArrow(expanded) + button.textContent);
 
                     if (expanded) {
                         if (!li.querySelector('ul'))
