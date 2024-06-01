@@ -92,6 +92,11 @@
     function extractBacklinksFromContent(content) {
         return content.match(/\[\[([^\]]+)\]\]/g);
     }
+    function restoreOriginalJsonPath(parsedPath) {
+
+        return parsedPath.replace(/`/g, "'");
+
+    }
 </script>
 
 <script>
@@ -100,88 +105,101 @@
         if (enable_backlinks === null ||
             enable_backlinks === '' ||
             enable_backlinks === undefined)
-            enable_backlinks = true;
-        if (enable_backlinks === false) return;
+            enable_backlinks = "true";
+        console.log("enable_backlinks: " + enable_backlinks);
+
         console.log("filePath: " + filePath);
         const fileName = extractFilenameFromPath(filePath);
+        // const fileName2 = restoreOriginalJsonPath(fileName);
         console.log("FileName: " + fileName);
         const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
 
         const selectedFilePathFull = vaultpath + filePath;
         console.log("vault+filePath: " + selectedFilePathFull)
 
-        const backlinks = '{{ site.data.backlinks | jsonify }}'
-
-        console.log("Enable backlinks: " + enable_backlinks);
-        let backlinks_parsed = null;
-        try {
-            backlinks_parsed = JSON.parse(backlinks);
-            generateLinkedMentions(filePath, backlinks_parsed);
-
-        } catch (e) {
-            console.error("Error parsing backlinks:", e);
-        }
-
-        fetch(selectedFilePathFull).then(response => {
-            if (!response.ok)
-                throw new Error('Network response: ' + response.statusText);
-            return response.text();
-        }).then(content => {
-            const md = window.markdownit();
-            let htmlContent = md.render(content);
-            let cleanHtmlContent = DOMPurify.sanitize(htmlContent);
-
-            const backlinksBtns = document.createElement('div');
-            backlinksBtns.innerHTML = DOMPurify.sanitize(htmlContent);
-
-            const backlinksArr = extractBacklinksFromContent(content);
-            if (backlinksArr) {
-                backlinksArr.forEach(backlink => {
-                    const innerText = backlink.slice(2, -2);
-                    const button = document.createElement('button');
-                    button.textContent = innerText;
-                    button.className = 'backlink';
-
-                    backlinksBtns.innerHTML =
-                        backlinksBtns.innerHTML.replace(backlink, button.outerHTML);
-                });
+        if (enable_backlinks === "true") {
+            const backlinks = '{{ site.data.backlinks | jsonify }}'
+            let backlinks_parsed = null;
+            try {
+                backlinks_parsed = JSON.parse(backlinks);
+                generateLinkedMentions(filePath, backlinks_parsed);
+            } catch (e) {
+                console.error("Error parsing backlinks:", e);
             }
-            document.getElementById('file-title').textContent = fileName;
-            document.getElementById('file-content').innerHTML = backlinksBtns.innerHTML;
 
-            document.getElementById('fileread').scrollTop = 0;
-            backlinksBtns.remove();
+            fetch(selectedFilePathFull).then(response => {
+                if (!response.ok)
+                    throw new Error('Network response: ' + response.statusText);
+                return response.text();
+            }).then(content => {
+                const md = window.markdownit();
+                let htmlContent = md.render(content);
 
-            document.querySelectorAll('.backlink').forEach(button => {
-                const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
-                button.style.fontSize = parentFontSize;
-                button.addEventListener('click', (event) => {
-                    findButtonBacklink(event.target.textContent, backlinks_parsed);
-                    console.log(event.target.textContent);
-                });
-            });
-        }).catch(error => {
-            console.error('Error fetching file:', error);
-        });
-    }
-    function matchBacklinks(backlinks_parsed) {
-        for (const parsedFilePath in backlinks_parsed) {
-            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                if (parsedFilePath === filePath) {
-                    const entry = backlinks_parsed[parsedFilePath];
-                    if (entry.backlink_words && entry.backlink_words.length > 0) {
-                        entry.backlink_words.forEach(word => {
-                            console.log(filePath + " word " + word);
-                        });
-                    }
-                    if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                        entry.backlink_paths.forEach(path => {
-                            console.log(filePath + " path " + path);
-                        });
-                    }
-                    break;
+                const cleanedHTML = document.createElement('div');
+                cleanedHTML.innerHTML = DOMPurify.sanitize(htmlContent);
+
+                const backlinksArr = extractBacklinksFromContent(content);
+                if (backlinksArr) {
+                    backlinksArr.forEach(backlink => {
+                        const innerText = backlink.slice(2, -2);
+                        const button = document.createElement('button');
+                        button.textContent = innerText;
+                        button.className = 'backlink';
+
+                        cleanedHTML.innerHTML =
+                            cleanedHTML.innerHTML.replace(backlink, button.outerHTML);
+                    });
                 }
-            }
+                // const md = window.markdownit();
+                // let htmlContent = md.render(content);
+                document.getElementById('file-title').textContent = fileName;
+                document.getElementById('file-content').innerHTML = cleanedHTML.innerHTML;
+
+                document.getElementById('fileread').scrollTop = 0;
+                cleanedHTML.remove();
+
+                if (enable_backlinks === "true") {
+                    document.querySelectorAll('.backlink').forEach(button => {
+                        const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
+                        button.style.fontSize = parentFontSize;
+                        button.addEventListener('click', (event) => {
+                            findButtonBacklink(event.target.textContent, backlinks_parsed);
+                            console.log(event.target.textContent);
+                        });
+                    });
+                }
+            }).catch(error => {
+                console.error('Error fetching file:', error);
+            });
+        } else {
+            fetch(selectedFilePathFull).then(response => {
+                if (!response.ok)
+                    throw new Error('Network response: ' + response.statusText);
+                return response.text();
+            }).then(content => {
+                const md = window.markdownit();
+                let htmlContent = md.render(content);
+
+                const cleanedHTML = document.createElement('div');
+                cleanedHTML.innerHTML = DOMPurify.sanitize(htmlContent);
+
+                const backlinksArr = extractBacklinksFromContent(content);
+                if (backlinksArr) {
+                    backlinksArr.forEach(backlink => {
+                        const innerText = backlink.slice(2, -2);
+                        cleanedHTML.innerHTML =
+                            cleanedHTML.innerHTML.replace(backlink, innerText);
+                    });
+                }
+                document.getElementById('file-title').textContent = fileName;
+                document.getElementById('file-content').innerHTML = cleanedHTML.innerHTML;
+
+                document.getElementById('fileread').scrollTop = 0;
+                cleanedHTML.remove();
+
+            }).catch(error => {
+                console.error('Error fetching file:', error);
+            });
         }
     }
 
@@ -224,37 +242,48 @@
             li.appendChild(button);
 
             const vaultPath = '/' + '{{ site.obsidian_vault | escape }}'
-            const linkedMentionedPathFull = vaultPath + linkedMentionPath;
-            button.dataset.filePath = linkedMentionedPathFull;
+            const linkedMentionPathFull = vaultPath + linkedMentionPath;
+
+            button.dataset.filePath = linkedMentionPathFull;
             button.addEventListener('click', function () {
                 const filePath = this.dataset.filePath.replace(vaultPath, '');
                 var event = new CustomEvent('obisidianFileSelect', { detail: filePath });
                 document.dispatchEvent(event);
             });
-            fetch(linkedMentionedPathFull).then(response => {
-                if (!response.ok)
-                    throw new Error('Network response: ' + response.statusText);
-                return response.text();
-            }).then(content => {
-                const ul_linkedMention = document.createElement('ul');
-                button.appendChild(ul_linkedMention);
-                const backlink = `[[${filePathName}]]`;
-                let lines = content.split('\n');
-                // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
+            const linkedMentionPathFull2 = linkedMentionPathFull.replace(/`/g, "'");
 
-                let sentences = [];
-                lines.forEach(line => {
-                    if (line.includes(backlink)) {
-                        sentences.push(line);
-                        const li_linkedMention = document.createElement('li');
-                        li_linkedMention.textContent = line;
-                        li_linkedMention.classList.add('sentence');
-                        ul_linkedMention.appendChild(li_linkedMention);
+            fetch(linkedMentionPathFull)
+                .then(response => {
+                    if (!response.ok) {
+                        console.log("ignore error above.", response.statusText);
+                        return fetch(linkedMentionPathFull2)
+                            .then(response => {
+                                if (!response.ok)
+                                    console.log("Error fetching file:", response.statusText);
+                                return response.text();
+                            });
                     }
+                    return response.text();
+                }).then(content => {
+                    const ul_linkedMention = document.createElement('ul');
+                    button.appendChild(ul_linkedMention);
+                    const backlink = `[[${filePathName}]]`;
+                    let lines = content.split('\n');
+                    // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
+
+                    let sentences = [];
+                    lines.forEach(line => {
+                        if (line.includes(backlink)) {
+                            sentences.push(line);
+                            const li_linkedMention = document.createElement('li');
+                            li_linkedMention.textContent = line;
+                            li_linkedMention.classList.add('sentence');
+                            ul_linkedMention.appendChild(li_linkedMention);
+                        }
+                    });
+                }).catch(error => {
+                    console.error('Error fetching file:', error);
                 });
-            }).catch(error => {
-                console.error('Error fetching file:', error);
-            });
         });
     }
 

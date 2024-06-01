@@ -75,11 +75,11 @@ module Jekyll
           # puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
             next if entry.start_with?("assets", ".obsidian")
-            {name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry))}
+            { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
           else
             next unless entry.end_with?(".md", ".canvas")
             next if File.zero?(entry_path) || File.empty?(entry_path)
-            {name: entry, type: "file", path: File.join(path, entry)}
+            { name: entry, type: "file", path: File.join(path, entry) }
           end
         end
         _files
@@ -107,17 +107,15 @@ module Jekyll
             puts "File: #{file[:name]}, Path: #{entry_path}"
             links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-            jsonlinks[file[:path]] ||= {"backlink_words" => [], "backlink_paths" => []}
+            jsonlinks[file[:path]] ||= { "backlink_paths" => [] }
 
             links.each do |link|
               lowercase_link = link.downcase
               matched_entry = find_matching_entry(root_files, lowercase_link)
               if matched_entry
-                unless jsonlinks[file[:path]]["backlink_words"].include?(link)
-                  jsonlinks[file[:path]]["backlink_words"] << link
+                unless jsonlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
                   jsonlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
                 end
-                # puts "Backlink: #{link}, Path: #{matched_entry[:path]}"
               else
                 puts "Backlink: #{link}, No matching file found"
               end
@@ -152,8 +150,8 @@ module Jekyll
         backlinks.each do |path, data|
           escaped_path = path.tr("'", "`")
           escaped_data = {
-            "backlink_words" => data["backlink_words"].map { |word| word.tr("'", "`") },
-            "backlink_paths" => data["backlink_paths"].map { |path| path.tr("'", "`") }
+            # "backlink_words" => data["backlink_words"].map { |word| word.tr("'", "`") },
+            "backlink_paths" => data["backlink_paths"].map { |path| path.tr("'", "`") },
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
