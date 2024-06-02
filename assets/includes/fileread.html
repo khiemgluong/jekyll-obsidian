@@ -12,7 +12,7 @@
         }
 
         #obsidian .backlink {
-            color: rgb(0, 153, 255);
+            color: var(--color-accent);
         }
 
         #file-title {
@@ -50,24 +50,38 @@
         }
 
         #linked-mentions button:hover {
-            background-color: #e4e4e4;
+            background-color: var(--bg-linked-mention-highlight);
         }
 
         #linked-mentions button ul li.sentence {
+            color: var(--color-linked-mention-text);
             width: 96%;
             padding: 8px 5px;
+            font-size: 1rem;
+            line-height: 1.4rem;
         }
 
         #linked-mentions button ul li.sentence:first-child {
-            border: 1px solid;
+            border: 1px solid var(--color-border);
             border-top-left-radius: .6rem;
             border-top-right-radius: .6rem;
         }
 
+        #linked-mentions button ul li.sentence:first-child:hover {
+            border: 1px solid var(--color-border-dark);
+        }
+
+
         #linked-mentions button ul li.sentence:not(:first-child) {
-            border-bottom: 1px solid;
-            border-left: 1px solid;
-            border-right: 1px solid;
+            border-bottom: 1px solid var(--color-border);
+            border-left: 1px solid var(--color-border);
+            border-right: 1px solid var(--color-border);
+        }
+
+        #linked-mentions button ul li.sentence:not(:first-child):hover {
+            border-bottom: 1px solid var(--color-border-dark);
+            border-left: 1px solid var(--color-border-dark);
+            border-right: 1px solid var(--color-border-dark);
         }
 
         #linked-mentions button ul li.sentence:last-child {
@@ -179,8 +193,12 @@
                 if (backlinksArr) {
                     backlinksArr.forEach(backlink => {
                         const innerText = backlink.slice(2, -2);
+                        const span = document.createElement('span');
+                        span.textContent = innerText;
+                        span.className = 'backlink';
+
                         cleanedHTML.innerHTML =
-                            cleanedHTML.innerHTML.replace(backlink, innerText);
+                            cleanedHTML.innerHTML.replace(backlink, span.outerHTML);
                     });
                 }
                 document.getElementById('file-title').textContent = fileName;
