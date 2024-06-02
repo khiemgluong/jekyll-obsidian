@@ -92,11 +92,6 @@
     function extractBacklinksFromContent(content) {
         return content.match(/\[\[([^\]]+)\]\]/g);
     }
-    function restoreOriginalJsonPath(parsedPath) {
-
-        return parsedPath.replace(/`/g, "'");
-
-    }
 </script>
 
 <script>
@@ -110,7 +105,6 @@
 
         console.log("filePath: " + filePath);
         const fileName = extractFilenameFromPath(filePath);
-        // const fileName2 = restoreOriginalJsonPath(fileName);
         console.log("FileName: " + fileName);
         const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
 
@@ -150,8 +144,6 @@
                             cleanedHTML.innerHTML.replace(backlink, button.outerHTML);
                     });
                 }
-                // const md = window.markdownit();
-                // let htmlContent = md.render(content);
                 document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = cleanedHTML.innerHTML;
 
@@ -163,8 +155,8 @@
                         const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
                         button.style.fontSize = parentFontSize;
                         button.addEventListener('click', (event) => {
+                            console.log("click textContent: " + event.target.textContent);
                             findButtonBacklink(event.target.textContent, backlinks_parsed);
-                            console.log(event.target.textContent);
                         });
                     });
                 }
@@ -206,7 +198,7 @@
     function generateLinkedMentions(filePath, backlinks_parsed) {
         let linked_mentions = [];
         const filePathName = extractFilenameFromPath(filePath);
-        for (const parsedFilePath in backlinks_parsed) {
+        for (const parsedFilePath in backlinks_parsed)
             if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
                 const entry = backlinks_parsed[parsedFilePath];
                 if (entry.backlink_paths && entry.backlink_paths.length > 0) {
@@ -214,12 +206,11 @@
                         if (!linked_mentions.includes(parsedFilePath) &&
                             path === filePath &&
                             parsedFilePath.endsWith('.md')) {
-                            linked_mentions.push(parsedFilePath);
+                            linked_mentions.push(parsedFilePath.replace("/:|", "'"));
                         }
                     });
                 }
             }
-        }
         const linkedMentionsId = document.getElementById('linked-mentions');
         while (linkedMentionsId.firstChild)
             linkedMentionsId.removeChild(linkedMentionsId.firstChild);
@@ -250,19 +241,11 @@
                 var event = new CustomEvent('obisidianFileSelect', { detail: filePath });
                 document.dispatchEvent(event);
             });
-            const linkedMentionPathFull2 = linkedMentionPathFull.replace(/`/g, "'");
 
             fetch(linkedMentionPathFull)
                 .then(response => {
-                    if (!response.ok) {
-                        console.log("ignore error above.", response.statusText);
-                        return fetch(linkedMentionPathFull2)
-                            .then(response => {
-                                if (!response.ok)
-                                    console.log("Error fetching file:", response.statusText);
-                                return response.text();
-                            });
-                    }
+                    if (!response.ok)
+                        throw new Error('Network response: ' + response.statusText);
                     return response.text();
                 }).then(content => {
                     const ul_linkedMention = document.createElement('ul');
@@ -289,11 +272,12 @@
 
     function findButtonBacklink(buttonString, backlinks_parsed) {
         for (const parsedFilePath in backlinks_parsed) {
-            if (parsedFilePath.endsWith('/')) parsedFilePath = parsedFilePath.slice(0, -1);
-            const fileName = extractFilenameFromPath(parsedFilePath).replace(/`/g, "'");
+            let _filePath = parsedFilePath.replace("/:|", "'");
+            if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
+            const fileName = extractFilenameFromPath(_filePath);
             if (fileName === buttonString) {
-                console.log("Parsed file path name : " + parsedFilePath);
-                var event = new CustomEvent('obisidianFileSelect', { detail: parsedFilePath });
+                console.log("Parsed file path name : " + _filePath);
+                var event = new CustomEvent('obisidianFileSelect', { detail: _filePath });
                 document.dispatchEvent(event);
             }
         }

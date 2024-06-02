@@ -148,10 +148,9 @@ module Jekyll
         escaped_backlinks = {}
         # json thinks ' is a special character, so we need to escape it
         backlinks.each do |path, data|
-          escaped_path = path.tr("'", "`")
+          escaped_path = path.gsub("'", "/:|").gsub('"', '/:|')
           escaped_data = {
-            # "backlink_words" => data["backlink_words"].map { |word| word.tr("'", "`") },
-            "backlink_paths" => data["backlink_paths"].map { |path| path.tr("'", "`") },
+            "backlink_paths" => data["backlink_paths"].map { |path| path.gsub("'", "/:|").gsub('"', '/:|') },
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
