@@ -126,15 +126,6 @@
         console.log("vault+filePath: " + selectedFilePathFull)
 
         if (enable_backlinks === "true") {
-            const backlinks = '{{ site.data.backlinks | jsonify }}'
-            let backlinks_parsed = null;
-            try {
-                backlinks_parsed = JSON.parse(backlinks);
-                generateLinkedMentions(filePath, backlinks_parsed);
-            } catch (e) {
-                console.error("Error parsing backlinks:", e);
-            }
-
             fetch(selectedFilePathFull).then(response => {
                 if (!response.ok)
                     throw new Error('Network response: ' + response.statusText);
@@ -164,16 +155,16 @@
                 document.getElementById('fileread').scrollTop = 0;
                 cleanedHTML.remove();
 
-                if (enable_backlinks === "true") {
-                    document.querySelectorAll('.backlink').forEach(button => {
-                        const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
-                        button.style.fontSize = parentFontSize;
-                        button.addEventListener('click', (event) => {
-                            console.log("click textContent: " + event.target.textContent);
-                            findButtonBacklink(event.target.textContent, backlinks_parsed);
-                        });
-                    });
+                const backlinks = '{{ site.data.backlinks | jsonify }}'
+                let backlinks_parsed = null;
+                try {
+                    backlinks_parsed = JSON.parse(backlinks);
+                    generateLinkedMentions(filePath, backlinks_parsed);
+                    generateButtonBacklinks(backlinks_parsed);
+                } catch (e) {
+                    console.error("Error parsing backlinks:", e);
                 }
+
             }).catch(error => {
                 console.error('Error fetching file:', error);
             });
@@ -288,17 +279,24 @@
         });
     }
 
-    function findButtonBacklink(buttonString, backlinks_parsed) {
-        for (const parsedFilePath in backlinks_parsed) {
-            let _filePath = parsedFilePath.replace("/:|", "'");
-            if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
-            const fileName = extractFilenameFromPath(_filePath);
-            if (fileName === buttonString) {
-                console.log("Parsed file path name : " + _filePath);
-                var event = new CustomEvent('obisidianFileSelect', { detail: _filePath });
-                document.dispatchEvent(event);
-            }
-        }
+    function generateButtonBacklinks(backlinks_parsed) {
+        document.querySelectorAll('.backlink').forEach(button => {
+            const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
+            button.style.fontSize = parentFontSize;
+            button.addEventListener('click', (event) => {
+                console.log("click textContent: " + event.target.textContent);
+                for (const parsedFilePath in backlinks_parsed) {
+                    let _filePath = parsedFilePath.replace("/:|", "'");
+                    if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
+                    const fileName = extractFilenameFromPath(_filePath);
+                    if (fileName === event.target.textContent) {
+                        console.log("Parsed file path name : " + _filePath);
+                        var event = new CustomEvent('obisidianFileSelect', { detail: _filePath });
+                        document.dispatchEvent(event);
+                    }
+                }
+            });
+        });
     }
 </script>
 
