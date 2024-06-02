@@ -44,9 +44,7 @@
             display: block;
             width: auto;
             text-align: left;
-            padding-top: 5px;
-            padding-left: 10px;
-            border-radius: .6rem;
+            padding: 5px 5px 5px 10px;
         }
 
         #linked-mentions button:hover {
@@ -61,32 +59,39 @@
             line-height: 1.4rem;
         }
 
-        #linked-mentions button ul li.sentence:first-child {
+        #linked-mentions ul button.sentence:first-child {
             border: 1px solid var(--color-border);
             border-top-left-radius: .6rem;
             border-top-right-radius: .6rem;
         }
 
-        #linked-mentions button ul li.sentence:first-child:hover {
-            border: 1px solid var(--color-border-dark);
+        #linked-mentions ul button.sentence:first-child:hover {
+            border-top: 1px solid var(--color-border-dark);
+            border-left: 1px solid var(--color-border-dark);
+            border-right: 1px solid var(--color-border-dark);
         }
 
 
-        #linked-mentions button ul li.sentence:not(:first-child) {
+        #linked-mentions ul button.sentence:not(:first-child) {
             border-bottom: 1px solid var(--color-border);
             border-left: 1px solid var(--color-border);
             border-right: 1px solid var(--color-border);
         }
 
-        #linked-mentions button ul li.sentence:not(:first-child):hover {
-            border-bottom: 1px solid var(--color-border-dark);
+        #linked-mentions ul button.sentence:not(:first-child):hover {
             border-left: 1px solid var(--color-border-dark);
             border-right: 1px solid var(--color-border-dark);
         }
 
-        #linked-mentions button ul li.sentence:last-child {
+        #linked-mentions ul button.sentence:last-child {
             border-bottom-left-radius: .6rem;
             border-bottom-right-radius: .6rem;
+        }
+
+        #linked-mentions ul button.sentence:last-child:hover {
+            border-bottom: 1px solid var(--color-border-dark);
+            border-left: 1px solid var(--color-border-dark);
+            border-right: 1px solid var(--color-border-dark);
         }
     </style>
 </head>
@@ -138,17 +143,15 @@
                 cleanedHTML.innerHTML = DOMPurify.sanitize(htmlContent);
 
                 const backlinksArr = extractBacklinksFromContent(content);
-                if (backlinksArr) {
-                    backlinksArr.forEach(backlink => {
-                        const innerText = backlink.slice(2, -2);
-                        const button = document.createElement('button');
-                        button.textContent = innerText;
-                        button.className = 'backlink';
+                if (backlinksArr) backlinksArr.forEach(backlink => {
+                    const innerText = backlink.slice(2, -2);
+                    const button = document.createElement('button');
+                    button.textContent = innerText;
+                    button.className = 'backlink';
 
-                        cleanedHTML.innerHTML =
-                            cleanedHTML.innerHTML.replace(backlink, button.outerHTML);
-                    });
-                }
+                    cleanedHTML.innerHTML =
+                        cleanedHTML.innerHTML.replace(backlink, button.outerHTML);
+                });
                 document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = cleanedHTML.innerHTML;
 
@@ -181,17 +184,15 @@
                 cleanedHTML.innerHTML = DOMPurify.sanitize(htmlContent);
 
                 const backlinksArr = extractBacklinksFromContent(content);
-                if (backlinksArr) {
-                    backlinksArr.forEach(backlink => {
-                        const innerText = backlink.slice(2, -2);
-                        const span = document.createElement('span');
-                        span.textContent = innerText;
-                        span.className = 'backlink';
+                if (backlinksArr) backlinksArr.forEach(backlink => {
+                    const innerText = backlink.slice(2, -2);
+                    const span = document.createElement('span');
+                    span.textContent = innerText;
+                    span.className = 'backlink';
 
-                        cleanedHTML.innerHTML =
-                            cleanedHTML.innerHTML.replace(backlink, span.outerHTML);
-                    });
-                }
+                    cleanedHTML.innerHTML =
+                        cleanedHTML.innerHTML.replace(backlink, span.outerHTML);
+                });
                 document.getElementById('file-title').textContent = fileName;
                 document.getElementById('file-content').innerHTML = cleanedHTML.innerHTML;
 
@@ -234,23 +235,11 @@
             linkedMentionsId.appendChild(li);
             li.classList.add('title');
 
-            const button = document.createElement('button');
             const decodedString = he.decode(linkedPathName);
-
-            button.textContent = decodedString;
-            button.innerHTML = DOMPurify.sanitize(button.textContent);
-            li.appendChild(button);
+            li.textContent = decodedString;
 
             const vaultPath = '/' + '{{ site.obsidian_vault | escape }}'
             const linkedMentionPathFull = vaultPath + linkedMentionPath;
-
-            button.dataset.filePath = linkedMentionPathFull;
-            button.addEventListener('click', function () {
-                const filePath = this.dataset.filePath.replace(vaultPath, '');
-                var event = new CustomEvent('obisidianFileSelect', { detail: filePath });
-                document.dispatchEvent(event);
-            });
-
             fetch(linkedMentionPathFull)
                 .then(response => {
                     if (!response.ok)
@@ -258,7 +247,7 @@
                     return response.text();
                 }).then(content => {
                     const ul_linkedMention = document.createElement('ul');
-                    button.appendChild(ul_linkedMention);
+                    li.appendChild(ul_linkedMention);
                     const backlink = `[[${filePathName}]]`;
                     let lines = content.split('\n');
                     // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
@@ -267,10 +256,16 @@
                     lines.forEach(line => {
                         if (line.includes(backlink)) {
                             sentences.push(line);
-                            const li_linkedMention = document.createElement('li');
-                            li_linkedMention.textContent = line;
-                            li_linkedMention.classList.add('sentence');
-                            ul_linkedMention.appendChild(li_linkedMention);
+                            const btnLinkedMention = document.createElement('button');
+                            btnLinkedMention.textContent = line;
+                            btnLinkedMention.classList.add('sentence');
+                            btnLinkedMention.dataset.filePath = linkedMentionPathFull;
+                            btnLinkedMention.addEventListener('click', function () {
+                                const filePath = this.dataset.filePath.replace(vaultPath, '');
+                                var event = new CustomEvent('obisidianFileSelect', { detail: filePath });
+                                document.dispatchEvent(event);
+                            });
+                            ul_linkedMention.appendChild(btnLinkedMention);
                         }
                     });
                 }).catch(error => {
