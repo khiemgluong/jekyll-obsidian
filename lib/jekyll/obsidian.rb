@@ -29,12 +29,12 @@ module Jekyll
         else
           puts "Backlinks disabled"
         end
-        obsidian_homepage = site.config["obsidian_homepage"]
+        site.config["obsidian_homepage"]
 
         site.data["obsidian_files"] = obsidian_files
         site.data["obsidian_files_json"] = obsidian_files.to_json
 
-        obsidian_dir = File.join(File.dirname(site.dest), "_includes", "_obsidian")
+        obsidian_dir = File.join(File.dirname(site.dest), "_includes", "obsidian")
         FileUtils.mkdir_p(obsidian_dir) unless File.directory?(obsidian_dir)
 
         layouts_dir = File.join(File.dirname(site.dest), "_layouts")
@@ -45,12 +45,16 @@ module Jekyll
         puts assets_dir
         explorer = File.join(assets_dir, "includes", "explorer.html")
         fileread = File.join(assets_dir, "includes", "fileread.html")
-        sidebar = File.join(assets_dir, "includes", "sidebar.html")
+        note = File.join(assets_dir, "includes", "note.html")
+        canvas = File.join(assets_dir, "includes", "canvas.html")
 
+        sidebar = File.join(assets_dir, "includes", "sidebar.html")
         layout = File.join(assets_dir, "layouts", "obsidian.html")
 
         copy_file_to_dir(explorer, obsidian_dir)
         copy_file_to_dir(fileread, obsidian_dir)
+        copy_file_to_dir(note, obsidian_dir)
+        copy_file_to_dir(canvas, obsidian_dir)
         copy_file_to_dir(sidebar, obsidian_dir)
 
         copy_file_to_dir(layout, layouts_dir)
@@ -141,16 +145,16 @@ module Jekyll
       end
 
       def save_backlinks_to_json(sitedest, backlinks)
-        data_dir = File.join(File.dirname(sitedest), "_data")
+        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "backlinks.json")
 
         escaped_backlinks = {}
         # json thinks ' is a special character, so we need to escape it
         backlinks.each do |path, data|
-          escaped_path = path.gsub("'", "/:|").gsub('"', '/:|')
+          escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
           escaped_data = {
-            "backlink_paths" => data["backlink_paths"].map { |path| path.gsub("'", "/:|").gsub('"', '/:|') },
+            "backlink_paths" => data["backlink_paths"].map { |path| path.gsub("'", "/:|").gsub('"', "/:|") },
           }
           escaped_backlinks[escaped_path] = escaped_data
         end

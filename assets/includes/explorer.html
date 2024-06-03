@@ -128,8 +128,13 @@
                 const decodedPath = he.decode(child.path);
 
                 button.addEventListener('click', () => {
-                    var event = new CustomEvent('obisidianFileSelect', { detail: decodedPath });
-                    document.dispatchEvent(event);
+                    if (decodedPath.endsWith('.canvas')) {
+                        var event = new CustomEvent('obsidianCanvasSelect', { detail: decodedPath });
+                        document.dispatchEvent(event);
+                    } else {
+                        var event = new CustomEvent('obsidianFileSelect', { detail: decodedPath });
+                        document.dispatchEvent(event);
+                    }
                 });
                 const fileName = child.name.replace(/\.[^/.]+$/, "")
                 button.textContent = he.decode(fileName);
