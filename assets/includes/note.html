@@ -97,18 +97,17 @@
 
         #obsidian #fileread #note #linked-mentions ul button.sentence:first-child:hover {
             border-top: 1px solid var(--color-border-dark);
-            border-left: 1px solid var(--color-border-dark);
-            border-right: 1px solid var(--color-border-dark);
         }
 
-
-        #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child) {
+        #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child),
+        #obsidian #fileread #note #linked-mentions ul button.sentence:last-child:hover {
             border-bottom: 1px solid var(--color-border);
             border-left: 1px solid var(--color-border);
             border-right: 1px solid var(--color-border);
         }
 
-        #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child):hover {
+        #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child):hover,
+        #obsidian #fileread #note #linked-mentions ul button.sentence:first-child:hover {
             border-left: 1px solid var(--color-border-dark);
             border-right: 1px solid var(--color-border-dark);
         }
@@ -117,17 +116,10 @@
             border-bottom-left-radius: .6rem;
             border-bottom-right-radius: .6rem;
         }
-
-        #obsidian #fileread #note #linked-mentions ul button.sentence:last-child:hover {
-            border-bottom: 1px solid var(--color-border-dark);
-            border-left: 1px solid var(--color-border-dark);
-            border-right: 1px solid var(--color-border-dark);
-        }
     </style>
 </head>
 
 <body>
-    <!-- <h4 id="note-title">henlo</h4> -->
     <ul id="breadcrumb"></ul>
     <h3 id="note-title"></h3>
     <div id="file-content"></div>
