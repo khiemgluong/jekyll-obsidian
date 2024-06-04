@@ -192,9 +192,7 @@
                     cleanedHTML.innerHTML.replace(backlink, backlinkElement.outerHTML);
             });
             const calloutsArr = extractCallouts(content);
-            if (calloutsArr) calloutsArr.forEach(callout => {
-                console.log("callout: " + callout);
-            });
+            if (calloutsArr) generateCallouts(calloutsArr, cleanedHTML)
             const css = '#obsidian #fileread';
             const fileName = extractFilenameFromPath(filePath);
             document.querySelector(`${css} #note #note-title`).textContent = fileName;
@@ -205,11 +203,10 @@
 
             if (backlinks_enabled === "true") {
                 const backlinks = '{{ site.data.obsidian.backlinks | jsonify }}'
-                let backlinks_parsed = null;
                 try {
-                    backlinks_parsed = JSON.parse(backlinks);
+                    const backlinks_parsed = JSON.parse(backlinks);
+                    generateBacklinks(backlinks_parsed);
                     generateLinkedMentions(filePath, backlinks_parsed);
-                    generateButtonBacklinks(backlinks_parsed);
                 } catch (e) {
                     console.error("Error parsing backlinks:", e);
                 }

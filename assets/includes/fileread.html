@@ -25,6 +25,7 @@
     }
 </script>
 
+<!-- --------------------------- Data Generators --------------------------- -->
 <script>
     function generateLinkedMentions(filePath, backlinks_parsed) {
         let linked_mentions = [];
@@ -93,13 +94,13 @@
         });
     }
 
-    function generateButtonBacklinks(backlinks_parsed) {
+    function generateBacklinks(backlinks_parsedArr) {
         document.querySelectorAll('.backlink').forEach(button => {
             const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
             button.style.fontSize = parentFontSize;
             button.addEventListener('click', (event) => {
                 console.log("click textContent: " + event.target.textContent);
-                for (const parsedFilePath in backlinks_parsed) {
+                for (const parsedFilePath in backlinks_parsedArr) {
                     let _filePath = parsedFilePath.replace("/:|", "'");
                     if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
                     const fileName = extractFilenameFromPath(_filePath);
@@ -112,16 +113,64 @@
             });
         });
     }
-</script>
-
-<!-- --------------------------- Data Generators --------------------------- -->
-<script>
-    function generateCallouts() {
-
+    function generateCallouts(calloutsArr, cleanedHTML) {
+        calloutsArr.forEach(callout => {
+            // Extract the callout type including square brackets, removing "> " part
+            const calloutType = callout.slice(2).trim().toLowerCase();
+            console.log("calloutType: " + calloutType);
+            let svgString = '';
+            switch (calloutType) {
+                case '[!note]':
+                    svgString = createSVGs(Icon.Note);
+                    break;
+                case '[!todo]':
+                    svgString = createSVGs(Icon.Todo);
+                    break;
+                case '[!tip]':
+                case '[!hint]':
+                case '[!important]':
+                    svgString = createSVGs(Icon.Tip);
+                    break;
+                case '[!question]':
+                case '[!help]':
+                case '[!faq]':
+                    svgString = createSVGs(Icon.Question);
+                    break;
+                case '[!success]':
+                case '[!check]':
+                case '[!done]':
+                    svgString = createSVGs(Icon.Success);
+                    break;
+                case '[!warning]':
+                case '[!caution]':
+                case '[!attention]':
+                    svgString = createSVGs(Icon.Warning);
+                    break;
+                case '[!failure]':
+                case '[!fail]':
+                case '[!missing]':
+                    svgString = createSVGs(Icon.Failure);
+                    break;
+                case '[!info]':
+                    svgString = createSVGs(Icon.Info);
+                    break;
+                case '[!example]':
+                    svgString = createSVGs(Icon.Example);
+                    break;
+                default:
+                    console.log(`Unknown callout type: ${calloutType}`);
+                    break;
+            }
+            // Perform the replacement in a case-insensitive manner
+            if (svgString) {
+                const calloutRegex = new RegExp(calloutType.replace(/[[\]!]/g, '\\$&'), 'gi');
+                cleanedHTML.innerHTML = cleanedHTML.innerHTML.replace(calloutRegex, svgString);
+            }
+        });
     }
-
 </script>
 
+<!-- ---------------------- File read event handlers ----------------------- -->
 <script>
     function switchPage(page) {
         if (page.endsWith('.canvas')) {
@@ -136,12 +185,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         console.log("file read loaded: " + homepage);
-        if (homepage) {
-            switchPage(homepage);
-            // var event = new CustomEvent('obsidianFileSelect', { detail: '/' + homepage });
-            // document.dispatchEvent(event);
-            // loadFile('/' + homepage);
-        }
+        if (homepage) switchPage(homepage);
     });
 
     document.addEventListener('obsidianFileSelect', function (event) {
