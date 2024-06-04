@@ -2,12 +2,26 @@
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 </head>
 
+<!-- --------------------------- Data Extractors --------------------------- -->
 <script>
     function extractFilenameFromPath(filePath) {
         return filePath.split('/').pop().replace(/\.[^/.]+$/, "");
     }
-    function extractBacklinksFromContent(content) {
-        return content.match(/\[\[([^\]]+)\]\]/g);
+    function extractBacklinks(content) {
+        // \[\[([^\]]+)\]\]: Matches double brackets with content inside.
+        // (?!\!): Negative lookahead to ensure the match is not followed by an exclamation mark.
+        return content.match(/\[\[([^\]]+)\]\](?!\!)/g);
+    }
+
+    function extractEmbeds(content) {
+        // !\[\[([^\]]+)\]\]: Matches double brackets prefixed by an exclamation mark.
+        return content.match(/!\[\[([^\]]+)\]\]/g);
+    }
+
+    function extractCallouts(content) {
+        // ^\>: Ensures the match starts at the beginning of a line with a >.
+        // \[\![^\]]+\]: Matches a space, followed by ![ and content inside the square brackets.
+        return content.match(/^\> \[\![^\]]+\]/gm);
     }
 </script>
 
@@ -98,6 +112,14 @@
             });
         });
     }
+</script>
+
+<!-- --------------------------- Data Generators --------------------------- -->
+<script>
+    function generateCallouts() {
+
+    }
+
 </script>
 
 <script>
