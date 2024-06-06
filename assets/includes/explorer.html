@@ -107,13 +107,14 @@
                 li.classList.add('dir');
 
                 button.innerHTML =
-                    DOMPurify.sanitize(getSVGArrow(false) + button.textContent);
+                    DOMPurify.sanitize(getSVGIcon(Icon.RightArrow) + button.textContent);
 
                 var expanded = false;
                 button.addEventListener('click', () => {
                     expanded = !expanded;
                     button.innerHTML =
-                        DOMPurify.sanitize(getSVGArrow(expanded) + button.textContent);
+                        DOMPurify.sanitize((expanded ? getSVGIcon(Icon.DownArrow)
+                            : getSVGIcon(Icon.RightArrow)) + button.textContent);
 
                     if (expanded) {
                         if (!li.querySelector('ul'))

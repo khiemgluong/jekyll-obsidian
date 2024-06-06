@@ -1,5 +1,14 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <style>
+        #obsidian #fileread video.embed {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: flex;
+        }
+        
+    </style>
 </head>
 
 <!-- --------------------------- Data Extractors --------------------------- -->
@@ -122,41 +131,41 @@
             let svgString = '';
             switch (calloutType) {
                 case '[!note]':
-                    svgString = createSVGs(Icon.Note);
+                    svgString = getSVGIcon(Icon.Note);
                     break;
                 case '[!todo]':
-                    svgString = createSVGs(Icon.Todo);
+                    svgString = getSVGIcon(Icon.Todo);
                     break;
                 case '[!tip]':
                 case '[!hint]':
                 case '[!important]':
-                    svgString = createSVGs(Icon.Tip);
+                    svgString = getSVGIcon(Icon.Tip);
                     break;
                 case '[!question]':
                 case '[!help]':
                 case '[!faq]':
-                    svgString = createSVGs(Icon.Question);
+                    svgString = getSVGIcon(Icon.Question);
                     break;
                 case '[!success]':
                 case '[!check]':
                 case '[!done]':
-                    svgString = createSVGs(Icon.Success);
+                    svgString = getSVGIcon(Icon.Success);
                     break;
                 case '[!warning]':
                 case '[!caution]':
                 case '[!attention]':
-                    svgString = createSVGs(Icon.Warning);
+                    svgString = getSVGIcon(Icon.Warning);
                     break;
                 case '[!failure]':
                 case '[!fail]':
                 case '[!missing]':
-                    svgString = createSVGs(Icon.Failure);
+                    svgString = getSVGIcon(Icon.Failure);
                     break;
                 case '[!info]':
-                    svgString = createSVGs(Icon.Info);
+                    svgString = getSVGIcon(Icon.Info);
                     break;
                 case '[!example]':
-                    svgString = createSVGs(Icon.Example);
+                    svgString = getSVGIcon(Icon.Example);
                     break;
                 default:
                     console.log(`Unknown callout type: ${calloutType}`);
@@ -181,6 +190,7 @@
             const embeds_parsed = JSON.parse(embeds);
             embedsArr.forEach(embed => {
                 const fileNameMatch = embed.match(/\[\[(.*?)\]\]/);
+                console.log("fileNameMatch: " + fileNameMatch);
                 if (fileNameMatch) {
                     const fileName = extractFilenameFromPath(fileNameMatch[1]);
                     for (let key in embeds_parsed) {
@@ -197,10 +207,36 @@
                                         encodedFileName.substring(lastDotIndex);
                                 }
                             const fullEmbedPath = encodedVaultPath + encodedFileName;
-                            const imgElement = document.createElement('img');
-                            imgElement.src = siteurl + fullEmbedPath;
-                            imgElement.className = 'embed';
-                            newHTML = newHTML.replace(embed, imgElement.outerHTML);
+                            const fileType = getFileType(encodedFileName);
+                            console.log("fileType: " + fileType);
+                            let embedElem;
+                            switch (fileType) {
+                                case 'pdf':
+                                default:
+                                    embedElem = document.createElement('a');
+                                    embedElem.href = siteurl + fullEmbedPath;
+                                    embedElem.className = 'embed';
+                                    embedElem.textContent = fileName;
+                                    break;
+                                case 'image':
+                                    embedElem = document.createElement('img');
+                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.className = 'embed';
+                                    break;
+                                case 'audio':
+                                    embedElem = document.createElement('audio');
+                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.controls = true;
+                                    embedElem.className = 'embed';
+                                    break;
+                                case 'video':
+                                    embedElem = document.createElement('video');
+                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.controls = true;
+                                    embedElem.className = 'embed';
+                                    break;
+                            }
+                            newHTML = newHTML.replace(embed, embedElem.outerHTML);
                         }
                     }
                 }

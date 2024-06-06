@@ -196,7 +196,7 @@ module Jekyll
         json_file_path = File.join(data_dir, "embeds.json")
         escaped_embeds = {}
         embeds.each do |path, _|
-          escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
+          escaped_path = path[1..-1].gsub("'", "/:|").gsub('"', "/:|")
           escaped_embeds[escaped_path] = {}
         end
         File.write(json_file_path, JSON.pretty_generate(escaped_embeds))

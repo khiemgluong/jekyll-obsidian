@@ -148,19 +148,24 @@
     }
 </script>
 
-
+<!-- ------------------------------- Getters ------------------------------- -->
 <script>
-    function getSVGArrow(expanded) {
-        if (expanded)
-            return `
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="dynamic-svg" viewBox="0 0 24 24" fill="none">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 9 7 7 7-7"/>
-                </svg>`;
-        else
-            return `
-                <svg class="dynamic-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
-                </svg>`;
+    function getFileType(filePath) {
+        const extensionToType = {
+            // Images
+            'jpg': 'image', 'jpeg': 'image', 'png': 'image', 'gif': 'image', 'bmp': 'image', 'webp': 'image',
+            // PDFs
+            'pdf': 'pdf',
+            // Audio
+            'mp3': 'audio', 'wav': 'audio', 'ogg': 'audio',
+            // Video
+            'mp4': 'video', 'avi': 'video', 'mov': 'video', 'mkv': 'video', 'webm': 'video',
+        };
+        // Extract the file extension
+        const extension = filePath.split('.').pop().toLowerCase();
+        console.log("extension: ", extension);
+        // Return the file type, defaulting to 'unknown' if the extension is not in the map
+        return extensionToType[extension] || 'unknown';
     }
 
     const Icon = {
@@ -181,7 +186,7 @@
         Settings: "Settings"
     };
 
-    function createSVGs(icon) {
+    function getSVGIcon(icon) {
         switch (icon) {
             case Icon.RightArrow:
                 return `
