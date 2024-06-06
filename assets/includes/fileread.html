@@ -4,13 +4,13 @@
 
 <!-- --------------------------- Data Extractors --------------------------- -->
 <script>
-    function extractFilenameFromPath(filePath) {
-        return filePath.split('/').pop().replace(/\.[^/.]+$/, "");
+    function extractFilenameFromPath(filePath, removeExtension = true) {
+        const fileName = filePath.split('/').pop();
+        return removeExtension ? fileName.replace(/\.[^/.]+$/, "") : fileName;
     }
     function extractBacklinks(content) {
-        // \[\[([^\]]+)\]\]: Matches double brackets with content inside.
-        // (?!\!): Negative lookahead to ensure the match is not followed by an exclamation mark.
-        return content.match(/\[\[([^\]]+)\]\](?!\!)/g);
+        // (?<!\!)\[\[([^\]]+)\]\]: Matches double brackets with content inside, not preceded by an exclamation mark.
+        return content.match(/(?<!\!)\[\[([^\]]+)\]\]/g);
     }
 
     function extractEmbeds(content) {
@@ -27,6 +27,26 @@
 
 <!-- --------------------------- Data Generators --------------------------- -->
 <script>
+    function generateBacklinks(backlinks_parsedArr) {
+        document.querySelectorAll('#obsidian #fileread .backlink').forEach(button => {
+            const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
+            button.style.fontSize = parentFontSize;
+            button.addEventListener('click', (event) => {
+                console.log("click textContent: " + event.target.textContent);
+                for (const parsedFilePath in backlinks_parsedArr) {
+                    let _filePath = parsedFilePath.replace("/:|", "'");
+                    if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
+                    const fileName = extractFilenameFromPath(_filePath);
+                    if (fileName === event.target.textContent) {
+                        console.log("Parsed file path name : " + _filePath);
+                        var event = new CustomEvent('obsidianFileSelect', { detail: _filePath });
+                        document.dispatchEvent(event);
+                    }
+                }
+            });
+        });
+    }
+
     function generateLinkedMentions(filePath, backlinks_parsed) {
         let linked_mentions = [];
         const filePathName = extractFilenameFromPath(filePath);
@@ -94,25 +114,6 @@
         });
     }
 
-    function generateBacklinks(backlinks_parsedArr) {
-        document.querySelectorAll('.backlink').forEach(button => {
-            const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
-            button.style.fontSize = parentFontSize;
-            button.addEventListener('click', (event) => {
-                console.log("click textContent: " + event.target.textContent);
-                for (const parsedFilePath in backlinks_parsedArr) {
-                    let _filePath = parsedFilePath.replace("/:|", "'");
-                    if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
-                    const fileName = extractFilenameFromPath(_filePath);
-                    if (fileName === event.target.textContent) {
-                        console.log("Parsed file path name : " + _filePath);
-                        var event = new CustomEvent('obsidianFileSelect', { detail: _filePath });
-                        document.dispatchEvent(event);
-                    }
-                }
-            });
-        });
-    }
     function generateCallouts(calloutsArr, cleanedHTML) {
         calloutsArr.forEach(callout => {
             // Extract the callout type including square brackets, removing "> " part
@@ -170,9 +171,39 @@
     }
 
     function generateEmbeds(embedsArr, cleanedHTML) {
-        embedsArr.forEach(embed => {
-            console.log("embed: " + embed);
-        });
+        const embeds = '{{ site.data.obsidian.embeds | jsonify }}';
+        const siteurl1 = '{{ site.url | escape }}' + '/';
+        const vaultpath = '{{ site.obsidian_vault | escape }}' + '/';
+        const encodedVaultPath = vaultpath.split('/').map(part => encodeURIComponent(part)).join('/');
+        const siteurl = window.location.href
+        try {
+            const embeds_parsed = JSON.parse(embeds);
+            embedsArr.forEach(embed => {
+                const fileNameMatch = embed.match(/\[\[(.*?)\]\]/);
+                if (fileNameMatch) {
+                    const fileName = extractFilenameFromPath(fileNameMatch[1]);
+                    console.log("Embed name: " + fileName);
+                    for (let key in embeds_parsed) {
+                        const embedFileName = extractFilenameFromPath(key);
+                        console.log("embedPath: ", embedFileName);
+                        if (embedFileName.replace("/:|", "'") === fileName) {
+                            const fileName = key.split('/').map(part => encodeURIComponent(part)).join('/');
+                            const fullEmbedPath = encodedVaultPath + fileName;
+                            console.log("Matched embed_parsed entry: ", key);
+                            const imgElement = document.createElement('img');
+
+                            imgElement.src = (siteurl1 + fullEmbedPath);
+                            console.log("siteurl + fullEmbedPath: ", siteurl1 + fullEmbedPath);
+                            imgElement.className = 'embed';
+                            cleanedHTML.innerHTML = cleanedHTML.innerHTML.replace(embed, imgElement.outerHTML);
+                        }
+                        // console.log("embeds_parsed[key]: ", key);
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Error parsing embeds:", e);
+        }
     }
 </script>
 
