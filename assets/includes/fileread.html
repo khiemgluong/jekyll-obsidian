@@ -172,35 +172,40 @@
 
     function generateEmbeds(embedsArr, cleanedHTML) {
         const embeds = '{{ site.data.obsidian.embeds | jsonify }}';
-        const siteurl1 = '{{ site.url | escape }}' + '/';
+        const siteurl = '{{ site.url | escape }}' + '/';
         const vaultpath = '{{ site.obsidian_vault | escape }}' + '/';
-        const encodedVaultPath = vaultpath.split('/').map(part => encodeURIComponent(part)).join('/');
-        const siteurl = window.location.href
+        const encodedVaultPath =
+            vaultpath.split('/').map(part => encodeURIComponent(part)).join('/');
+        let newHTML = cleanedHTML.innerHTML;
         try {
             const embeds_parsed = JSON.parse(embeds);
             embedsArr.forEach(embed => {
                 const fileNameMatch = embed.match(/\[\[(.*?)\]\]/);
                 if (fileNameMatch) {
                     const fileName = extractFilenameFromPath(fileNameMatch[1]);
-                    console.log("Embed name: " + fileName);
                     for (let key in embeds_parsed) {
                         const embedFileName = extractFilenameFromPath(key);
-                        console.log("embedPath: ", embedFileName);
                         if (embedFileName.replace("/:|", "'") === fileName) {
-                            const fileName = key.split('/').map(part => encodeURIComponent(part)).join('/');
-                            const fullEmbedPath = encodedVaultPath + fileName;
-                            console.log("Matched embed_parsed entry: ", key);
+                            let encodedFileName =
+                                key.split('/').map(part => encodeURIComponent(part)).join('/');
+                            const lastDotIndex = encodedFileName.lastIndexOf('.');
+                            if (lastDotIndex > 0)
+                                if (encodedFileName.charAt(lastDotIndex - 1) === '.') {
+                                    // Remove one of the consecutive periods
+                                    encodedFileName =
+                                        encodedFileName.substring(0, lastDotIndex - 1) +
+                                        encodedFileName.substring(lastDotIndex);
+                                }
+                            const fullEmbedPath = encodedVaultPath + encodedFileName;
                             const imgElement = document.createElement('img');
-
-                            imgElement.src = (siteurl1 + fullEmbedPath);
-                            console.log("siteurl + fullEmbedPath: ", siteurl1 + fullEmbedPath);
+                            imgElement.src = siteurl + fullEmbedPath;
                             imgElement.className = 'embed';
-                            cleanedHTML.innerHTML = cleanedHTML.innerHTML.replace(embed, imgElement.outerHTML);
+                            newHTML = newHTML.replace(embed, imgElement.outerHTML);
                         }
-                        // console.log("embeds_parsed[key]: ", key);
                     }
                 }
             });
+            cleanedHTML.innerHTML = DOMPurify.sanitize(newHTML);
         } catch (e) {
             console.error("Error parsing embeds:", e);
         }
