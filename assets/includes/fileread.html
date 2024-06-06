@@ -1,13 +1,27 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
     <style>
-        #obsidian #fileread video.embed {
+        #obsidian #fileread .embed {
             width: 100%;
             max-width: 100%;
             height: auto;
             display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        
+
+        #obsidian #fileread .embed audio {
+            width: 80%;
+        }
+
+        #obsidian #fileread .embed p {
+            font-size: small;
+            color: var(--color-button);
+        }
+
+        #obsidian #fileread .embed p:hover {
+            color: var(--color-text);
+        }
     </style>
 </head>
 
@@ -18,7 +32,7 @@
         return removeExtension ? fileName.replace(/\.[^/.]+$/, "") : fileName;
     }
     function extractBacklinks(content) {
-        // (?<!\!)\[\[([^\]]+)\]\]: Matches double brackets with content inside, not preceded by an exclamation mark.
+        // Matches double brackets not preceded by an exclamation mark: (?<!\!)\[\[([^\]]+)\]\] 
         return content.match(/(?<!\!)\[\[([^\]]+)\]\]/g);
     }
 
@@ -29,7 +43,7 @@
 
     function extractCallouts(content) {
         // ^\>: Ensures the match starts at the beginning of a line with a >.
-        // \[\![^\]]+\]: Matches a space, followed by ![ and content inside the square brackets.
+        // \[\![^\]]+\]: Matches a space, followed by ![ w/ content inside the square brackets.
         return content.match(/^\> \[\![^\]]+\]/gm);
     }
 </script>
@@ -215,28 +229,33 @@
                                 default:
                                     embedElem = document.createElement('a');
                                     embedElem.href = siteurl + fullEmbedPath;
-                                    embedElem.className = 'embed';
+                                    embedElem.className = 'url-link';
                                     embedElem.textContent = fileName;
                                     break;
                                 case 'image':
                                     embedElem = document.createElement('img');
                                     embedElem.src = siteurl + fullEmbedPath;
-                                    embedElem.className = 'embed';
                                     break;
                                 case 'audio':
                                     embedElem = document.createElement('audio');
                                     embedElem.src = siteurl + fullEmbedPath;
                                     embedElem.controls = true;
-                                    embedElem.className = 'embed';
                                     break;
                                 case 'video':
                                     embedElem = document.createElement('video');
                                     embedElem.src = siteurl + fullEmbedPath;
                                     embedElem.controls = true;
-                                    embedElem.className = 'embed';
                                     break;
                             }
-                            newHTML = newHTML.replace(embed, embedElem.outerHTML);
+                            if (fileType !== 'pdf' && fileType !== 'unknown') {
+                                embedContainer = document.createElement('div');
+                                embedContainer.className = 'embed';
+                                pTag = document.createElement('p');
+                                pTag.textContent = fileName;
+                                embedContainer.appendChild(embedElem);
+                                embedContainer.appendChild(pTag);
+                                newHTML = newHTML.replace(embed, embedContainer.outerHTML);
+                            } else newHTML = newHTML.replace(embed, embedElem.outerHTML);
                         }
                     }
                 }
