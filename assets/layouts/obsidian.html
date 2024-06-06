@@ -150,6 +150,11 @@
 
 <!-- ------------------------------- Getters ------------------------------- -->
 <script>
+    function getFullFilePath(filePath) {
+        const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
+        return fullFilePath = vaultpath + filePath;
+    }
+
     function getFileType(filePath) {
         const extensionToType = {
             // Images

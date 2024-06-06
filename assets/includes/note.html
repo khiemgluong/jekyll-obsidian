@@ -161,8 +161,7 @@
     }
 
     function fetchNoteContent(backlinks_enabled, filePath) {
-        const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
-        const fullFilePath = vaultpath + filePath;
+        const fullFilePath = getFullFilePath(filePath);
         console.log("fullFilePath: " + fullFilePath)
         fetch(fullFilePath).then(response => {
             if (!response.ok)

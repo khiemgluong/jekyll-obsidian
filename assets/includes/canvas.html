@@ -19,7 +19,42 @@
 
 
 <script>
-    function loadCanvas(canvasFile) {
+    function loadCanvas(canvasPath) {
+        const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
+        const fullFilePath = vaultpath + canvasPath;
+        console.log("fullFilePath Canvas: " + fullFilePath)
+        fetch(fullFilePath).then(response => {
+            if (!response.ok)
+                throw new Error('Network response: ' + response.statusText);
+            return response.text();
+        }).then(content => {
+            try {
+                const canvas_parsed = JSON.parse(content);
+                if (!canvas_parsed.nodes || !Array.isArray(canvas_parsed.nodes)) {
+                    console.error('Invalid or missing nodes array');
+                    return;
+                }
+                const keysList = canvas_parsed.nodes.map(node => Object.keys(node));
+                console.log("Canvas keysList: " + keysList);
+            } catch (e) {
+                console.error("Error parsing canvas:", e);
+            }
 
+        });
     }
+</script>
+
+<script>
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     const homepage = '{{ site.obsidian_homepage | escape }}'
+    //     if (homepage) {
+    //         loadCanvas('/' + homepage);
+    //         console.log("canvas read loaded: " + homepage);
+    //     }
+    // });
+
+    document.addEventListener('obsidianCanvasSelect', function (event) {
+        switchPage(event.detail);
+        loadCanvas(event.detail);
+    });
 </script>

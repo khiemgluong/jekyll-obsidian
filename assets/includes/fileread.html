@@ -284,11 +284,4 @@
         console.log("file read loaded: " + homepage);
         if (homepage) switchPage(homepage);
     });
-
-    document.addEventListener('obsidianFileSelect', function (event) {
-        switchPage(event.detail);
-    });
-    document.addEventListener('obsidianCanvasSelect', function (event) {
-        switchPage(event.detail);
-    });
 </script>
