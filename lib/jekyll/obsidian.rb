@@ -23,8 +23,9 @@ module Jekyll
         enable_backlinks = site.config["obsidian_backlinks"]
         if enable_backlinks || enable_backlinks.nil?
           puts "Building backlinks..."
-          backlinks = build_backlinks(source_dir, obsidian_files, obsidian_files)
+          backlinks, embeds = build_backlinks(source_dir, obsidian_files, obsidian_files)
           save_backlinks_to_json(site.dest, backlinks)
+          save_embeds_to_json(site.dest, embeds)
           puts "Backlinks built"
         else
           puts "Backlinks disabled"
@@ -71,6 +72,15 @@ module Jekyll
         end
       end
 
+      def excluded_file_exts(filename)
+        extensions = [".exe", ".bat", ".sh", ".zip", ".7z", ".stl", ".fbx"]
+        is_excluded = extensions.any? { |ext| filename.end_with?(ext) }
+        if is_excluded
+          puts "Excluded file: #{filename}"
+        end
+        is_excluded
+      end
+
       def collect_files(rootdir, path = "")
         _files = []
         Dir.entries(rootdir).each do |entry|
@@ -78,10 +88,11 @@ module Jekyll
           entry_path = File.join(rootdir, entry)
           # puts "file path: #{entry_path}"  # print the path
           _files << if File.directory?(entry_path)
-            next if entry.start_with?("assets", ".obsidian")
-            { name: entry, type: "dir", path: File.join(path, entry), children: collect_files(entry_path, File.join(path, entry)) }
+            next if entry.start_with?(".obsidian")
+            { name: entry, type: "dir", path: File.join(path, entry),
+              children: collect_files(entry_path, File.join(path, entry)) }
           else
-            next unless entry.end_with?(".md", ".canvas")
+            # next unless entry.end_with?(".md", ".canvas")
             next if File.zero?(entry_path) || File.empty?(entry_path)
             { name: entry, type: "file", path: File.join(path, entry) }
           end
@@ -89,46 +100,56 @@ module Jekyll
         _files
       end
 
-      def build_backlinks(rootdir, _files, root_files, jsonlinks = {})
+      def build_backlinks(rootdir, _files, root_files, backlinks = {}, embeds = {})
         _files.each do |file|
           if file[:type] == "dir"
             # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
-            build_backlinks(rootdir, file[:children], root_files, jsonlinks)
-          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
+            build_backlinks(rootdir, file[:children], root_files, backlinks, embeds)
+          elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
-            next if File.zero?(entry_path)
+            next if File.zero?(entry_path) || excluded_file_exts(file[:name])
+            if file[:name].end_with?(".md", ".canvas")
+              begin
+                content = File.read(entry_path)
+              rescue Errno::ENOENT
+                puts "Error reading file: #{entry_path} - No such file"
+                next
+              rescue Errno::EACCES
+                puts "Error reading file: #{entry_path} - Permission denied"
+                next
+              end
 
-            begin
-              content = File.read(entry_path)
-            rescue Errno::ENOENT
-              puts "Error reading file: #{entry_path} - No such file or directory"
-              next
-            rescue Errno::EACCES
-              puts "Error reading file: #{entry_path} - Permission denied"
-              next
-            end
+              puts "File: #{file[:name]}, Path: #{entry_path}"
+              links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-            puts "File: #{file[:name]}, Path: #{entry_path}"
-            links = content.scan(/\[\[(.*?)\]\]/).flatten
+              backlinks[file[:path]] ||= { "backlink_paths" => [] }
 
-            jsonlinks[file[:path]] ||= { "backlink_paths" => [] }
-
-            links.each do |link|
-              lowercase_link = link.downcase
-              matched_entry = find_matching_entry(root_files, lowercase_link)
-              if matched_entry
-                unless jsonlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
-                  jsonlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
+              links.each do |link|
+                lowercase_link = link.downcase
+                matched_entry = find_matching_entry(root_files, lowercase_link)
+                if matched_entry
+                  unless backlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
+                    backlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
+                  end
+                else
+                  puts "Backlink: #{link}, No matching file found"
                 end
+              end
+            elsif !file[:name].end_with?(".md", ".canvas")
+              # Your code for .png and .pdf files here
+              if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
+                embeds[file[:path]] = { "embed_paths" => [entry_path] }
               else
-                puts "Backlink: #{link}, No matching file found"
+                unless embeds[file[:path]]["embed_paths"].include?(entry_path)
+                  embeds[file[:path]]["embed_paths"] << entry_path
+                end
               end
             end
           else
             puts "Skipping non-markdown file: #{file[:name]}"
           end
         end
-        jsonlinks
+        [backlinks, embeds]
       end
 
       def find_matching_entry(files, lowercase_link)
@@ -159,6 +180,18 @@ module Jekyll
           escaped_backlinks[escaped_path] = escaped_data
         end
         File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
+      end
+
+      def save_embeds_to_json(sitedest, embeds)
+        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
+        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+        json_file_path = File.join(data_dir, "embeds.json")
+        escaped_embeds = {}
+        embeds.each do |path, _|
+          escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
+          escaped_embeds[escaped_path] = {}
+        end
+        File.write(json_file_path, JSON.pretty_generate(escaped_embeds))
       end
     end
   end

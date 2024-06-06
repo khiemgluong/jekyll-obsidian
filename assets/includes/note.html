@@ -178,24 +178,29 @@
             const backlinksArr = extractBacklinks(content);
             if (backlinksArr) backlinksArr.forEach(backlink => {
                 const innerText = backlink.slice(2, -2);
-                let backlinkElement;
+                let backlinkElem;
                 if (backlinks_enabled === "true") {
                     const button = document.createElement('button');
-                    backlinkElement = button;
+                    backlinkElem = button;
                 } else {
                     const span = document.createElement('span');
-                    backlinkElement = span;
+                    backlinkElem = span;
                 }
-                backlinkElement.textContent = innerText;
-                backlinkElement.className = 'backlink';
+                backlinkElem.textContent = innerText;
+                backlinkElem.className = 'backlink';
                 cleanedHTML.innerHTML =
-                    cleanedHTML.innerHTML.replace(backlink, backlinkElement.outerHTML);
+                    cleanedHTML.innerHTML.replace(backlink, backlinkElem.outerHTML);
             });
             const calloutsArr = extractCallouts(content);
             if (calloutsArr) generateCallouts(calloutsArr, cleanedHTML)
+
+            const embedsArr = extractEmbeds(content);
+            if (embedsArr) generateEmbeds(embedsArr, cleanedHTML);
+
             const css = '#obsidian #fileread';
             const fileName = extractFilenameFromPath(filePath);
-            document.querySelector(`${css} #note #note-title`).textContent = fileName;
+            document.querySelector(`${css} #note #note-title`).textContent =
+                fileName;
             document.querySelector(`${css} #note #file-content`).innerHTML =
                 cleanedHTML.innerHTML;
             document.querySelector(css).scrollTop = 0;
