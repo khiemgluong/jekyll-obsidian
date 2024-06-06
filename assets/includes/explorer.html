@@ -142,7 +142,7 @@
         });
     }
 
-    let obsidianFilesJson = '{{ site.data.obsidian_files_json | escape }}';
+    let obsidianFilesJson = '{{ site.data.obsidian_files | escape }}';
     var parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
 
     function sortObsidianFiles(tree) {

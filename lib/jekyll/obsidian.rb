@@ -16,24 +16,34 @@ module Jekyll
       def generate(site)
         source_dir = site.config["obsidian_vault"] || site.source
         if source_dir.nil?
-          puts "\e[31mError: obsidian_vault is not set in the config.yml\e[0m"
+          puts "Error: obsidian_vault is not set in config.yml"
           exit(1)
         end
         obsidian_files = collect_files(source_dir)
+        site.data["obsidian_files"] = obsidian_files.to_json
+
+        backlinks, embeds = build_links(source_dir, obsidian_files, obsidian_files)
+        puts "Obsidian links built"
+
         enable_backlinks = site.config["obsidian_backlinks"]
         if enable_backlinks || enable_backlinks.nil?
           puts "Building backlinks..."
-          backlinks, embeds = build_backlinks(source_dir, obsidian_files, obsidian_files)
           save_backlinks_to_json(site.dest, backlinks)
-          save_embeds_to_json(site.dest, embeds)
           puts "Backlinks built"
         else
           puts "Backlinks disabled"
         end
-        site.config["obsidian_homepage"]
 
-        site.data["obsidian_files"] = obsidian_files
-        site.data["obsidian_files_json"] = obsidian_files.to_json
+        enable_embeds = site.config["obsidian_embeds"]
+        if enable_embeds || enable_embeds.nil?
+          puts "Building embeds..."
+          save_embeds_to_json(site.dest, embeds)
+          puts "Embeds built"
+        else
+          puts "Embeds disabled"
+        end
+
+        site.config["obsidian_homepage"]
 
         obsidian_dir = File.join(File.dirname(site.dest), "_includes", "obsidian")
         FileUtils.mkdir_p(obsidian_dir) unless File.directory?(obsidian_dir)
@@ -100,11 +110,11 @@ module Jekyll
         _files
       end
 
-      def build_backlinks(rootdir, _files, root_files, backlinks = {}, embeds = {})
+      def build_links(rootdir, _files, root_files, backlinks = {}, embeds = {})
         _files.each do |file|
           if file[:type] == "dir"
             # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
-            build_backlinks(rootdir, file[:children], root_files, backlinks, embeds)
+            build_links(rootdir, file[:children], root_files, backlinks, embeds)
           elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path) || excluded_file_exts(file[:name])
@@ -119,7 +129,7 @@ module Jekyll
                 next
               end
 
-              puts "File: #{file[:name]}, Path: #{entry_path}"
+              # puts "File: #{file[:name]}, Path: #{entry_path}"
               links = content.scan(/\[\[(.*?)\]\]/).flatten
 
               backlinks[file[:path]] ||= { "backlink_paths" => [] }
@@ -131,8 +141,6 @@ module Jekyll
                   unless backlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
                     backlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
                   end
-                else
-                  puts "Backlink: #{link}, No matching file found"
                 end
               end
             elsif !file[:name].end_with?(".md", ".canvas")
