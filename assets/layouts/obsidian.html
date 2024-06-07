@@ -111,16 +111,15 @@
     <!-- {%- include footer.html -%} -->
 </body>
 
-<!-- ----------------------------------------------------------------------- -->
-<!--                          Divider drag handler                           -->
-<!-- ----------------------------------------------------------------------- -->
+<!-- ------------------------ Divider drag handler ------------------------- -->
 <script>
     const divider = document.getElementById('divider');
     const explorer = document.getElementById('explorer');
-    const fileread = document.getElementById('fileread');
-
+    const note = document.querySelector('#obsidian #fileread #note');
     let isDragging = false;
     let startX, startWidth;
+    const minWidth = 10; const maxWidth = 50;
+    const minPadding = 5; const maxPadding = 20;
 
     divider.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -137,8 +136,17 @@
         let newWidth = startWidth + offset;
         let explorerWidth = newWidth / window.innerWidth * 100;
         // Clamp width 
-        explorerWidth = Math.max(10, Math.min(explorerWidth, 50));
+        explorerWidth = Math.max(minWidth, Math.min(explorerWidth, maxWidth));
         explorer.style.width = `${explorerWidth}%`;
+
+        let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
+        note.style.paddingLeft = `${padding}vw`;
+        note.style.paddingRight = `${padding}vw`;
+    }
+
+    // Linear mapping function
+    function map(value, x1, y1, x2, y2) {
+        return (value - x1) * (y2 - x2) / (y1 - x1) + x2;
     }
 
     function onMouseUp() {
@@ -146,6 +154,21 @@
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
+</script>
+
+<!-- --------------------------- On content load --------------------------- -->
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let explorer = document.querySelector('#obsidian #explorer');
+        let note = document.querySelector('#obsidian #fileread #note');
+        let explorerWidthPx = parseFloat(getComputedStyle(explorer).width);
+        let parentWidthPx = parseFloat(getComputedStyle(explorer.parentElement).width);
+        let explorerWidth = (explorerWidthPx / parentWidthPx) * 100;
+        let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
+        note.style.paddingLeft = `${padding}vw`;
+        note.style.paddingRight = `${padding}vw`;
+        console.log("Explorer width:", explorerWidth);
+    });
 </script>
 
 <!-- ------------------------------- Getters ------------------------------- -->
@@ -195,40 +218,40 @@
         switch (icon) {
             case Icon.RightArrow:
                 return `
-                <svg class="dynamic-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <svg class="svg_RightArrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
                 </svg>`;
             case Icon.DownArrow:
                 return `
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="dynamic-svg" viewBox="0 0 24 24" fill="none">
+                <svg class="svg_DownArrow" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="dynamic-svg" viewBox="0 0 24 24" fill="none">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 9 7 7 7-7"/>
                 </svg>`;
             // ------------------------------ callouts -------------------------------
             case Icon.Note:
                 return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="svg_Note" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
                 </svg>`;
             case Icon.Info:
                 return ` 
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                <svg class="svg_Info" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                     viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>`;
             case Icon.Tip:
                 return `
-                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <svg class="svg_Tip" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.122 17.645a7.185 7.185 0 0 1-2.656 2.495 7.06 7.06 0 0 1-3.52.853 6.617 6.617 0 0 1-3.306-.718 6.73 6.73 0 0 1-2.54-2.266c-2.672-4.57.287-8.846.887-9.668A4.448 4.448 0 0 0 8.07 6.31 4.49 4.49 0 0 0 7.997 4c1.284.965 6.43 3.258 5.525 10.631 1.496-1.136 2.7-3.046 2.846-6.216 1.43 1.061 3.985 5.462 1.754 9.23Z" />
                 </svg>`;
             case Icon.Todo:
                 return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="svg_Todo" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>`;
             case Icon.Question:
                 return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="svg_Question" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>`;
             case Icon.Success:
@@ -243,7 +266,7 @@
                 </svg>`;
             case Icon.Warning:
                 return `
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="svg_Warning" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
                 </svg>`;
                 break;

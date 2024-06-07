@@ -10,6 +10,14 @@
             align-items: center;
         }
 
+        #obsidian #fileread #file-content .url-link {
+            display: flex;
+            font-size: large;
+            color: var(--color-button);
+            padding-bottom: 0.5rem;
+        }
+
+
         #obsidian #fileread .embed audio {
             width: 80%;
         }
@@ -21,6 +29,21 @@
 
         #obsidian #fileread .embed p:hover {
             color: var(--color-text);
+        }
+
+        #file-content blockquote svg {
+            vertical-align: text-bottom;
+        }
+
+        #file-content blockquote .svg_Warning,
+        #file-content blockquote .svg_Question {
+            color: #ed7908;
+        }
+
+        #file-content blockquote .svg_Info,
+        #file-content blockquote .svg_Todo,
+        #file-content blockquote .svg_Note {
+            color: #086ddd;
         }
     </style>
 </head>
