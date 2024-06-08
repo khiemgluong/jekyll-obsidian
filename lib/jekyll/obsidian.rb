@@ -182,14 +182,17 @@ module Jekyll
         # json thinks ' is a special character, so we need to escape it
         backlinks.each do |path, data|
           escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
+          escaped_path = escaped_path.slice(1..-1) if escaped_path.length > 0
           escaped_data = {
-            "backlink_paths" => data["backlink_paths"].map { |path| path.gsub("'", "/:|").gsub('"', "/:|") },
+            "backlink_paths" => data["backlink_paths"].map do |path|
+              path = path.gsub("'", "/:|").gsub('"', "/:|")
+              path.length > 0 ? path.slice(1..-1) : path
+            end,
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
         File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
       end
-
       def save_embeds_to_json(sitedest, embeds)
         data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)

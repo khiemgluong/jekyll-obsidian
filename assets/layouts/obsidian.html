@@ -119,7 +119,7 @@
     let isDragging = false;
     let startX, startWidth;
     const minWidth = 10; const maxWidth = 50;
-    const minPadding = 5; const maxPadding = 20;
+    const minPadding = 6; const maxPadding = 22;
 
     divider.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -184,9 +184,9 @@
             'jpg': 'image', 'jpeg': 'image', 'png': 'image', 'gif': 'image', 'bmp': 'image', 'webp': 'image',
             // PDFs
             'pdf': 'pdf',
-            // Audio
+            // Audios
             'mp3': 'audio', 'wav': 'audio', 'ogg': 'audio',
-            // Video
+            // Videos
             'mp4': 'video', 'avi': 'video', 'mov': 'video', 'mkv': 'video', 'webm': 'video',
         };
         // Extract the file extension

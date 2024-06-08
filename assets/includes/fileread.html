@@ -71,94 +71,70 @@
     }
 </script>
 
+<!-- --------------------------- Data Replacers ---------------------------- -->
+<script>
+    function replaceBacklinks(backlinksArr, cleanedHTML, backlinks_enabled = "true") {
+        if (backlinksArr) backlinksArr.forEach(backlink => {
+            const innerText = backlink.slice(2, -2);
+            let backlinkElem;
+            if (backlinks_enabled === "true") {
+                const button = document.createElement('button');
+                backlinkElem = button;
+            } else {
+                const span = document.createElement('span');
+                backlinkElem = span;
+            }
+            let parts = innerText.split('|');
+            if (parts.length > 1) {
+                backlinkElem.textContent =
+                    extractFilenameFromPath(parts[1].trim(), false);
+                // let hashtagPart = parts[0].match(/#(.*)\|/);
+                // if (hashtagPart && hashtagPart.length > 1) {
+                //     backlinkElem.dataset.value = hashtagPart[1].trim();
+                // }
+
+                backlinkElem.dataset.value = parts[0].trim();
+
+            } else {
+                backlinkElem.textContent = innerText;
+            }
+
+            backlinkElem.className = 'backlink';
+            cleanedHTML.innerHTML =
+                cleanedHTML.innerHTML.replace(backlink, backlinkElem.outerHTML);
+        });
+    }
+</script>
+
 <!-- --------------------------- Data Generators --------------------------- -->
 <script>
-    function generateBacklinks(backlinks_parsedArr) {
+    function mapBacklinksToJson(backlinks_json) {
         document.querySelectorAll('#obsidian #fileread .backlink').forEach(button => {
             const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
             button.style.fontSize = parentFontSize;
+            console.log("textContent: " + button.textContent); // Print the textContent
             button.addEventListener('click', (event) => {
                 console.log("click textContent: " + event.target.textContent);
-                for (const parsedFilePath in backlinks_parsedArr) {
+                for (const parsedFilePath in backlinks_json) {
                     let _filePath = parsedFilePath.replace("/:|", "'");
                     if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
                     const fileName = extractFilenameFromPath(_filePath);
-                    if (fileName === event.target.textContent) {
-                        console.log("Parsed file path name : " + _filePath);
-                        var event = new CustomEvent('obsidianFileSelect', { detail: _filePath });
-                        document.dispatchEvent(event);
+                    // let parts = _filePath.split('#');
+                    if (!button.dataset.value) {
+                        if (fileName === event.target.textContent) {
+                            dispatchFileSelectEvt(_filePath);
+                        }
+                    } else {
+                        const dataValue = button.dataset.value;
+                        if (fileName === extractFilenameFromPath(dataValue)) {
+                            dispatchFileSelectEvt('/' + _filePath);
+                        }
                     }
                 }
             });
         });
     }
 
-    function generateLinkedMentions(filePath, backlinks_parsed) {
-        let linked_mentions = [];
-        const filePathName = extractFilenameFromPath(filePath);
-        for (const parsedFilePath in backlinks_parsed)
-            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                const entry = backlinks_parsed[parsedFilePath];
-                if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                    entry.backlink_paths.forEach(path => {
-                        if (!linked_mentions.includes(parsedFilePath) &&
-                            path === filePath &&
-                            parsedFilePath.endsWith('.md')) {
-                            linked_mentions.push(parsedFilePath.replace("/:|", "'"));
-                        }
-                    });
-                }
-            }
-        const linkedMentionsId = document.getElementById('linked-mentions');
-        while (linkedMentionsId.firstChild)
-            linkedMentionsId.removeChild(linkedMentionsId.firstChild);
-        if (linked_mentions.length !== 0) {
-            const h4 = document.createElement('h4');
-            h4.textContent = 'Linked mentions';
-            linkedMentionsId.appendChild(h4);
-        }
-        linked_mentions.forEach(linkedMentionPath => {
-            const li = document.createElement('li');
-            const linkedPathName = extractFilenameFromPath(linkedMentionPath);
-            linkedMentionsId.appendChild(li);
-            li.classList.add('title');
-
-            const decodedString = he.decode(linkedPathName);
-            li.textContent = decodedString;
-
-            const vaultPath = '/' + '{{ site.obsidian_vault | escape }}'
-            const linkedMentionPathFull = vaultPath + linkedMentionPath;
-            fetch(linkedMentionPathFull)
-                .then(response => {
-                    if (!response.ok)
-                        throw new Error('Network response: ' + response.statusText);
-                    return response.text();
-                }).then(content => {
-                    const ul_linkedMention = document.createElement('ul');
-                    li.appendChild(ul_linkedMention);
-                    const backlink = `[[${filePathName}]]`;
-                    let lines = content.split('\n');
-                    // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
-
-                    lines.forEach(line => {
-                        if (line.toLowerCase().includes(backlink.toLowerCase())) {
-                            const btnLinkedMention = document.createElement('button');
-                            btnLinkedMention.textContent = line;
-                            btnLinkedMention.classList.add('sentence');
-                            btnLinkedMention.dataset.filePath = linkedMentionPathFull;
-                            btnLinkedMention.addEventListener('click', function () {
-                                const filePath = this.dataset.filePath.replace(vaultPath, '');
-                                var event = new CustomEvent('obsidianFileSelect', { detail: filePath });
-                                document.dispatchEvent(event);
-                            });
-                            ul_linkedMention.appendChild(btnLinkedMention);
-                        }
-                    });
-                }).catch(error => {
-                    console.error('Error fetching file:', error);
-                });
-        });
-    }
 
     function generateCallouts(calloutsArr, cleanedHTML) {
         calloutsArr.forEach(callout => {
@@ -299,6 +275,16 @@
         } else {
             document.getElementById('canvas').style.display = 'none';
             document.getElementById('note').style.display = 'flex';
+        }
+    }
+
+    function dispatchFileSelectEvt(filePath) {
+        if (filePath.endsWith('.md')) {
+            const event = new CustomEvent('obsidian_noteSelect', { detail: filePath });
+            document.dispatchEvent(event);
+        } else if (filePath.endsWith('.canvas')) {
+            const event = new CustomEvent('obsidian_canvasSelect', { detail: filePath });
+            document.dispatchEvent(event);
         }
     }
 

@@ -127,16 +127,8 @@
                 });
             } else if (child.type === 'file') {
                 li.classList.add('file');
-                const decodedPath = he.decode(child.path);
-
                 button.addEventListener('click', () => {
-                    if (decodedPath.endsWith('.canvas')) {
-                        var event = new CustomEvent('obsidianCanvasSelect', { detail: decodedPath });
-                        document.dispatchEvent(event);
-                    } else {
-                        var event = new CustomEvent('obsidianFileSelect', { detail: decodedPath });
-                        document.dispatchEvent(event);
-                    }
+                    dispatchFileSelectEvt(he.decode(child.path));
                 });
                 const fileName = child.name.replace(/\.[^/.]+$/, "")
                 button.textContent = he.decode(fileName);
