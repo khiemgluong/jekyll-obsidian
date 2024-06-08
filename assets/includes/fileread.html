@@ -110,6 +110,26 @@
 
 <!-- --------------------------- Data Generators --------------------------- -->
 <script>
+    function generateBreadcrumbs(filePath) {
+        const filePathArr = filePath.split('/').filter(Boolean);
+        const breadcrumbs = document.querySelector('#obsidian #fileread #breadcrumb');
+        while (breadcrumbs.firstChild)
+            breadcrumbs.removeChild(breadcrumbs.firstChild);
+        filePathArr.forEach((path, index) => {
+            const li = document.createElement('li');
+            breadcrumbs.appendChild(li);
+            const btn = document.createElement('button');
+            btn.textContent = path;
+            li.appendChild(btn);
+            if (index === filePathArr.length - 1) {
+                btn.textContent = extractFilenameFromPath(path);
+                btn.addEventListener('click', () => {
+                    document.querySelector(css_fileread).scrollTop = 0;
+                });
+            }
+        });
+    }
+
     function mapBacklinksToJson(backlinks_json) {
         document.querySelectorAll('#obsidian #fileread .backlink').forEach(button => {
             const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;

@@ -12,37 +12,11 @@
         #obsidian #fileread #note-title {
             font-size: 2em;
             font-weight: bold;
-            margin: .6em 0;
+            margin: .2em 0 1rem 0;
         }
 
         #obsidian #fileread #note .backlink {
             color: var(--color-accent);
-        }
-
-        /* ----------------------------- Breadcrumb ------------------------------ */
-        #obsidian #fileread #note #breadcrumb {
-            list-style: none;
-            padding: 0;
-            color: var(--color-text);
-        }
-
-        #obsidian #fileread #note ul#breadcrumb {
-            padding: 10px 16px;
-            margin-left: 12px;
-            margin-right: 12px;
-            list-style: none;
-        }
-
-        #obsidian #fileread #note ul#breadcrumb li,
-        #obsidian #fileread #note ul#breadcrumb button {
-            display: inline;
-            font-size: medium;
-        }
-
-        #obsidian #fileread #note ul#breadcrumb li+li:before {
-            padding: 5px;
-            color: var(--color-text);
-            content: "/\00a0";
         }
 
         /* --------------------------- Linked mentions --------------------------- */
@@ -123,31 +97,12 @@
 </head>
 
 <body>
-    <ul id="breadcrumb"></ul>
     <h3 id="note-title"></h3>
     <div id="file-content"></div>
     <ul id="linked-mentions"></ul>
 </body>
 
 <script>
-    function generateBreadcrumbs(filePath) {
-        const filePathArr = filePath.split('/').filter(Boolean);
-        const breadcrumbs = document.querySelector('#obsidian #fileread #note #breadcrumb');
-        if (filePathArr.length === 1) {
-            breadcrumbs.style.margin = '0';
-        } else breadcrumbs.style.marginTop = '1rem';
-        while (breadcrumbs.firstChild)
-            breadcrumbs.removeChild(breadcrumbs.firstChild);
-        filePathArr.forEach((path, index) => {
-            if (index !== filePathArr.length - 1) { // Skip the last item
-                const li = document.createElement('li');
-                breadcrumbs.appendChild(li);
-                const btn = document.createElement('button');
-                btn.textContent = path;
-                li.appendChild(btn);
-            }
-        });
-    }
     function generateLinkedMentions(filePath, backlinks_parsed) {
         let linked_mentions = [];
         const filePathName = extractFilenameFromPath(filePath);
@@ -251,13 +206,12 @@
             const embedsArr = extractEmbeds(content);
             if (embedsArr) generateEmbeds(embedsArr, cleanedHTML);
 
-            const css = '#obsidian #fileread';
             const fileName = extractFilenameFromPath(filePath);
-            document.querySelector(`${css} #note #note-title`).textContent =
+            document.querySelector(`${css_fileread} #note #note-title`).textContent =
                 fileName;
-            document.querySelector(`${css} #note #file-content`).innerHTML =
+            document.querySelector(`${css_fileread} #note #file-content`).innerHTML =
                 cleanedHTML.innerHTML;
-            document.querySelector(css).scrollTop = 0;
+            document.querySelector(css_fileread).scrollTop = 0;
             if (header) {
                 const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
                 headers.forEach((heading) => {
@@ -286,11 +240,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        console.log("Note loaded");
         const homepage = '{{ site.obsidian_homepage | escape }}'
-        if (homepage) {
+        if (homepage && homepage.endsWith('.md')) {
             loadNote(homepage);
-            console.log("file read loaded: " + homepage);
+            console.log("note loaded: " + homepage);
         }
     });
 

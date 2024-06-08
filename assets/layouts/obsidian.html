@@ -81,6 +81,41 @@
         #file-read::-webkit-scrollbar {
             display: none;
         }
+
+        /* ----------------------------- Breadcrumb ------------------------------ */
+        #obsidian #fileread #breadcrumb {
+            list-style: none;
+            padding: 0;
+            z-index: 2;
+            color: var(--color-text);
+        }
+
+        #obsidian #fileread ul#breadcrumb {
+            padding: 8px 16px;
+            margin: 0;
+            list-style: none;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg);
+            width: 100%;
+            text-align: center;
+        }
+
+        #obsidian #fileread ul#breadcrumb li,
+        #obsidian #fileread ul#breadcrumb button {
+            display: inline;
+            font-size: medium;
+        }
+
+        #obsidian #fileread ul#breadcrumb button:hover{
+            color: var(--color-accent);
+        }
+
+        #obsidian #fileread ul#breadcrumb li+li:before {
+            padding: 5px;
+            color: var(--color-text);
+            content: "/\00a0";
+        }
     </style>
 </head>
 
@@ -99,6 +134,7 @@
             </div>
             <div id="divider"></div>
             <div id="fileread">
+                <ul id="breadcrumb"> </ul>
                 {% include obsidian/fileread.html %}
                 <div id="note" style="display: flex;">
                     {% include obsidian/note.html %}
@@ -111,15 +147,19 @@
     <!-- {%- include footer.html -%} -->
 </body>
 
-<!-- ------------------------ Divider drag handler ------------------------- -->
 <script>
     const divider = document.getElementById('divider');
     const explorer = document.getElementById('explorer');
     const note = document.querySelector('#obsidian #fileread #note');
+    const minWidth = 10; const maxWidth = 50;
+    const minPadding = 4; const maxPadding = 22;
+    const css_fileread = '#obsidian #fileread';
+</script>
+
+<!-- ------------------------ Divider drag handler ------------------------- -->
+<script>
     let isDragging = false;
     let startX, startWidth;
-    const minWidth = 10; const maxWidth = 50;
-    const minPadding = 4; const maxPadding = 24;
 
     divider.addEventListener('mousedown', (e) => {
         isDragging = true;

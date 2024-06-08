@@ -63,8 +63,8 @@
     document.getElementById('homepage').addEventListener('click', () => {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         if (homepage) {
-            var event = new CustomEvent('obsidian_noteSelect', { detail: '/' + homepage });
-            document.dispatchEvent(event);
+            switchPage(homepage);
+            dispatchFileSelectEvt(homepage);
             console.log("Homepage: " + homepage);
         }
     });

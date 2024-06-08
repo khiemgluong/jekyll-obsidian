@@ -10,37 +10,10 @@
             background-size: 30px 30px;
         }
 
-        /* ----------------------------- Breadcrumb ------------------------------ */
-        #obsidian #fileread #note #breadcrumb {
-            list-style: none;
-            padding: 0;
-            color: var(--color-text);
-        }
-
-        #obsidian #fileread #note ul#breadcrumb {
-            padding: 10px 16px;
-            list-style: none;
-        }
-
-        #obsidian #fileread #note ul#breadcrumb li,
-        #obsidian #fileread #note ul#breadcrumb button {
-            display: inline;
-            font-size: medium;
-        }
-
-        #obsidian #fileread #note ul#breadcrumb li+li:before {
-            padding: 5px;
-            color: var(--color-text);
-            content: "/\00a0";
-        }
     </style>
 </head>
 
 <body>
-    <ul id="breadcrumb">
-        <li>Test</li>
-        <li>Test2</li>
-    </ul>
     <h3 id="canvas-title"></h3>
 </body>
 
@@ -48,6 +21,7 @@
 <script>
     function loadCanvas(canvasPath) {
         const fullFilePath = getFullFilePath(canvasPath);
+        generateBreadcrumbs(canvasPath);
         console.log("fullFilePath Canvas: " + fullFilePath)
         fetch(fullFilePath).then(response => {
             if (!response.ok)
@@ -71,13 +45,13 @@
 </script>
 
 <script>
-    // document.addEventListener('DOMContentLoaded', () => {
-    // const homepage = '{{ site.obsidian_homepage | uri_escape }}';
-    //     if (homepage) {
-    //         loadCanvas('/' + homepage);
-    //         console.log("canvas read loaded: " + homepage);
-    //     }
-    // });
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepage = '{{ site.obsidian_homepage | escape }}';
+        if (homepage && homepage.endsWith('.canvas')) {
+            loadCanvas(homepage);
+            console.log("canvas read loaded: " + homepage);
+        }
+    });
 
     document.addEventListener('obsidian_canvasSelect', function (event) {
         switchPage(event.detail.filePath);
