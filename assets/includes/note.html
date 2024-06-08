@@ -28,6 +28,8 @@
 
         #obsidian #fileread #note ul#breadcrumb {
             padding: 10px 16px;
+            margin-left: 12px;
+            margin-right: 12px;
             list-style: none;
         }
 
@@ -224,7 +226,7 @@
         console.log("enable_backlinks: " + enable_backlinks);
         console.log("filePath: " + filePath);
         generateBreadcrumbs(filePath);
-        fetchNoteContent(enable_backlinks, filePath);
+        fetchNoteContent(enable_backlinks, filePath, header);
     }
 
     function fetchNoteContent(backlinks_enabled, filePath, header = "") {
@@ -256,6 +258,14 @@
             document.querySelector(`${css} #note #file-content`).innerHTML =
                 cleanedHTML.innerHTML;
             document.querySelector(css).scrollTop = 0;
+            if (header) {
+                const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                headers.forEach((heading) => {
+                    if (heading.textContent === header) {
+                        heading.scrollIntoView();
+                    }
+                });
+            }
             cleanedHTML.remove();
 
             if (backlinks_enabled === "true") {
@@ -285,7 +295,7 @@
     });
 
     document.addEventListener('obsidian_noteSelect', function (event) {
-        switchPage(event.detail);
-        loadNote(event.detail);
+        switchPage(event.detail.filePath);
+        loadNote(event.detail.filePath, event.detail.heading);
     });
 </script>

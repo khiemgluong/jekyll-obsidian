@@ -1,3 +1,5 @@
+<!-- ------------------ Contains note.html & canvas.html ------------------- -->
+
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
     <style>
@@ -119,15 +121,26 @@
                     let _filePath = parsedFilePath.replace("/:|", "'");
                     if (_filePath.endsWith('/')) _filePath = _filePath.slice(0, -1);
                     const fileName = extractFilenameFromPath(_filePath);
-                    // let parts = _filePath.split('#');
                     if (!button.dataset.value) {
-                        if (fileName === event.target.textContent) {
-                            dispatchFileSelectEvt(_filePath);
+                        const dataValue = event.target.textContent;
+                        if (dataValue.includes('#')) {
+                            const parts = dataValue.split('#');
+                            if (fileName === parts[0])
+                                dispatchFileSelectEvt('/' + _filePath, parts[1]);
+                        } else {
+                            if (fileName === event.target.textContent)
+                                dispatchFileSelectEvt(_filePath);
                         }
                     } else {
                         const dataValue = button.dataset.value;
-                        if (fileName === extractFilenameFromPath(dataValue)) {
-                            dispatchFileSelectEvt('/' + _filePath);
+                        if (dataValue.includes('#')) {
+                            const parts = dataValue.split('#');
+                            if (fileName === parts[0])
+                                dispatchFileSelectEvt('/' + _filePath, parts[1]);
+                        } else {
+                            if (fileName === extractFilenameFromPath(dataValue)) {
+                                dispatchFileSelectEvt('/' + _filePath);
+                            }
                         }
                     }
                 }
@@ -278,12 +291,14 @@
         }
     }
 
-    function dispatchFileSelectEvt(filePath) {
+    function dispatchFileSelectEvt(filePath, heading) {
+        const detail = { filePath };
         if (filePath.endsWith('.md')) {
-            const event = new CustomEvent('obsidian_noteSelect', { detail: filePath });
+            if (heading) detail.heading = heading;
+            const event = new CustomEvent('obsidian_noteSelect', { detail });
             document.dispatchEvent(event);
         } else if (filePath.endsWith('.canvas')) {
-            const event = new CustomEvent('obsidian_canvasSelect', { detail: filePath });
+            const event = new CustomEvent('obsidian_canvasSelect', { detail });
             document.dispatchEvent(event);
         }
     }

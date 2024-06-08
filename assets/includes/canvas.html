@@ -80,7 +80,7 @@
     // });
 
     document.addEventListener('obsidian_canvasSelect', function (event) {
-        switchPage(event.detail);
-        loadCanvas(event.detail);
+        switchPage(event.detail.filePath);
+        loadCanvas(event.detail.filePath);
     });
 </script>
