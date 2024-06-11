@@ -17,6 +17,7 @@
 
         #obsidian #fileread #note .backlink {
             color: var(--color-accent);
+            font-size: inherit;
         }
 
         /* --------------------------- Linked mentions --------------------------- */
@@ -47,7 +48,7 @@
         }
 
         #obsidian #fileread #note #linked-mentions .title button {
-            font-size: .85em;
+            font-size: .8em;
             display: block;
             width: auto;
             text-align: left;
@@ -72,21 +73,11 @@
             border-top-right-radius: .6rem;
         }
 
-        #obsidian #fileread #note #linked-mentions ul button.sentence:first-child:hover {
-            border-top: 1px solid var(--color-border-dark);
-        }
-
         #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child),
         #obsidian #fileread #note #linked-mentions ul button.sentence:last-child:hover {
             border-bottom: 1px solid var(--color-border);
             border-left: 1px solid var(--color-border);
             border-right: 1px solid var(--color-border);
-        }
-
-        #obsidian #fileread #note #linked-mentions ul button.sentence:not(:first-child):hover,
-        #obsidian #fileread #note #linked-mentions ul button.sentence:first-child:hover {
-            border-left: 1px solid var(--color-border-dark);
-            border-right: 1px solid var(--color-border-dark);
         }
 
         #obsidian #fileread #note #linked-mentions ul button.sentence:last-child {
@@ -98,13 +89,17 @@
 
 <body>
     <h3 id="note-title"></h3>
-    <div id="file-content"></div>
+    <div id="note-content"></div>
     <ul id="linked-mentions"></ul>
 </body>
 
 <script>
     function generateLinkedMentions(filePath, backlinks_parsed) {
         const vaultPath = '/' + '{{ site.obsidian_vault | escape }}' + '/';
+        const linkedMentionsId =
+            document.querySelector(`${css_fileread} #note #linked-mentions`);
+        while (linkedMentionsId.firstChild)
+            linkedMentionsId.removeChild(linkedMentionsId.firstChild);
         let linked_mentions = [];
         for (const parsedFilePath in backlinks_parsed) {
             const entry = backlinks_parsed[parsedFilePath];
@@ -115,22 +110,6 @@
                 }
             });
         }
-        // if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-        //     entry.backlink_paths.forEach(path => {
-        //         // console.log("pathh " + path);
-        //         if (!linked_mentions.includes(parsedFilePath) &&
-        //             path === filePath &&
-        //             parsedFilePath.endsWith('.md')) {
-        //             console.log("linked mention: " + parsedFilePath);
-        //             linked_mentions.push(parsedFilePath.replace("/:|", "'"));
-        //         }
-        //     });
-        // }
-        // }
-        const linkedMentionsId =
-            document.querySelector(`${css_fileread} #note #linked-mentions`);
-        while (linkedMentionsId.firstChild)
-            linkedMentionsId.removeChild(linkedMentionsId.firstChild);
         if (linked_mentions.length !== 0) {
             const h4 = document.createElement('h4');
             h4.textContent = 'Linked mentions';
@@ -155,18 +134,13 @@
                     li.appendChild(ul_linkedMention);
                     const backlink = `[[${extractFilenameFromPath(filePath)}]]`;
                     let lines = content.split('\n');
-                    // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
-                    console.log("lines: " + content);
                     lines.forEach(line => {
                         if (line) {
-                            let stripped_line = line.toLowerCase().replace(/\|.*$/, '').replace(/#.*$/, '');
-                            // console.log("line: " + stripped_line);
                             const line_backlinks = extractBacklinks(line);
                             if (line_backlinks) {
                                 line_backlinks.forEach(line_backlink => {
-                                    console.log("backlink line: " + line_backlink);
-                                    const stripped_backlink = line_backlink.toLowerCase().replace(/\|.*?\]\]/, ']]').replace(/#.*?\]\]/, ']]');
-                                    console.log("stripped_backlink: " + stripped_backlink);
+                                    const stripped_backlink =
+                                        line_backlink.toLowerCase().replace(/\|.*?\]\]/, ']]').replace(/#.*?\]\]/, ']]');
                                     if (stripped_backlink === backlink.toLowerCase()) {
                                         const btnLinkedMention = document.createElement('button');
                                         btnLinkedMention.textContent = line;
@@ -175,25 +149,13 @@
 
                                         btnLinkedMention.addEventListener('click', function () {
                                             const filePath = this.dataset.filePath.replace(vaultPath, '');
+                                            console.info("linked mention clicked: " + filePath);
                                             dispatchFileSelectEvt(filePath);
                                         });
                                         ul_linkedMention.appendChild(btnLinkedMention);
                                     }
                                 });
                             }
-
-                            // if (stripped_line.toLowerCase().includes(backlink.toLowerCase())) {
-                            //     const btnLinkedMention = document.createElement('button');
-                            //     btnLinkedMention.textContent = line;
-                            //     btnLinkedMention.classList.add('sentence');
-                            //     btnLinkedMention.dataset.filePath = linkedMentionPathFull;
-
-                            //     btnLinkedMention.addEventListener('click', function () {
-                            //         const filePath = this.dataset.filePath.replace(vaultPath, '');
-                            //         dispatchFileSelectEvt(filePath);
-                            //     });
-                            //     ul_linkedMention.appendChild(btnLinkedMention);
-                            // }
                         }
                     });
                 }).catch(error => {
@@ -205,20 +167,16 @@
 
 <script>
     function loadNote(filePath, header = "") {
-        let enable_backlinks = '{{ site.obsidian_backlinks | escape }}';
-        if (enable_backlinks === null ||
-            enable_backlinks === '' ||
-            enable_backlinks === undefined)
-            enable_backlinks = "true";
-        console.log("enable_backlinks: " + enable_backlinks);
         console.log("filePath: " + filePath);
+        if (filePath.startsWith('/'))
+            filePath = filePath.substring(1);
         generateBreadcrumbs(filePath);
-        fetchNoteContent(enable_backlinks, filePath, header);
+        fetchNoteContent(filePath, header);
     }
 
-    function fetchNoteContent(backlinks_enabled, filePath, header = "") {
+    function fetchNoteContent(filePath, header = "") {
         const fullFilePath = getFullFilePath('/' + filePath);
-        console.log("fullFilePath: " + fullFilePath)
+        console.debug("fullNoteFilePath: " + fullFilePath)
         fetch(fullFilePath).then(response => {
             if (!response.ok)
                 throw new Error('Network response: ' + response.statusText);
@@ -241,29 +199,20 @@
             const fileName = extractFilenameFromPath(filePath);
             document.querySelector(`${css_fileread} #note #note-title`).textContent =
                 fileName;
-            document.querySelector(`${css_fileread} #note #file-content`).innerHTML =
+            document.querySelector(`${css_fileread} #note #note-content`).innerHTML =
                 cleanedHTML.innerHTML;
             document.querySelector(css_fileread).scrollTop = 0;
             if (header) {
                 const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
                 headers.forEach((heading) => {
-                    if (heading.textContent === header) {
-                        heading.scrollIntoView();
-                    }
+                    if (heading.textContent === header) heading.scrollIntoView();
                 });
             }
             cleanedHTML.remove();
 
-            if (backlinks_enabled === "true") {
-                const backlinks = '{{ site.data.obsidian.backlinks | jsonify }}'
-                try {
-                    const backlinks_parsed = JSON.parse(backlinks);
-                    mapBacklinksToJson(backlinks_parsed);
-                    console.log("backlinks_parsed: " + backlinks_parsed);
-                    generateLinkedMentions(filePath, backlinks_parsed);
-                } catch (e) {
-                    console.error("Error parsing backlinks:", e);
-                }
+            if (backlinksJSON) {
+                mapBacklinksToJson(backlinksJSON);
+                generateLinkedMentions(filePath, backlinksJSON);
             }
         }).catch(error => {
             console.error('Error fetching file:', error);

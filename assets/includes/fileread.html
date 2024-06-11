@@ -12,7 +12,7 @@
             align-items: center;
         }
 
-        #obsidian #fileread #file-content .url-link {
+        #obsidian #fileread #note-content .url-link {
             display: flex;
             font-size: large;
             color: var(--color-button);
@@ -33,18 +33,18 @@
             color: var(--color-text);
         }
 
-        #file-content blockquote svg {
+        #note-content blockquote svg {
             vertical-align: text-bottom;
         }
 
-        #file-content blockquote .svg_Warning,
-        #file-content blockquote .svg_Question {
+        #note-content blockquote .svg_Warning,
+        #note-content blockquote .svg_Question {
             color: #ed7908;
         }
 
-        #file-content blockquote .svg_Info,
-        #file-content blockquote .svg_Todo,
-        #file-content blockquote .svg_Note {
+        #note-content blockquote .svg_Info,
+        #note-content blockquote .svg_Todo,
+        #note-content blockquote .svg_Note {
             color: #086ddd;
         }
     </style>
@@ -90,10 +90,6 @@
             if (parts.length > 1) {
                 backlinkElem.textContent =
                     extractFilenameFromPath(parts[1].trim(), false);
-                // let hashtagPart = parts[0].match(/#(.*)\|/);
-                // if (hashtagPart && hashtagPart.length > 1) {
-                //     backlinkElem.dataset.value = hashtagPart[1].trim();
-                // }
 
                 backlinkElem.dataset.value = parts[0].trim();
 
@@ -132,9 +128,6 @@
 
     function mapBacklinksToJson(backlinks_json) {
         document.querySelectorAll('#obsidian #fileread .backlink').forEach(button => {
-            const parentFontSize = window.getComputedStyle(button.parentElement).fontSize;
-            button.style.fontSize = parentFontSize;
-            console.log("textContent: " + button.textContent); // Print the textContent
             button.addEventListener('click', (event) => {
                 console.log("click textContent: " + event.target.textContent);
                 for (const parsedFilePath in backlinks_json) {
@@ -301,6 +294,28 @@
 
 <!-- ---------------------- File read event handlers ----------------------- -->
 <script>
+    let backlinksJSON; 
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepage = '{{ site.obsidian_homepage | escape }}'
+        let backlinks_enabled = '{{ site.obsidian_backlinks | escape }}';
+        if (backlinks_enabled === null ||
+            backlinks_enabled === '' ||
+            backlinks_enabled === undefined)
+            backlinks_enabled = "true";
+        console.info("backlinks enabled? " + backlinks_enabled);
+        if (backlinks_enabled === "true") {
+            const backlinks =
+                '{{ site.data.obsidian.backlinks | jsonify }}';
+            try {
+                backlinksJSON = JSON.parse(backlinks);
+                console.log("backlinks_parsed: " + backlinksJSON);
+            } catch (e) {
+                console.error("Error parsing backlinks:", e);
+            }
+        }
+        if (homepage) switchPage(homepage);
+    });
+
     function switchPage(page) {
         if (page.endsWith('.canvas')) {
             document.getElementById('note').style.display = 'none';
@@ -322,10 +337,4 @@
             document.dispatchEvent(event);
         }
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const homepage = '{{ site.obsidian_homepage | escape }}'
-        console.log("file read loaded: " + homepage);
-        if (homepage) switchPage(homepage);
-    });
 </script>
