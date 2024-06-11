@@ -58,6 +58,7 @@ module Jekyll
         fileread = File.join(assets_dir, "includes", "fileread.html")
         note = File.join(assets_dir, "includes", "note.html")
         canvas = File.join(assets_dir, "includes", "canvas.html")
+        modals = File.join(assets_dir, "includes", "modals.html")
 
         sidebar = File.join(assets_dir, "includes", "sidebar.html")
         layout = File.join(assets_dir, "layouts", "obsidian.html")
@@ -66,6 +67,7 @@ module Jekyll
         copy_file_to_dir(fileread, obsidian_dir)
         copy_file_to_dir(note, obsidian_dir)
         copy_file_to_dir(canvas, obsidian_dir)
+        copy_file_to_dir(modals, obsidian_dir)
         copy_file_to_dir(sidebar, obsidian_dir)
 
         copy_file_to_dir(layout, layouts_dir)
@@ -92,26 +94,26 @@ module Jekyll
       end
 
       def collect_files(rootdir, path = "")
-        _files = []
+        root_files_ = []
         Dir.entries(rootdir).each do |entry|
           next if entry == "." || entry == ".." || entry.start_with?("_")
           entry_path = File.join(rootdir, entry)
           # puts "file path: #{entry_path}"  # print the path
-          _files << if File.directory?(entry_path)
+          root_files_ << if File.directory?(entry_path)
             next if entry.start_with?(".obsidian")
-            { name: entry, type: "dir", path: File.join(path, entry),
-              children: collect_files(entry_path, File.join(path, entry)) }
+            {name: entry, type: "dir", path: File.join(path, entry),
+             children: collect_files(entry_path, File.join(path, entry))}
           else
             # next unless entry.end_with?(".md", ".canvas")
             next if File.zero?(entry_path) || File.empty?(entry_path)
-            { name: entry, type: "file", path: File.join(path, entry) }
+            {name: entry, type: "file", path: File.join(path, entry)}
           end
         end
-        _files
+        root_files_
       end
 
-      def build_links(rootdir, _files, root_files, backlinks = {}, embeds = {})
-        _files.each do |file|
+      def build_links(rootdir, root_files_, root_files, backlinks = {}, embeds = {})
+        root_files_.each do |file|
           if file[:type] == "dir"
             # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
             build_links(rootdir, file[:children], root_files, backlinks, embeds)
@@ -132,13 +134,14 @@ module Jekyll
               # puts "File: #{file[:name]}, Path: #{entry_path}"
               links = content.scan(/\[\[(.*?)\]\]/).flatten
 
-              backlinks[file[:path]] ||= { "backlink_paths" => [] }
+              backlinks[file[:path]] ||= {"backlink_paths" => []}
 
               links.each do |link|
                 lowercase_link = link.downcase
                 matched_entry = find_matching_entry(root_files, lowercase_link)
                 if matched_entry
-                  unless backlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
+                  unless matched_entry[:path] == file[:path] ||
+                      backlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
                     backlinks[file[:path]]["backlink_paths"] << matched_entry[:path]
                   end
                 end
@@ -146,7 +149,7 @@ module Jekyll
             elsif !file[:name].end_with?(".md", ".canvas")
               # Your code for .png and .pdf files here
               if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
-                embeds[file[:path]] = { "embed_paths" => [entry_path] }
+                embeds[file[:path]] = {"embed_paths" => [entry_path]}
               else
                 unless embeds[file[:path]]["embed_paths"].include?(entry_path)
                   embeds[file[:path]]["embed_paths"] << entry_path
@@ -161,13 +164,14 @@ module Jekyll
       end
 
       def find_matching_entry(files, lowercase_link)
+        stripped_link = lowercase_link.sub(/\|.*$/, "").sub(/#.*$/, "")
         files.each do |file|
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
           elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
-            return file if file_name_without_extension == lowercase_link
+            return file if file_name_without_extension == stripped_link
           end
         end
         nil
@@ -186,20 +190,21 @@ module Jekyll
           escaped_data = {
             "backlink_paths" => data["backlink_paths"].map do |path|
               path = path.gsub("'", "/:|").gsub('"', "/:|")
-              path.length > 0 ? path.slice(1..-1) : path
-            end,
+              (path.length > 0) ? path.slice(1..-1) : path
+            end
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
         File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
       end
+
       def save_embeds_to_json(sitedest, embeds)
         data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "embeds.json")
         escaped_embeds = {}
         embeds.each do |path, _|
-          escaped_path = path[1..-1].gsub("'", "/:|").gsub('"', "/:|")
+          escaped_path = path[1..].gsub("'", "/:|").gsub('"', "/:|")
           escaped_embeds[escaped_path] = {}
         end
         File.write(json_file_path, JSON.pretty_generate(escaped_embeds))

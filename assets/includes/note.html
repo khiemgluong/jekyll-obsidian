@@ -104,22 +104,31 @@
 
 <script>
     function generateLinkedMentions(filePath, backlinks_parsed) {
+        const vaultPath = '/' + '{{ site.obsidian_vault | escape }}' + '/';
         let linked_mentions = [];
-        const filePathName = extractFilenameFromPath(filePath);
-        for (const parsedFilePath in backlinks_parsed)
-            if (backlinks_parsed.hasOwnProperty(parsedFilePath)) {
-                const entry = backlinks_parsed[parsedFilePath];
-                if (entry.backlink_paths && entry.backlink_paths.length > 0) {
-                    entry.backlink_paths.forEach(path => {
-                        if (!linked_mentions.includes(parsedFilePath) &&
-                            path === filePath &&
-                            parsedFilePath.endsWith('.md')) {
-                            linked_mentions.push(parsedFilePath.replace("/:|", "'"));
-                        }
-                    });
+        for (const parsedFilePath in backlinks_parsed) {
+            const entry = backlinks_parsed[parsedFilePath];
+            entry.backlink_paths.forEach(path => {
+                if (path === filePath && parsedFilePath.endsWith('.md')) {
+                    console.log("linked mention: " + parsedFilePath);
+                    linked_mentions.push(parsedFilePath.replace("/:|", "'"));
                 }
-            }
-        const linkedMentionsId = document.getElementById('linked-mentions');
+            });
+        }
+        // if (entry.backlink_paths && entry.backlink_paths.length > 0) {
+        //     entry.backlink_paths.forEach(path => {
+        //         // console.log("pathh " + path);
+        //         if (!linked_mentions.includes(parsedFilePath) &&
+        //             path === filePath &&
+        //             parsedFilePath.endsWith('.md')) {
+        //             console.log("linked mention: " + parsedFilePath);
+        //             linked_mentions.push(parsedFilePath.replace("/:|", "'"));
+        //         }
+        //     });
+        // }
+        // }
+        const linkedMentionsId =
+            document.querySelector(`${css_fileread} #note #linked-mentions`);
         while (linkedMentionsId.firstChild)
             linkedMentionsId.removeChild(linkedMentionsId.firstChild);
         if (linked_mentions.length !== 0) {
@@ -132,11 +141,9 @@
             const linkedPathName = extractFilenameFromPath(linkedMentionPath);
             linkedMentionsId.appendChild(li);
             li.classList.add('title');
-
             const decodedString = he.decode(linkedPathName);
             li.textContent = decodedString;
 
-            const vaultPath = '/' + '{{ site.obsidian_vault | escape }}' + '/';
             const linkedMentionPathFull = vaultPath + linkedMentionPath;
             fetch(linkedMentionPathFull)
                 .then(response => {
@@ -146,22 +153,47 @@
                 }).then(content => {
                     const ul_linkedMention = document.createElement('ul');
                     li.appendChild(ul_linkedMention);
-                    const backlink = `[[${filePathName}]]`;
+                    const backlink = `[[${extractFilenameFromPath(filePath)}]]`;
                     let lines = content.split('\n');
                     // let lines = content.split(/(?<=[.!?])\s*(?=\n|$)/);
-
+                    console.log("lines: " + content);
                     lines.forEach(line => {
-                        if (line.toLowerCase().includes(backlink.toLowerCase())) {
-                            const btnLinkedMention = document.createElement('button');
-                            btnLinkedMention.textContent = line;
-                            btnLinkedMention.classList.add('sentence');
-                            btnLinkedMention.dataset.filePath = linkedMentionPathFull;
-                            btnLinkedMention.addEventListener('click', function () {
-                                const filePath = this.dataset.filePath.replace(vaultPath, '');
-                                var event = new CustomEvent('obsidian_noteSelect', { detail: filePath });
-                                document.dispatchEvent(event);
-                            });
-                            ul_linkedMention.appendChild(btnLinkedMention);
+                        if (line) {
+                            let stripped_line = line.toLowerCase().replace(/\|.*$/, '').replace(/#.*$/, '');
+                            // console.log("line: " + stripped_line);
+                            const line_backlinks = extractBacklinks(line);
+                            if (line_backlinks) {
+                                line_backlinks.forEach(line_backlink => {
+                                    console.log("backlink line: " + line_backlink);
+                                    const stripped_backlink = line_backlink.toLowerCase().replace(/\|.*?\]\]/, ']]').replace(/#.*?\]\]/, ']]');
+                                    console.log("stripped_backlink: " + stripped_backlink);
+                                    if (stripped_backlink === backlink.toLowerCase()) {
+                                        const btnLinkedMention = document.createElement('button');
+                                        btnLinkedMention.textContent = line;
+                                        btnLinkedMention.classList.add('sentence');
+                                        btnLinkedMention.dataset.filePath = linkedMentionPathFull;
+
+                                        btnLinkedMention.addEventListener('click', function () {
+                                            const filePath = this.dataset.filePath.replace(vaultPath, '');
+                                            dispatchFileSelectEvt(filePath);
+                                        });
+                                        ul_linkedMention.appendChild(btnLinkedMention);
+                                    }
+                                });
+                            }
+
+                            // if (stripped_line.toLowerCase().includes(backlink.toLowerCase())) {
+                            //     const btnLinkedMention = document.createElement('button');
+                            //     btnLinkedMention.textContent = line;
+                            //     btnLinkedMention.classList.add('sentence');
+                            //     btnLinkedMention.dataset.filePath = linkedMentionPathFull;
+
+                            //     btnLinkedMention.addEventListener('click', function () {
+                            //         const filePath = this.dataset.filePath.replace(vaultPath, '');
+                            //         dispatchFileSelectEvt(filePath);
+                            //     });
+                            //     ul_linkedMention.appendChild(btnLinkedMention);
+                            // }
                         }
                     });
                 }).catch(error => {
@@ -227,6 +259,7 @@
                 try {
                     const backlinks_parsed = JSON.parse(backlinks);
                     mapBacklinksToJson(backlinks_parsed);
+                    console.log("backlinks_parsed: " + backlinks_parsed);
                     generateLinkedMentions(filePath, backlinks_parsed);
                 } catch (e) {
                     console.error("Error parsing backlinks:", e);
@@ -242,6 +275,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         if (homepage && homepage.endsWith('.md')) {
+            switchPage(homepage);
             loadNote(homepage);
             console.log("note loaded: " + homepage);
         }
