@@ -2,8 +2,6 @@
 <html lang="{{ page.lang | default: site.lang | default: " en" }}">
 
 <head>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
-        integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
     <!-- --------------------------- Obsidian styles --------------------------- -->
@@ -18,7 +16,6 @@
         #obsidian {
             --bg: white;
             --color-border: #e0e0e0;
-            --color-border-dark: #363636;
             --color-button: #606060;
             --bg-tinted: #f6f6f6;
             --color-accent: #469fd3;
@@ -149,12 +146,22 @@
 </body>
 
 <script>
-    const divider = document.getElementById('divider');
-    const explorer = document.getElementById('explorer');
-    const note = document.querySelector('#obsidian #fileread #note');
+    // ! ELEMENT SELECTORS
+    const OBSIDIAN = document.getElementById('obsidian');
+    const css_fileread = '#obsidian #fileread';
+
+    const EXPLORER = OBSIDIAN.querySelector('#explorer');
+    const FILE_TREE = EXPLORER.querySelector(' #file-tree');
+
+    const DIVIDER = OBSIDIAN.querySelector(' #divider');
+
+    const FILEREAD = OBSIDIAN.querySelector(' #fileread');
+    const NOTE = FILEREAD.querySelector('#note');
+    const CANVAS = FILEREAD.querySelector('#canvas');
+
+    // ! GLOBAL CONSTS
     const minWidth = 10; const maxWidth = 50;
     const minPadding = 4; const maxPadding = 22;
-    const css_fileread = '#obsidian #fileread';
 </script>
 
 <!-- ------------------------ Divider drag handler ------------------------- -->
@@ -162,10 +169,10 @@
     let isDragging = false;
     let startX, startWidth;
 
-    divider.addEventListener('mousedown', (e) => {
+    DIVIDER.addEventListener('mousedown', (e) => {
         isDragging = true;
         startX = e.clientX;
-        startWidth = explorer.getBoundingClientRect().width;
+        startWidth = EXPLORER.getBoundingClientRect().width;
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
     });
@@ -178,11 +185,11 @@
         let explorerWidth = newWidth / window.innerWidth * 100;
         // Clamp width 
         explorerWidth = Math.max(minWidth, Math.min(explorerWidth, maxWidth));
-        explorer.style.width = `${explorerWidth}%`;
+        EXPLORER.style.width = `${explorerWidth}%`;
 
         let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
-        note.style.paddingLeft = `${padding}vw`;
-        note.style.paddingRight = `${padding}vw`;
+        NOTE.style.paddingLeft = `${padding}vw`;
+        NOTE.style.paddingRight = `${padding}vw`;
     }
 
     // Linear mapping function
@@ -200,10 +207,8 @@
 <!-- --------------------------- On content load --------------------------- -->
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-        let explorer = document.querySelector('#obsidian #explorer');
-        let note = document.querySelector('#obsidian #fileread #note');
-        let explorerWidthPx = parseFloat(getComputedStyle(explorer).width);
-        let parentWidthPx = parseFloat(getComputedStyle(explorer.parentElement).width);
+        let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
+        let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
         let explorerWidth = (explorerWidthPx / parentWidthPx) * 100;
         let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
         note.style.paddingLeft = `${padding}vw`;
@@ -238,8 +243,11 @@
     }
 
     const Icon = {
+        // ------------------------------ explorer -------------------------------
         RightArrow: "RightArrow",
         DownArrow: "DownArrow",
+        ChevronExpand: "ChevronExpand",
+        ChevronCollapse: "ChevronCollapse",
         // ------------------------------ callouts -------------------------------
         Note: "Note",
         Info: "Info",
@@ -259,12 +267,12 @@
         switch (icon) {
             case Icon.RightArrow:
                 return `
-                <svg class="svg_RightArrow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <svg class="svg_RightArrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
                 </svg>`;
             case Icon.DownArrow:
                 return `
-                <svg class="svg_DownArrow" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="dynamic-svg" viewBox="0 0 24 24" fill="none">
+                <svg class="svg_downArrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 9 7 7 7-7"/>
                 </svg>`;
             // ------------------------------ callouts -------------------------------

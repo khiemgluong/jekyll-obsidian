@@ -1,12 +1,26 @@
 <head>
     <style>
+        /* ----------------------------- Vault Name ------------------------------ */
         #vault-name {
             margin-bottom: 3px;
             font-weight: 500;
             font-size: 1.1rem;
-            padding-left: 14px;
+            display: flex;
+            justify-content: space-between;
         }
 
+        #vault-name #text {
+            padding-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #vault-name #tools {
+            padding-right: 4px;
+        }
+
+        /* ------------------------------ File Tree ------------------------------ */
         #file-tree {
             position: relative;
         }
@@ -33,6 +47,10 @@
         #file-tree ul button svg {
             vertical-align: middle;
             margin-right: 4px;
+            width: 100%;
+            height: 100%;
+            max-width: 16px;
+            max-height: 16px;
         }
 
         #file-tree ul button span {
@@ -74,19 +92,15 @@
         #file-tree ul ul li {
             padding-bottom: 4px;
         }
-
-        .svg_RightArrow,
-        .svg_DownArrow {
-            width: 100%;
-            height: 100%;
-            max-width: 16px;
-            max-height: 16px;
-        }
     </style>
 </head>
 
 <body>
-    <div id="vault-name">{{ site.obsidian_vault | split: "/" | last }}</div>
+    <div id="vault-name">
+        <div id="text">
+            {{ site.obsidian_vault | split: "/" | last }}</div>
+        <button id="tools">X</button>
+    </div>
     <div id="file-tree"></div>
 </body>
 
@@ -156,9 +170,8 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const rootElement = document.getElementById('file-tree');
         const sortedFiles = sortObsidianFiles(parsedObsidianFilesJson);
-        buildFileTree(rootElement, sortedFiles);
+        buildFileTree(FILE_TREE, sortedFiles);
     });
     console.log(parsedObsidianFilesJson);
     console.log("DIR root " + '{{ site.obsidian_vault | escape }}')

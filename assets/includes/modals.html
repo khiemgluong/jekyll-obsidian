@@ -17,8 +17,11 @@
 
         /* Modal Content/Box */
         #obsidian #modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
+            background-color: var(--bg);
+            border: 1px solid var(--color-border);
+            margin: auto;
+            height: fit-content;
+            max-height: 60%;
             border-radius: 1em;
             padding: 20px;
             padding-top: 0.5vh;
@@ -26,16 +29,17 @@
             width: 50%;
             display: flex;
             flex-direction: column;
+            box-shadow: 0px 0px 50px var(--color-button);
         }
 
         #modal-content #close {
             color: #aaa;
-            float: right;
             font-size: 28px;
             font-weight: bold;
+            line-height: 2.5vh;
             align-self: flex-end;
         }
-
+z
         #modal-content #close:hover,
         #modal-content #close:focus {
             color: black;
@@ -100,5 +104,13 @@
             <div>Download Vault</div>
         </div>
     </div>
-
 </div>
+
+<!-- --------------------------- Modal Switcher ---------------------------- -->
+ <script>
+        const Modal = {
+        Info: "Info",
+        Search: "Search",
+
+    };
+ </script>
