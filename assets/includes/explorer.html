@@ -1,5 +1,15 @@
 <head>
     <style>
+        /* ------------------------------ Explorer ------------------------------- */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         /* ----------------------------- Vault Name ------------------------------ */
         #vault-name {
             margin-bottom: 3px;
@@ -190,16 +200,29 @@
     document.addEventListener('DOMContentLoaded', () => {
         const sortedFiles = sortObsidianFiles(parsedObsidianFilesJson);
         buildFileTree(FILE_TREE, sortedFiles);
+
+        // collape expand button
         const collapseExpand = EXPLORER.querySelector('#vault-name #collapseExpand');
+        collapseExpand.innerHTML = DOMPurify.sanitize(getSVGIcon(Icon.ChevronExpand));
         collapseExpand.addEventListener('click', () => {
             expandOrCollapseFileTree = !expandOrCollapseFileTree;
+            if (expandOrCollapseFileTree)
+                EXPLORER.classList.add('hide-scrollbar');
             buildFileTree(FILE_TREE, sortedFiles, expandOrCollapseFileTree);
             collapseExpand.innerHTML = DOMPurify.sanitize((expandOrCollapseFileTree ?
                 getSVGIcon(Icon.ChevronCollapse)
                 : getSVGIcon(Icon.ChevronExpand)));
         });
-        collapseExpand.innerHTML = DOMPurify.sanitize(getSVGIcon(Icon.ChevronExpand));
+
+        // scroll listener
+        EXPLORER.addEventListener('scroll', () => {
+            if (EXPLORER.scrollTop < 250) {
+                EXPLORER.classList.add('hide-scrollbar');
+            } else
+                EXPLORER.classList.remove('hide-scrollbar');
+            console.log(`Scroll position: ${EXPLORER.scrollTop}`);
+        });
     });
-    console.log(parsedObsidianFilesJson);
+    console.debug(parsedObsidianFilesJson);
     console.log("DIR root " + '{{ site.obsidian_vault | escape }}')
 </script>
