@@ -96,7 +96,7 @@ module Jekyll
       def collect_files(rootdir, path = "")
         root_files_ = []
         Dir.entries(rootdir).each do |entry|
-          next if entry == "." || entry == ".." || entry.start_with?("_")
+          next if entry.start_with?(".", "_")
           entry_path = File.join(rootdir, entry)
           # puts "file path: #{entry_path}"  # print the path
           root_files_ << if File.directory?(entry_path)

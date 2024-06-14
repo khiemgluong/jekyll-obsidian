@@ -3,21 +3,29 @@
         /* ----------------------------- Vault Name ------------------------------ */
         #vault-name {
             margin-bottom: 3px;
+            padding: 2px 0;
             font-weight: 500;
-            font-size: 1.1rem;
+            font-size: 1rem;
             display: flex;
             justify-content: space-between;
+            border-bottom: 1px solid var(--color-border);
+
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background-color: var(--bg-tinted);
         }
 
         #vault-name #text {
-            padding-left: 10px;
+            padding-left: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        #vault-name #tools {
-            padding-right: 4px;
+        #vault-name #collapseExpand {
+            padding-right: 5px;
+            padding-top: 2px;
         }
 
         /* ------------------------------ File Tree ------------------------------ */
@@ -36,6 +44,7 @@
             outline: none;
             box-shadow: none;
             font: inherit;
+            font-size: 0.9rem;
             color: var(--color-button);
             gap: 4px;
             white-space: nowrap;
@@ -66,7 +75,7 @@
         #file-tree ul ul,
         #file-tree ul li.file {
             padding-left: 12px;
-            padding-top: 5px;
+            padding-top: 2px;
         }
 
         /*First level files*/
@@ -90,7 +99,7 @@
 
         #file-tree ul li,
         #file-tree ul ul li {
-            padding-bottom: 4px;
+            padding-bottom: 2px;
         }
     </style>
 </head>
@@ -99,13 +108,15 @@
     <div id="vault-name">
         <div id="text">
             {{ site.obsidian_vault | split: "/" | last }}</div>
-        <button id="tools">X</button>
+        <button id="collapseExpand"></button>
     </div>
     <div id="file-tree"></div>
 </body>
 
 <script lang="text/javascript">
-    function buildFileTree(rootElement, tree) {
+    function buildFileTree(rootElement, tree, expandRoot = false) {
+        const old_ul = rootElement.querySelector('ul');
+        if (old_ul) rootElement.removeChild(old_ul);
         const ul = document.createElement('ul');
         rootElement.appendChild(ul);
 
@@ -123,7 +134,6 @@
 
                 button.innerHTML =
                     DOMPurify.sanitize(getSVGIcon(Icon.RightArrow) + button.textContent);
-
                 var expanded = false;
                 button.addEventListener('click', () => {
                     expanded = !expanded;
@@ -139,6 +149,14 @@
                         if (nestedUl) li.removeChild(nestedUl);
                     }
                 });
+                if (expandRoot === true) {
+                    expanded = true;
+                    button.innerHTML =
+                        DOMPurify.sanitize(getSVGIcon(Icon.DownArrow) + button.textContent);
+                    if (!li.querySelector('ul'))
+                        buildFileTree(li, child.children, true);
+                }
+
             } else if (child.type === 'file') {
                 li.classList.add('file');
                 button.addEventListener('click', () => {
@@ -168,10 +186,19 @@
         });
         return tree;
     }
-
+    let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
         const sortedFiles = sortObsidianFiles(parsedObsidianFilesJson);
         buildFileTree(FILE_TREE, sortedFiles);
+        const collapseExpand = EXPLORER.querySelector('#vault-name #collapseExpand');
+        collapseExpand.addEventListener('click', () => {
+            expandOrCollapseFileTree = !expandOrCollapseFileTree;
+            buildFileTree(FILE_TREE, sortedFiles, expandOrCollapseFileTree);
+            collapseExpand.innerHTML = DOMPurify.sanitize((expandOrCollapseFileTree ?
+                getSVGIcon(Icon.ChevronCollapse)
+                : getSVGIcon(Icon.ChevronExpand)));
+        });
+        collapseExpand.innerHTML = DOMPurify.sanitize(getSVGIcon(Icon.ChevronExpand));
     });
     console.log(parsedObsidianFilesJson);
     console.log("DIR root " + '{{ site.obsidian_vault | escape }}')
