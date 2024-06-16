@@ -178,8 +178,8 @@
         });
     }
 
-    let obsidianFilesJson = '{{ site.data.obsidian_files | escape }}';
-    var parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
+    const obsidianFilesJson = '{{ site.data.obsidian_files | escape }}';
+    const parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
 
     function sortObsidianFiles(tree) {
         tree.sort((a, b) => {
@@ -223,6 +223,6 @@
             console.log(`Scroll position: ${EXPLORER.scrollTop}`);
         });
     });
-    console.debug(parsedObsidianFilesJson);
-    console.log("DIR root " + '{{ site.obsidian_vault | escape }}')
+    console.info(parsedObsidianFilesJson);
+    console.debug("DIR root " + '{{ site.obsidian_vault | escape }}')
 </script>

@@ -69,22 +69,20 @@
         }
     });
     document.addEventListener('DOMContentLoaded', () => {
-        const modals = document.querySelector('#obsidian #modal');
-        const modalClose = document.querySelector('#obsidian #modal #close');
-        const info = document.querySelector('#obsidian #sidebar #info');
+        const modal = OBSIDIAN.querySelector('#modal');
+        const modalClose = modal.querySelector('#close');
+        const infoBtn = OBSIDIAN.querySelector('#sidebar #info');
 
-        info.onclick = function () {
+        infoBtn.onclick = function () {
             modal.style.display = "inherit";
         }
-
         // When the user clicks on <span> (x), close the modal
         modalClose.onclick = function () {
             modal.style.display = "none";
         }
-
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
-            if (event.target == modals) {
+            if (event.target == modal) {
                 modal.style.display = "none";
             }
         }

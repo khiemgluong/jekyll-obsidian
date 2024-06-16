@@ -19,7 +19,13 @@ module Jekyll
           puts "Error: obsidian_vault is not set in config.yml"
           exit(1)
         end
-        obsidian_files = collect_files(source_dir)
+        counts = {dirs: 0, files: 0, size: 0}
+        obsidian_files = collect_files(source_dir, "", counts)
+        puts "Total dir count: #{counts[:dirs]}"
+        puts "Total file count: #{counts[:files]}"
+        puts "Total size of files: #{counts[:size]} B"
+        site.data["obsidian_counts"] = counts.to_json
+
         site.data["obsidian_files"] = obsidian_files.to_json
 
         backlinks, embeds = build_links(source_dir, obsidian_files, obsidian_files)
@@ -27,18 +33,16 @@ module Jekyll
 
         enable_backlinks = site.config["obsidian_backlinks"]
         if enable_backlinks || enable_backlinks.nil?
-          puts "Building backlinks..."
           save_backlinks_to_json(site.dest, backlinks)
-          puts "Backlinks built"
+          puts "Backlinks built."
         else
           puts "Backlinks disabled"
         end
 
         enable_embeds = site.config["obsidian_embeds"]
         if enable_embeds || enable_embeds.nil?
-          puts "Building embeds..."
           save_embeds_to_json(site.dest, embeds)
-          puts "Embeds built"
+          puts "Embeds built."
         else
           puts "Embeds disabled"
         end
@@ -93,25 +97,25 @@ module Jekyll
         is_excluded
       end
 
-      def collect_files(rootdir, path = "")
+      def collect_files(rootdir, path = "", counts = {dirs: 0, files: 0, size: 0})
         root_files_ = []
         Dir.entries(rootdir).each do |entry|
           next if entry.start_with?(".", "_")
           entry_path = File.join(rootdir, entry)
-          # puts "file path: #{entry_path}"  # print the path
           root_files_ << if File.directory?(entry_path)
             next if entry.start_with?(".obsidian")
+            counts[:dirs] += 1
             {name: entry, type: "dir", path: File.join(path, entry),
-             children: collect_files(entry_path, File.join(path, entry))}
+             children: collect_files(entry_path, File.join(path, entry), counts)}
           else
-            # next unless entry.end_with?(".md", ".canvas")
             next if File.zero?(entry_path) || File.empty?(entry_path)
-            {name: entry, type: "file", path: File.join(path, entry)}
+            counts[:files] += 1
+            counts[:size] += File.size(entry_path)
+            {name: entry, type: "file", path: File.join(path, entry), size: File.size(entry_path)}
           end
         end
         root_files_
       end
-
       def build_links(rootdir, root_files_, root_files, backlinks = {}, embeds = {})
         root_files_.each do |file|
           if file[:type] == "dir"
