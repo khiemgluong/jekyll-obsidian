@@ -3,17 +3,18 @@
         #obsidian #fileread #canvas {
             --canvas-backdrop: rgba(200, 200, 200, 0.1);
             position: absolute;
-            height: 4000px;
-            width: 4000px;
+            height: 10000px;
+            width: 10000px;
             /* https://codepen.io/mapsandapps/pen/pbzooY */
             background-color: var(--bg);
             background-image: radial-gradient(rgb(108, 110, 112) 5%, transparent 0);
-            background-size: 25px 25px;
+            background-size: 24px 24px;
         }
 
         #obsidian #fileread #canvas #canvas-content {
             width: 100%;
             height: 100%;
+            transform-origin: center center;
         }
 
         #obsidian #fileread #canvas .card {
@@ -53,6 +54,8 @@
             return response.text();
         }).then(content => {
             try {
+                FILEREAD.scrollTop = 0;
+                FILEREAD.scrollLeft = 0;
                 const canvas_parsed = JSON.parse(content);
                 if (!canvas_parsed.nodes || !Array.isArray(canvas_parsed.nodes)) {
                     console.error('Invalid or missing nodes array');
@@ -62,6 +65,7 @@
                 const canvasContent = CANVAS.querySelector('#canvas-content');
                 while (canvasContent.firstChild)
                     canvasContent.removeChild(canvasContent.firstChild);
+                canvasContent.style.transform = `scale(1)`;
 
                 const keysList = canvas_parsed.nodes.map(node => Object.keys(node));
                 console.log("Canvas keysList: " + keysList);
@@ -79,13 +83,9 @@
                 const centerY = (minY + maxY) / 2;
                 console.warn(`Center point: (${centerX}, ${centerY})`);
 
-                FILEREAD.scrollTop = centerY + canvasSizeHalved;
-                FILEREAD.scrollLeft = centerX + canvasSizeHalved;
-
                 console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
                 canvas_parsed.nodes.forEach(node => {
                     console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
-
                     const card = document.createElement('div');
                     switch (node.type) {
                         case "text":
@@ -96,7 +96,6 @@
                                 card.innerHTML = DOMPurify.sanitize(cardDiv.innerHTML);
                                 cardDiv.remove();
                                 if (BACKLINKS_JSON) mapBacklinksToJson(BACKLINKS_JSON);
-                                console.log("text: " + node.text);
                             }
                             break;
                         case "file":
@@ -112,7 +111,6 @@
                             // card.textContent = node.label;
                             break;
                     }
-                    card.classList.add('card');
                     // Set the div's position and size
                     card.style.position = 'absolute';
                     card.style.left = `${node.x + (-minX) + canvasSizeHalved}px`;
@@ -121,30 +119,97 @@
                     card.style.height = `${node.height}px`;
 
                     canvasContent.appendChild(card);
-
                 });
+
+                const boundingBox = getBoundingBoxOfChildren(canvasContent);
+                if (boundingBox) {
+                    const center = getCenterOfBoundingBox(boundingBox);
+                    console.info(`Bounding box height: ${boundingBox.height}, width: ${boundingBox.width}`);
+                    console.info(`Canvas center: x=${center.x}, y=${center.y}`);
+                    const FILEREADWidth = FILEREAD.offsetWidth;
+                    const FILEREADHeight = FILEREAD.offsetHeight;
+
+                    console.log(`FILEREAD Width: ${FILEREADWidth}px`);
+                    console.log(`FILEREAD Height: ${FILEREADHeight}px`);
+                    FILEREAD.scrollTop = center.y;
+                    FILEREAD.scrollLeft = center.x;
+                    // const scale = Math.min(FILEREADWidth / boundingBox.width, FILEREADHeight / boundingBox.height);
+                    // canvasContent.style.transform = `scale(${FILEREADHeight / boundingBox.height})`;
+
+                    canvasContent.querySelectorAll('.card').forEach(card => {
+                        const newLeft = card.offsetLeft + boundingBox.width / 2;
+                        card.style.left = `${newLeft}px`;
+                    });
+                } else
+                    console.warn('The parent element has no children.');
+
                 FILEREAD.addEventListener('wheel', adjustCanvasScaleOnScroll);
                 console.warn("wheel event listener added to FILEREAD");
             } catch (e) {
                 console.error("Error parsing canvas:", e);
             }
-
         });
     }
-
-    function resizeCanvasContent(canvasContent) {
-        let maxX = 0, maxY = 0;
-
-        // Iterate over each child of canvasContent
-        for (const child of canvasContent.children) {
-            const rect = child.getBoundingClientRect();
-            maxX = Math.max(maxX, rect.right);
-            maxY = Math.max(maxY, rect.bottom);
+</script>
+<!-- --------------------- Canvas movement and zooming --------------------- -->
+<script>
+    function getBoundingBoxOfChildren(parentElement) {
+        const children = parentElement.children;
+        if (children.length === 0) {
+            return null;
         }
 
-        canvasContent.style.width = `${maxX}px`;
-        canvasContent.style.height = `${maxY}px`;
+        // Initialize the bounding box with the first child's bounding rectangle
+        const firstChildRect = children[0].getBoundingClientRect();
+        let minX = firstChildRect.left;
+        let minY = firstChildRect.top;
+        let maxX = firstChildRect.right;
+        let maxY = firstChildRect.bottom;
+
+        // Iterate over all children to find the bounding box
+        for (let i = 1; i < children.length; i++) {
+            const rect = children[i].getBoundingClientRect();
+            if (rect.left < minX) minX = rect.left;
+            if (rect.top < minY) minY = rect.top;
+            if (rect.right > maxX) maxX = rect.right;
+            if (rect.bottom > maxY) maxY = rect.bottom;
+        }
+
+        const boundingBox = {
+            left: minX,
+            top: minY,
+            right: maxX,
+            bottom: maxY,
+            width: maxX - minX,
+            height: maxY - minY,
+        };
+
+        return boundingBox;
     }
+
+    // Function to calculate the center of the bounding box
+    function getCenterOfBoundingBox(boundingBox) {
+        const centerX = boundingBox.left + (boundingBox.width / 2);
+        const centerY = boundingBox.top + (boundingBox.height / 2);
+        return { x: centerX, y: centerY };
+    }
+
+    function adjustCanvasScaleOnScroll(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const canvasContent = CANVAS.querySelector('#canvas-content');
+            let scale = parseFloat(canvasContent.style.transform.replace(/[^0-9.-]/g, ''));
+            if (isNaN(scale)) scale = 1; // Default scale
+            console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
+            if (e.deltaY > 0) {
+                scale = Math.max(.1, scale - .02); // Decrease scale, but not less than 0.1
+            } else {
+                scale = Math.min(1, scale + .02); // Increase scale, but not more than 2
+            }
+            canvasContent.style.transform = `scale(${scale})`;
+        }
+    }
+
 </script>
 
 <script>
@@ -155,24 +220,6 @@
             console.log("canvas read loaded: " + homepage);
         }
     });
-
-    function adjustCanvasScaleOnScroll(e) {
-        if (e.ctrlKey) {
-            e.preventDefault();
-            const canvasContent = CANVAS.querySelector('#canvas-content');
-            let scale = parseFloat(canvasContent.style.transform.replace(/[^0-9.-]/g, ''));
-            if (isNaN(scale)) {
-                scale = 1; // Default scale
-            }
-            console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
-            if (e.deltaY > 0) {
-                scale = Math.max(0.1, scale - .02); // Decrease scale, but not less than 0.1
-            } else {
-                scale = Math.min(2, scale + .02); // Increase scale, but not more than 2
-            }
-            canvasContent.style.transform = `scale(${scale})`;
-        }
-    }
 
     document.addEventListener('obsidian_canvasSelect', function (event) {
         switchPage(event.detail.filePath);

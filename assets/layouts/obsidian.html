@@ -164,7 +164,15 @@
 
     // ! GLOBAL CONSTS
     const minWidth = 10; const maxWidth = 50;
-    const minPadding = 4; const maxPadding = 22;
+    const minPadding = 4; const maxPadding = 22.5;
+</script>
+
+<!-- -------------------------- Utility functions -------------------------- -->
+<script>
+    // Linear mapping function
+    function linearMapInRange(value, x1, y1, x2, y2) {
+        return (value - x1) * (y2 - x2) / (y1 - x1) + x2;
+    }
 </script>
 
 <!-- ------------------------ Divider drag handler ------------------------- -->
@@ -190,14 +198,9 @@
         explorerWidth = Math.max(minWidth, Math.min(explorerWidth, maxWidth));
         EXPLORER.style.width = `${explorerWidth}%`;
 
-        let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
+        let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
         NOTE.style.paddingLeft = `${padding}vw`;
         NOTE.style.paddingRight = `${padding}vw`;
-    }
-
-    // Linear mapping function
-    function map(value, x1, y1, x2, y2) {
-        return (value - x1) * (y2 - x2) / (y1 - x1) + x2;
     }
 
     function onMouseUp() {
@@ -213,7 +216,7 @@
         let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
         let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
         let explorerWidth = (explorerWidthPx / parentWidthPx) * 100;
-        let padding = map(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
+        let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
         note.style.paddingLeft = `${padding}vw`;
         note.style.paddingRight = `${padding}vw`;
         console.log("Explorer width:", explorerWidth);
