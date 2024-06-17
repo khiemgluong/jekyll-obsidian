@@ -3,6 +3,20 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
     <style>
+        #obsidian #fileread #note-content .url-link {
+            display: flex;
+            font-size: large;
+            color: var(--color-button);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Backlink styles */
+        #obsidian #fileread .backlink {
+            color: var(--color-accent);
+            font-size: inherit;
+        }
+
+        /* Embed styles */
         #obsidian #fileread .embed {
             width: 100%;
             max-width: 100%;
@@ -11,14 +25,6 @@
             flex-direction: column;
             align-items: center;
         }
-
-        #obsidian #fileread #note-content .url-link {
-            display: flex;
-            font-size: large;
-            color: var(--color-button);
-            padding-bottom: 0.5rem;
-        }
-
 
         #obsidian #fileread .embed audio {
             width: 80%;
@@ -33,6 +39,7 @@
             color: var(--color-text);
         }
 
+        /* Callout style */
         #note-content blockquote svg {
             vertical-align: text-bottom;
         }

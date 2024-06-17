@@ -15,8 +15,8 @@ module Jekyll
 
       def generate(site)
         # -------------------------------- site config ------------------------------- #
-        source_dir = site.config["obsidian_vault"] || site.source
-        if source_dir.nil?
+        vault = site.config["obsidian_vault"] || site.source
+        if vault.nil?
           puts "Error: obsidian_vault is not set in config.yml"
           exit(1)
         end
@@ -27,7 +27,7 @@ module Jekyll
         site.data["obsidian"] = {} unless site.data["obsidian"]
 
         counts = {dirs: 0, files: 0, size: 0}
-        obsidian_files = collect_files(source_dir, "", counts)
+        obsidian_files = collect_files(vault, "", counts)
         puts "Total dir count: #{counts[:dirs]}"
         puts "Total file count: #{counts[:files]}"
         puts "Total size of files: #{counts[:size]} B"
@@ -35,7 +35,7 @@ module Jekyll
 
         site.data["obsidian"]["vault_files"] = obsidian_files.to_json
 
-        backlinks, embeds = build_links(source_dir, obsidian_files, obsidian_files)
+        backlinks, embeds = build_links(vault, obsidian_files, obsidian_files)
         puts "Obsidian links built"
 
         if enable_backlinks || enable_backlinks.nil?

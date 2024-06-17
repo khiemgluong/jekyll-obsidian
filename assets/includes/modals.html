@@ -1,6 +1,7 @@
 <head>
     <style>
         #obsidian #modal {
+            --modal-backdrop: rgba(0, 0, 0, 0.45);
             display: none;
             position: fixed;
             z-index: 10;
@@ -12,7 +13,7 @@
             /* Enable scroll if needed */
             background-color: rgb(0, 0, 0);
             /* Fallback color */
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: var(--modal-backdrop);
         }
 
         /* Modal Content/Box */

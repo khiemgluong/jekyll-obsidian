@@ -1,6 +1,8 @@
 <head>
     <style>
         #obsidian #fileread #canvas {
+            --canvas-backdrop: rgba(200, 200, 200, 0.4);
+
             position: absolute;
             height: 4000px;
             width: 4000px;
@@ -16,18 +18,20 @@
         }
 
         #obsidian #fileread #canvas .card {
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border-style: 1px solid var(--color-border);
+            box-sizing: border-box;
+            padding: .8rem;
+            padding-bottom: 0;
+            border-radius: .5rem;
+            border: 1px solid var(--color-border);
+            overflow: auto;
         }
-
         #obsidian #fileread #canvas .card.text,
         #obsidian #fileread #canvas .card.file {
-            background-color: rgb(243, 243, 243);
+            background-color: var(--bg);
         }
 
         #obsidian #fileread #canvas .card.group {
-            background-color: rgba(201, 201, 201, 0.534);
+            background-color: var(--canvas-backdrop);
         }
     </style>
 </head>
@@ -72,19 +76,18 @@
                 const canvasWidthHalved = parseInt(canvasWidth) / 2;
                 console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
                 canvas_parsed.nodes.forEach(node => {
-                    // console.log(`x: ${node.x}, y: ${node.y}`);
+                    console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
 
-                    // console.log(`id: ${node.id}, type: ${node.type}, x: ${node.x}, y: ${node.y}, width: ${node.width}, height: ${node.height}, label: ${node.label}`);
                     const card = document.createElement('div');
                     switch (node.type) {
                         case "text":
                         default:
                             card.classList.add('card', 'text');
                             if (node.text) {
-                                const cardDiv =  parseStringToMarkdown(node.text);
+                                const cardDiv = parseStringToMarkdown(node.text);
                                 card.innerHTML = DOMPurify.sanitize(cardDiv.innerHTML);
                                 cardDiv.remove();
-
+                                if (BACKLINKS_JSON) mapBacklinksToJson(BACKLINKS_JSON);
                                 console.log("text: " + node.text);
                             }
                             break;
