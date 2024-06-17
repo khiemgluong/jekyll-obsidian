@@ -1,8 +1,7 @@
 <head>
     <style>
         #obsidian #fileread #canvas {
-            --canvas-backdrop: rgba(200, 200, 200, 0.4);
-
+            --canvas-backdrop: rgba(200, 200, 200, 0.1);
             position: absolute;
             height: 4000px;
             width: 4000px;
@@ -25,6 +24,7 @@
             border: 1px solid var(--color-border);
             overflow: auto;
         }
+
         #obsidian #fileread #canvas .card.text,
         #obsidian #fileread #canvas .card.file {
             background-color: var(--bg);
@@ -66,14 +66,22 @@
                 const keysList = canvas_parsed.nodes.map(node => Object.keys(node));
                 console.log("Canvas keysList: " + keysList);
 
+                const canvasWidth = window.getComputedStyle(CANVAS).width;
+                console.warn("Canvas width: " + canvasWidth);
+                const canvasSizeHalved = parseInt(canvasWidth) / 2;
+
                 const minX = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.x), Infinity);
                 const maxX = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.x), -Infinity);
                 const minY = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.y), Infinity);
                 const maxY = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.y), -Infinity);
 
-                const canvasWidth = window.getComputedStyle(CANVAS).width;
-                console.warn("Canvas width: " + canvasWidth);
-                const canvasWidthHalved = parseInt(canvasWidth) / 2;
+                const centerX = (minX + maxX) / 2;
+                const centerY = (minY + maxY) / 2;
+                console.warn(`Center point: (${centerX}, ${centerY})`);
+
+                FILEREAD.scrollTop = centerY + canvasSizeHalved;
+                FILEREAD.scrollLeft = centerX + canvasSizeHalved;
+
                 console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
                 canvas_parsed.nodes.forEach(node => {
                     console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
@@ -107,15 +115,16 @@
                     card.classList.add('card');
                     // Set the div's position and size
                     card.style.position = 'absolute';
-                    card.style.left = `${node.x + (-minX) + canvasWidthHalved}px`;
-                    card.style.top = `${node.y + (-minY) + canvasWidthHalved}px`;
+                    card.style.left = `${node.x + (-minX) + canvasSizeHalved}px`;
+                    card.style.top = `${node.y + (-minY) + canvasSizeHalved}px`;
                     card.style.width = `${node.width}px`;
                     card.style.height = `${node.height}px`;
 
                     canvasContent.appendChild(card);
 
                 });
-
+                FILEREAD.addEventListener('wheel', adjustCanvasScaleOnScroll);
+                console.warn("wheel event listener added to FILEREAD");
             } catch (e) {
                 console.error("Error parsing canvas:", e);
             }
@@ -146,6 +155,24 @@
             console.log("canvas read loaded: " + homepage);
         }
     });
+
+    function adjustCanvasScaleOnScroll(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            const canvasContent = CANVAS.querySelector('#canvas-content');
+            let scale = parseFloat(canvasContent.style.transform.replace(/[^0-9.-]/g, ''));
+            if (isNaN(scale)) {
+                scale = 1; // Default scale
+            }
+            console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
+            if (e.deltaY > 0) {
+                scale = Math.max(0.1, scale - .02); // Decrease scale, but not less than 0.1
+            } else {
+                scale = Math.min(2, scale + .02); // Increase scale, but not more than 2
+            }
+            canvasContent.style.transform = `scale(${scale})`;
+        }
+    }
 
     document.addEventListener('obsidian_canvasSelect', function (event) {
         switchPage(event.detail.filePath);

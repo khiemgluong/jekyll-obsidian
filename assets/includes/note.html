@@ -102,6 +102,7 @@
             filePath = filePath.substring(1);
         generateBreadcrumbs(filePath);
         fetchNoteContent(filePath, header);
+        FILEREAD.removeEventListener('wheel', adjustCanvasScaleOnScroll);
     }
 
     function fetchNoteContent(filePath, header = "") {
