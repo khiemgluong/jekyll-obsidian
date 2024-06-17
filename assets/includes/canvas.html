@@ -6,15 +6,33 @@
             width: 4000px;
             /* https://codepen.io/mapsandapps/pen/pbzooY */
             background-color: var(--bg);
-            background-image: radial-gradient(rgb(133, 137, 141) 5%, transparent 0);
-            background-size: 30px 30px;
+            background-image: radial-gradient(rgb(108, 110, 112) 5%, transparent 0);
+            background-size: 25px 25px;
         }
 
+        #obsidian #fileread #canvas #canvas-content {
+            width: 100%;
+            height: 100%;
+        }
+
+        #obsidian #fileread #canvas .card {
+            border-radius: 0.5rem;
+            border-style: 1px solid var(--color-border);
+        }
+
+        #obsidian #fileread #canvas .card.text,
+        #obsidian #fileread #canvas .card.file{
+            background-color: rgb(243, 243, 243);
+        }
+
+        #obsidian #fileread #canvas .card.group {
+            background-color: rgba(201, 201, 201, 0.534);
+        }
     </style>
 </head>
 
 <body>
-    <h3 id="canvas-title"></h3>
+    <div id="canvas-content"></div>
 </body>
 
 
@@ -23,6 +41,7 @@
         const fullFilePath = getFullFilePath(canvasPath);
         generateBreadcrumbs(canvasPath);
         console.log("fullFilePath Canvas: " + fullFilePath)
+
         fetch(fullFilePath).then(response => {
             if (!response.ok)
                 throw new Error('Network response: ' + response.statusText);
@@ -34,13 +53,81 @@
                     console.error('Invalid or missing nodes array');
                     return;
                 }
+
+                const canvasContent = CANVAS.querySelector('#canvas-content');
+                while (canvasContent.firstChild)
+                    canvasContent.removeChild(canvasContent.firstChild);
+
                 const keysList = canvas_parsed.nodes.map(node => Object.keys(node));
                 console.log("Canvas keysList: " + keysList);
+
+                const minX = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.x), Infinity);
+                const maxX = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.x), -Infinity);
+                const minY = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.y), Infinity);
+                const maxY = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.y), -Infinity);
+
+                const canvasWidth = window.getComputedStyle(CANVAS).width;
+                console.warn("Canvas width: " + canvasWidth);
+                const canvasWidthHalved = parseInt(canvasWidth) / 2;
+                console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
+                canvas_parsed.nodes.forEach(node => {
+                    // console.log(`x: ${node.x}, y: ${node.y}`);
+
+                    // console.log(`id: ${node.id}, type: ${node.type}, x: ${node.x}, y: ${node.y}, width: ${node.width}, height: ${node.height}, label: ${node.label}`);
+                    const card = document.createElement('div');
+                    switch (node.type) {
+                        case "text":
+                        default:
+                            card.classList.add('card', 'text');
+                            if(node.text){
+                                card.textContent = node.text;
+                                console.log("text: " + node.text);
+                            }
+                            break;
+                        case "file":
+                            card.classList.add('card', 'file');
+                            card.textContent = node.file;
+                            break;
+                        case "link":
+                            card.classList.add('card', 'link');
+                            card.textContent = node.link;
+                            break;
+                        case "group":
+                            card.classList.add('card', 'group');
+                            // card.textContent = node.label;
+                            break;
+                    }
+                    card.classList.add('card');
+                    // Set the div's position and size
+                    card.style.position = 'absolute';
+                    card.style.left = `${node.x + (-minX) + canvasWidthHalved}px`;
+                    card.style.top = `${node.y + (-minY) + canvasWidthHalved}px`;
+                    card.style.width = `${node.width}px`;
+                    card.style.height = `${node.height}px`;
+
+                    canvasContent.appendChild(card);
+
+                });
+
             } catch (e) {
                 console.error("Error parsing canvas:", e);
             }
 
         });
+    }
+
+    function resizeCanvasContent(canvasContent) {
+        let maxX = 0, maxY = 0;
+
+        // Iterate over each child of canvasContent
+        for (const child of canvasContent.children) {
+            const rect = child.getBoundingClientRect();
+            maxX = Math.max(maxX, rect.right);
+            maxY = Math.max(maxY, rect.bottom);
+        }
+
+        canvasContent.style.width = `${maxX}px`;
+        canvasContent.style.height = `${maxY}px`;
     }
 </script>
 

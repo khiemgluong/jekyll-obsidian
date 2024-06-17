@@ -104,6 +104,23 @@
     }
 </script>
 
+<!-- --------------------------- Content Parser ---------------------------- -->
+<script>
+    function parseContentToMarkdown(content) {
+        const md = window.markdownit();
+        let htmlContent = md.render(content);
+
+        const backlinksArr = extractBacklinks(content);
+        if (backlinksArr) replaceBacklinks(backlinksArr, htmlContent);
+        const calloutsArr = extractCallouts(content);
+        if (calloutsArr) generateCallouts(calloutsArr, htmlContent);
+
+        const embedsArr = extractEmbeds(content);
+        if (embedsArr) generateEmbeds(embedsArr, htmlContent);
+        return htmlContent;
+    }
+</script>
+
 <!-- --------------------------- Data Generators --------------------------- -->
 <script>
     function generateBreadcrumbs(filePath) {
@@ -120,7 +137,7 @@
             if (index === filePathArr.length - 1) {
                 btn.textContent = extractFilenameFromPath(path);
                 btn.addEventListener('click', () => {
-                    document.querySelector(css_fileread).scrollTop = 0;
+                    FILEREAD.scrollTop = 0;
                 });
             }
         });
@@ -222,7 +239,7 @@
         const embeds = '{{ site.data.obsidian.embeds | escape }}';
         const siteurl = '{{ site.url | escape }}' + '/';
         const encodedVaultPath =
-            VAULTPATH.split('/').map(part => encodeURIComponent(part)).join('/')+'/';
+            VAULTPATH.split('/').map(part => encodeURIComponent(part)).join('/') + '/';
         let newHTML = cleanedHTML.innerHTML;
         try {
             const embedsParsed = JSON.parse(embeds.replace(/&quot;/g, '"'));

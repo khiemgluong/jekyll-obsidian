@@ -86,18 +86,21 @@
         }
     </style>
 </head>
+
 <!-- -------------------------------- Note --------------------------------- -->
+
 <body>
     <h3 id="note-title"></h3>
     <div id="note-content"></div>
     <ul id="linked-mentions"></ul>
 </body>
 
+<!-- ---------------------- Generate Linked Mentions ----------------------- -->
 <script>
     function generateLinkedMentions(filePath, backlinks_parsed) {
         const vaultPath = '/' + VAULTPATH + '/';
         const linkedMentionsId =
-            document.querySelector(`${css_fileread} #note #linked-mentions`);
+            NOTE.querySelector('#linked-mentions');
         while (linkedMentionsId.firstChild)
             linkedMentionsId.removeChild(linkedMentionsId.firstChild);
         let linked_mentions = [];
@@ -182,6 +185,9 @@
                 throw new Error('Network response: ' + response.statusText);
             return response.text();
         }).then(content => {
+            NOTE.querySelector('#note-title').textContent =
+                extractFilenameFromPath(filePath);
+
             const md = window.markdownit();
             let htmlContent = md.render(content);
 
@@ -196,12 +202,9 @@
             const embedsArr = extractEmbeds(content);
             if (embedsArr) generateEmbeds(embedsArr, cleanedHTML);
 
-            const fileName = extractFilenameFromPath(filePath);
-            document.querySelector(`${css_fileread} #note #note-title`).textContent =
-                fileName;
-            document.querySelector(`${css_fileread} #note #note-content`).innerHTML =
-                cleanedHTML.innerHTML;
-            document.querySelector(css_fileread).scrollTop = 0;
+            NOTE.querySelector('#note-content').innerHTML = cleanedHTML.innerHTML;
+            FILEREAD.scrollTop = 0;
+            FILEREAD.scrollLeft = 0;
             if (header) {
                 const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
                 headers.forEach((heading) => {
