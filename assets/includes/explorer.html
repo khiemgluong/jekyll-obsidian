@@ -178,10 +178,10 @@
         });
     }
 
-    const obsidianFilesJson = '{{ site.data.obsidian_files | escape }}';
-    const parsedObsidianFilesJson = JSON.parse(obsidianFilesJson.replace(/&quot;/g, '"'));
+    const vaultFiles = '{{ site.data.obsidian.vault_files | escape }}';
+    const parsedVaultFiles = JSON.parse(vaultFiles.replace(/&quot;/g, '"'));
 
-    function sortObsidianFiles(tree) {
+    function sortObsidianVaultFiles(tree) {
         tree.sort((a, b) => {
             if (a.type === 'dir' && b.type === 'file') {
                 return -1;
@@ -191,14 +191,14 @@
         });
         tree.forEach(child => {
             if (child.type === 'dir') {
-                sortObsidianFiles(child.children);
+                sortObsidianVaultFiles(child.children);
             }
         });
         return tree;
     }
     let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
-        const sortedFiles = sortObsidianFiles(parsedObsidianFilesJson);
+        const sortedFiles = sortObsidianVaultFiles(parsedVaultFiles);
         buildFileTree(FILE_TREE, sortedFiles);
 
         // collape expand button
@@ -223,6 +223,6 @@
             console.log(`Scroll position: ${EXPLORER.scrollTop}`);
         });
     });
-    console.info(parsedObsidianFilesJson);
+    console.info(parsedVaultFiles);
     console.debug("DIR root " + '{{ site.obsidian_vault | escape }}')
 </script>

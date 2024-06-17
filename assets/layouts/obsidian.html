@@ -146,6 +146,9 @@
 </body>
 
 <script>
+    // ! SITE DATA
+    const VAULTPATH = '{{ site.obsidian_vault | escape }}';
+
     // ! ELEMENT SELECTORS
     const OBSIDIAN = document.getElementById('obsidian');
     const css_fileread = '#obsidian #fileread';
@@ -220,10 +223,7 @@
 
 <!-- ------------------------------- Getters ------------------------------- -->
 <script>
-    function getFullFilePath(filePath) {
-        const vaultpath = '/' + '{{ site.obsidian_vault | escape }}'
-        return fullFilePath = vaultpath + filePath;
-    }
+    function getFullFilePath(filePath) { return fullFilePath = '/' + VAULTPATH + filePath; }
 
     function getFileType(filePath) {
         const extensionToType = {

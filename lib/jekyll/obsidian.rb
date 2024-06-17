@@ -14,11 +14,18 @@ module Jekyll
       priority :lowest
 
       def generate(site)
+        # -------------------------------- site config ------------------------------- #
         source_dir = site.config["obsidian_vault"] || site.source
         if source_dir.nil?
           puts "Error: obsidian_vault is not set in config.yml"
           exit(1)
         end
+        enable_backlinks = site.config["obsidian_backlinks"]
+        enable_embeds = site.config["obsidian_embeds"]
+
+        # --------------------------------- site data -------------------------------- #
+        site.data["obsidian"] = {} unless site.data["obsidian"]
+
         counts = {dirs: 0, files: 0, size: 0}
         obsidian_files = collect_files(source_dir, "", counts)
         puts "Total dir count: #{counts[:dirs]}"
@@ -26,22 +33,21 @@ module Jekyll
         puts "Total size of files: #{counts[:size]} B"
         site.data["obsidian_counts"] = counts.to_json
 
-        site.data["obsidian_files"] = obsidian_files.to_json
+        site.data["obsidian"]["vault_files"] = obsidian_files.to_json
 
         backlinks, embeds = build_links(source_dir, obsidian_files, obsidian_files)
         puts "Obsidian links built"
 
-        enable_backlinks = site.config["obsidian_backlinks"]
         if enable_backlinks || enable_backlinks.nil?
-          save_backlinks_to_json(site.dest, backlinks)
+          site.data["obsidian"]["backlinks"] = escape_backlinks(backlinks).to_json
           puts "Backlinks built."
         else
           puts "Backlinks disabled"
         end
 
-        enable_embeds = site.config["obsidian_embeds"]
         if enable_embeds || enable_embeds.nil?
-          save_embeds_to_json(site.dest, embeds)
+          site.data["obsidian"]["embeds"] = escape_embeds(embeds).to_json
+          # save_embeds_to_json(site.dest, embeds)
           puts "Embeds built."
         else
           puts "Embeds disabled"
@@ -97,6 +103,7 @@ module Jekyll
         is_excluded
       end
 
+      # ------------------------ Ruby Hash object generators ----------------------- #
       def collect_files(rootdir, path = "", counts = {dirs: 0, files: 0, size: 0})
         root_files_ = []
         Dir.entries(rootdir).each do |entry|
@@ -116,10 +123,10 @@ module Jekyll
         end
         root_files_
       end
+
       def build_links(rootdir, root_files_, root_files, backlinks = {}, embeds = {})
         root_files_.each do |file|
           if file[:type] == "dir"
-            # puts "Directory: #{file[:name]}, Path: #{file[:path]}"
             build_links(rootdir, file[:children], root_files, backlinks, embeds)
           elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
@@ -135,7 +142,6 @@ module Jekyll
                 next
               end
 
-              # puts "File: #{file[:name]}, Path: #{entry_path}"
               links = content.scan(/\[\[(.*?)\]\]/).flatten
 
               backlinks[file[:path]] ||= {"backlink_paths" => []}
@@ -151,7 +157,6 @@ module Jekyll
                 end
               end
             elsif !file[:name].end_with?(".md", ".canvas")
-              # Your code for .png and .pdf files here
               if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
                 embeds[file[:path]] = {"embed_paths" => [entry_path]}
               else
@@ -181,24 +186,41 @@ module Jekyll
         nil
       end
 
-      def save_backlinks_to_json(sitedest, backlinks)
-        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
-        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
-        json_file_path = File.join(data_dir, "backlinks.json")
-
+      # ------------------------ Ruby Hash object formatters ----------------------- #
+      def escape_backlinks(backlinks)
         escaped_backlinks = {}
-        # json thinks ' is a special character, so we need to escape it
         backlinks.each do |path, data|
-          escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
-          escaped_path = escaped_path.slice(1..-1) if escaped_path.length > 0
+          escaped_path = escape_path(path)
           escaped_data = {
             "backlink_paths" => data["backlink_paths"].map do |path|
-              path = path.gsub("'", "/:|").gsub('"', "/:|")
-              (path.length > 0) ? path.slice(1..-1) : path
+              escape_path(path)
             end
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
+        escaped_backlinks
+      end
+
+      def escape_embeds(embeds)
+        escaped_embeds = {}
+        embeds.each do |path, _|
+          escaped_path = escape_path(path)
+          escaped_embeds[escaped_path] = {}
+        end
+        escaped_embeds
+      end
+
+      def escape_path(path)
+        escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
+        (escaped_path[0] == "/") ? escaped_path.slice(1..-1) : escaped_path
+      end
+
+      # ------------------- Write Ruby Hash objects to JSON files ------------------ #
+      def save_backlinks_to_json(sitedest, backlinks)
+        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
+        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+        json_file_path = File.join(data_dir, "backlinks.json")
+        escaped_backlinks = escape_backlinks(backlinks)
         File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
       end
 
@@ -206,11 +228,7 @@ module Jekyll
         data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
         FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
         json_file_path = File.join(data_dir, "embeds.json")
-        escaped_embeds = {}
-        embeds.each do |path, _|
-          escaped_path = path[1..].gsub("'", "/:|").gsub('"', "/:|")
-          escaped_embeds[escaped_path] = {}
-        end
+        escaped_embeds = escape_embeds(embeds)
         File.write(json_file_path, JSON.pretty_generate(escaped_embeds))
       end
     end

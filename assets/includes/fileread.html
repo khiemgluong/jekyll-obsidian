@@ -219,20 +219,19 @@
     }
 
     function generateEmbeds(embedsArr, cleanedHTML) {
-        const embeds = '{{ site.data.obsidian.embeds | jsonify }}';
+        const embeds = '{{ site.data.obsidian.embeds | escape }}';
         const siteurl = '{{ site.url | escape }}' + '/';
-        const vaultpath = '{{ site.obsidian_vault | escape }}' + '/';
         const encodedVaultPath =
-            vaultpath.split('/').map(part => encodeURIComponent(part)).join('/');
+            VAULTPATH.split('/').map(part => encodeURIComponent(part)).join('/')+'/';
         let newHTML = cleanedHTML.innerHTML;
         try {
-            const embeds_parsed = JSON.parse(embeds);
+            const embedsParsed = JSON.parse(embeds.replace(/&quot;/g, '"'));
             embedsArr.forEach(embed => {
                 const fileNameMatch = embed.match(/\[\[(.*?)\]\]/);
                 console.log("fileNameMatch: " + fileNameMatch);
                 if (fileNameMatch) {
                     const fileName = extractFilenameFromPath(fileNameMatch[1]);
-                    for (let key in embeds_parsed) {
+                    for (let key in embedsParsed) {
                         const embedFileName = extractFilenameFromPath(key);
                         if (embedFileName.replace("/:|", "'") === fileName) {
                             let encodedFileName =
@@ -294,7 +293,7 @@
 
 <!-- ---------------------- File read event handlers ----------------------- -->
 <script>
-    let backlinksJSON; 
+    let BACKLINKS_JSON;
     document.addEventListener('DOMContentLoaded', () => {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         let backlinks_enabled = '{{ site.obsidian_backlinks | escape }}';
@@ -305,10 +304,10 @@
         console.info("backlinks enabled? " + backlinks_enabled);
         if (backlinks_enabled === "true") {
             const backlinks =
-                '{{ site.data.obsidian.backlinks | jsonify }}';
+                '{{ site.data.obsidian.backlinks | escape }}';
             try {
-                backlinksJSON = JSON.parse(backlinks);
-                console.log("backlinks_parsed: " + backlinksJSON);
+                BACKLINKS_JSON = JSON.parse(backlinks.replace(/&quot;/g, '"'));
+                console.info("backlinks parsed: " + Object.keys(BACKLINKS_JSON).length);
             } catch (e) {
                 console.error("Error parsing backlinks:", e);
             }

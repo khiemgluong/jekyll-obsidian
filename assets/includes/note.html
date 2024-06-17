@@ -95,7 +95,7 @@
 
 <script>
     function generateLinkedMentions(filePath, backlinks_parsed) {
-        const vaultPath = '/' + '{{ site.obsidian_vault | escape }}' + '/';
+        const vaultPath = '/' + VAULTPATH + '/';
         const linkedMentionsId =
             document.querySelector(`${css_fileread} #note #linked-mentions`);
         while (linkedMentionsId.firstChild)
@@ -210,9 +210,9 @@
             }
             cleanedHTML.remove();
 
-            if (backlinksJSON) {
-                mapBacklinksToJson(backlinksJSON);
-                generateLinkedMentions(filePath, backlinksJSON);
+            if (BACKLINKS_JSON) {
+                mapBacklinksToJson(BACKLINKS_JSON);
+                generateLinkedMentions(filePath, BACKLINKS_JSON);
             }
         }).catch(error => {
             console.error('Error fetching file:', error);
