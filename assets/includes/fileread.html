@@ -104,20 +104,24 @@
     }
 </script>
 
-<!-- --------------------------- Content Parser ---------------------------- -->
+<!-- ---------------------- Parse string to Markdown ----------------------- -->
 <script>
-    function parseContentToMarkdown(content) {
-        const md = window.markdownit();
+    function parseStringToMarkdown(content) {
+        const md = window.markdownit({ breaks: true });
         let htmlContent = md.render(content);
 
-        const backlinksArr = extractBacklinks(content);
-        if (backlinksArr) replaceBacklinks(backlinksArr, htmlContent);
-        const calloutsArr = extractCallouts(content);
-        if (calloutsArr) generateCallouts(calloutsArr, htmlContent);
+        const markdownDiv = document.createElement('div');
+        markdownDiv.innerHTML = DOMPurify.sanitize(htmlContent);
 
+        const backlinksArr = extractBacklinks(content);
+        if (backlinksArr)
+            replaceBacklinks(backlinksArr, markdownDiv);
+        const calloutsArr = extractCallouts(content);
+        if (calloutsArr)
+            generateCallouts(calloutsArr, markdownDiv);
         const embedsArr = extractEmbeds(content);
-        if (embedsArr) generateEmbeds(embedsArr, htmlContent);
-        return htmlContent;
+        if (embedsArr) generateEmbeds(embedsArr, markdownDiv);
+        return markdownDiv
     }
 </script>
 
@@ -125,7 +129,7 @@
 <script>
     function generateBreadcrumbs(filePath) {
         const filePathArr = filePath.split('/').filter(Boolean);
-        const breadcrumbs = document.querySelector('#obsidian #fileread #breadcrumb');
+        const breadcrumbs = FILEREAD.querySelector('#breadcrumb');
         while (breadcrumbs.firstChild)
             breadcrumbs.removeChild(breadcrumbs.firstChild);
         filePathArr.forEach((path, index) => {
@@ -144,7 +148,7 @@
     }
 
     function mapBacklinksToJson(backlinks_json) {
-        document.querySelectorAll('#obsidian #fileread .backlink').forEach(button => {
+        FILEREAD.querySelectorAll('.backlink').forEach(button => {
             button.addEventListener('click', (event) => {
                 console.log("click textContent: " + event.target.textContent);
                 for (const parsedFilePath in backlinks_json) {

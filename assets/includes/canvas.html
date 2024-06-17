@@ -16,12 +16,13 @@
         }
 
         #obsidian #fileread #canvas .card {
+            padding: 1rem;
             border-radius: 0.5rem;
             border-style: 1px solid var(--color-border);
         }
 
         #obsidian #fileread #canvas .card.text,
-        #obsidian #fileread #canvas .card.file{
+        #obsidian #fileread #canvas .card.file {
             background-color: rgb(243, 243, 243);
         }
 
@@ -79,8 +80,11 @@
                         case "text":
                         default:
                             card.classList.add('card', 'text');
-                            if(node.text){
-                                card.textContent = node.text;
+                            if (node.text) {
+                                const cardDiv =  parseStringToMarkdown(node.text);
+                                card.innerHTML = DOMPurify.sanitize(cardDiv.innerHTML);
+                                cardDiv.remove();
+
                                 console.log("text: " + node.text);
                             }
                             break;
