@@ -247,6 +247,11 @@
     }
 
     const Icon = {
+        // ------------------------------- sidebar -------------------------------
+        Homepage: "Homepage",
+        Search: "Search",
+        Tags: "Tags",
+        Settings: "Settings",
         // ------------------------------ explorer -------------------------------
         RightArrow: "RightArrow",
         DownArrow: "DownArrow",
@@ -262,13 +267,32 @@
         Failure: "Failure",
         Warning: "Warning",
         Example: "Example",
-        // ------------------------------- sidebar -------------------------------
-        Homepage: "Homepage",
-        Settings: "Settings"
+
     };
 
     function getSVGIcon(icon) {
         switch (icon) {
+            // ------------------------------- sidebar ------------------------------- -->
+            case Icon.Homepage:
+                return `
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
+                </svg>`;
+            case Icon.Search:
+                return `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>`;
+            case Icon.Tags:
+                return `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
+                    <path d="M3 2v4.586l7 7L14.586 9l-7-7zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586z"/>
+                    <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1m0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1z"/>
+                </svg>`;
+            case Icon.Settings:
+                break;
+            // ------------------------------ explorer ------------------------------- -->
             case Icon.RightArrow:
                 return `
                 <svg class="svg_RightArrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
@@ -338,17 +362,6 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
                 </svg>`;
-            // ------------------------------- sidebar ------------------------------- -->
-            case Icon.Homepage:
-                return `
-                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                    viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
-                </svg>`;
-            case Icon.Settings:
-                // Your code here
-                break;
             default:
                 console.error('Invalid icon:', icon);
         }

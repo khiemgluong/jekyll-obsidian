@@ -3,8 +3,8 @@
         #obsidian #fileread #canvas {
             --canvas-backdrop: rgba(200, 200, 200, 0.1);
             position: absolute;
-            height: 10000px;
-            width: 10000px;
+            height: 5000px;
+            width: 5000px;
             /* https://codepen.io/mapsandapps/pen/pbzooY */
             background-color: var(--bg);
             background-image: radial-gradient(rgb(108, 110, 112) 5%, transparent 0);
@@ -133,8 +133,6 @@
                     console.log(`FILEREAD Height: ${FILEREADHeight}px`);
                     FILEREAD.scrollTop = center.y;
                     FILEREAD.scrollLeft = center.x;
-                    // const scale = Math.min(FILEREADWidth / boundingBox.width, FILEREADHeight / boundingBox.height);
-                    // canvasContent.style.transform = `scale(${FILEREADHeight / boundingBox.height})`;
 
                     canvasContent.querySelectorAll('.card').forEach(card => {
                         const newLeft = card.offsetLeft + boundingBox.width / 2;
@@ -200,15 +198,33 @@
             const canvasContent = CANVAS.querySelector('#canvas-content');
             let scale = parseFloat(canvasContent.style.transform.replace(/[^0-9.-]/g, ''));
             if (isNaN(scale)) scale = 1; // Default scale
+
+            // Get cursor position relative to the FILEREAD element
+            const rect = FILEREAD.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Store old scale to calculate the difference
+            const oldScale = scale;
+
+            // Update the scale
             console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
             if (e.deltaY > 0) {
-                scale = Math.max(.1, scale - .02); // Decrease scale, but not less than 0.1
+                scale = Math.max(0.1, scale - 0.01); // Decrease scale
             } else {
-                scale = Math.min(1, scale + .02); // Increase scale, but not more than 2
+                scale = Math.min(2, scale + 0.01); // Increase scale
             }
+
+            // Apply the new scale
             canvasContent.style.transform = `scale(${scale})`;
+            // Calculate the ratio of the scale change
+            const scaleRatio = scale / oldScale;
+            // Adjust scroll to maintain cursor position
+            FILEREAD.scrollLeft = scaleRatio * (FILEREAD.scrollLeft + x) - x;
+            FILEREAD.scrollTop = scaleRatio * (FILEREAD.scrollTop + y) - y;
         }
     }
+
 
 </script>
 
