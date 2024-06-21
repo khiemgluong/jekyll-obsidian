@@ -1,4 +1,6 @@
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
     <style>
         #obsidian #modal {
             --modal-backdrop: rgba(0, 0, 0, 0.4);
@@ -61,7 +63,8 @@
             font-size: x-large;
         }
 
-        #modal-content #info>div:not(:first-child) {
+        #modal-content #info>div:not(:first-child),
+        #modal-content #info>button:not(:first-child) {
             align-self: flex-start;
             font-size: large;
         }
@@ -99,7 +102,9 @@
                     </svg>
                     <span style="margin-left: 10px;">GitHub</span></a>
             </div>
-            <div id="download-vault">Download Vault</div>
+
+            <div id="vault-props"></div>
+            <!-- <button id="download-vault" onclick="downloadVaultFiles()">Download Vault</button> -->
         </div>
     </div>
 </div>
@@ -115,16 +120,16 @@
 
 <!-- ----------------------- Convert to byte string ------------------------ -->
 <script>
-function formatNumberToBytes(number) {
-    if (number < 1) return 'no size';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB'];
-    const digits = Math.floor((Math.log(number) / Math.log(1024)));
-    const unitIndex = Math.min(digits, units.length - 1); // Ensure we don't exceed the units array
-    const sizeInUnit = number / Math.pow(1024, unitIndex);
-    // Format the number to have up to 3 digits (including after the decimal point if applicable)
-    const formattedSize = sizeInUnit.toFixed(sizeInUnit >= 100 ? 0 : sizeInUnit >= 10 ? 1 : 2);
-    return `${formattedSize} ${units[unitIndex]}`;
-}
+    function formatNumberToBytes(number) {
+        if (number < 1) return 'no size';
+        const units = ['B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB'];
+        const digits = Math.floor((Math.log(number) / Math.log(1024)));
+        const unitIndex = Math.min(digits, units.length - 1); // Ensure we don't exceed the units array
+        const sizeInUnit = number / Math.pow(1024, unitIndex);
+        // Format the number to have up to 3 digits (including after the decimal point if applicable)
+        const formattedSize = sizeInUnit.toFixed(sizeInUnit >= 100 ? 0 : sizeInUnit >= 10 ? 1 : 2);
+        return `${formattedSize} ${units[unitIndex]}`;
+    }
 </script>
 
 <script>
@@ -136,14 +141,67 @@ function formatNumberToBytes(number) {
         const parsedVaultData =
             JSON.parse(vaultData.replace(/&quot;/g, '"'));
 
-        console.log(`Total dir count: ${parsedVaultData.dirs}`);
-        console.log(`Total file count: ${parsedVaultData.files}`);
-        console.log(`Total size of files: ${parsedVaultData.size} B`);
         const formattedSize = formatNumberToBytes(parsedVaultData.size);
-        const downloadVault = infoModal.querySelector('#download-vault');
-        downloadVault.textContent = `Download vault: ${formattedSize}`;
+        const vaultProps = infoModal.querySelector('#vault-props');
+        vaultProps.textContent =
+            `${parsedVaultData.files} files | ${parsedVaultData.dirs} folders | ${formattedSize}`;
     });
 
     function loadInfoModal(infoModal) {
     }
+</script>
+
+<script>
+    async function downloadVaultFiles() {
+        const vaultFiles = '{{ site.data.obsidian.vault_files | escape }}';
+        const parsedVaultFiles = JSON.parse(vaultFiles.replace(/&quot;/g, '"'));
+
+        // Function to recursively collect all file paths
+        const filesToFetch = [];
+        function collectFiles(fileNode) {
+            if (fileNode.type === 'file') {
+                filesToFetch.push(fileNode.path);
+            }
+            if (fileNode.children) {
+                fileNode.children.forEach(collectFiles);
+            }
+        }
+
+        if (Array.isArray(parsedVaultFiles)) {
+            parsedVaultFiles.forEach(collectFiles);
+        } else {
+            collectFiles(parsedVaultFiles);
+        }
+
+        const zip = new JSZip();
+        // Fetch all files and add them to the zip
+        for (const filePath of filesToFetch) {
+            const fullFilePath = he.decode(getFullFilePath(filePath));
+            console.log("fullfilePath vaultDownload " + fullFilePath)
+            const content = await fetch(fullFilePath).then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${fullFilePath}: ${response.statusText}`);
+                }
+                return response.blob();
+            });
+            zip.file(filePath, content, { binary: true });
+        }
+
+        // Generate zip file and trigger download
+        zip.generateAsync({ type: "blob" }).then(function (blob) {
+            // Create a download link
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "vaultFiles.zip";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }).catch(function (error) {
+            console.error('Error while creating the zip:', error);
+        });
+    }
+
+    // You might need to ensure JSZip is properly loaded before running this function
+
 </script>
