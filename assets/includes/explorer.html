@@ -122,7 +122,7 @@
     </div>
     <div id="file-tree"></div>
 </body>
-
+<!-- ------------------------- File tree generator ------------------------- -->
 <script lang="text/javascript">
     function buildFileTree(rootElement, tree, expandRoot = false) {
         const old_ul = rootElement.querySelector('ul');
@@ -178,9 +178,6 @@
         });
     }
 
-    const vaultFiles = '{{ site.data.obsidian.vault_files | escape }}';
-    const parsedVaultFiles = JSON.parse(vaultFiles.replace(/&quot;/g, '"'));
-
     function sortObsidianVaultFiles(tree) {
         tree.sort((a, b) => {
             if (a.type === 'dir' && b.type === 'file') {
@@ -198,17 +195,15 @@
     }
     let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
-        const sortedFiles = sortObsidianVaultFiles(parsedVaultFiles);
-        buildFileTree(FILE_TREE, sortedFiles);
+        buildFileTree(FILE_TREE, sortObsidianVaultFiles(VAULT_FILES));
 
-        // collape expand button
         const collapseExpand = EXPLORER.querySelector('#vault-name #collapseExpand');
         collapseExpand.innerHTML = DOMPurify.sanitize(getSVGIcon(Icon.ChevronExpand));
         collapseExpand.addEventListener('click', () => {
             expandOrCollapseFileTree = !expandOrCollapseFileTree;
             if (expandOrCollapseFileTree)
                 EXPLORER.classList.add('hide-scrollbar');
-            buildFileTree(FILE_TREE, sortedFiles, expandOrCollapseFileTree);
+            buildFileTree(FILE_TREE, sortedVaultFiles, expandOrCollapseFileTree);
             collapseExpand.innerHTML = DOMPurify.sanitize((expandOrCollapseFileTree ?
                 getSVGIcon(Icon.ChevronCollapse)
                 : getSVGIcon(Icon.ChevronExpand)));
@@ -222,6 +217,4 @@
                 EXPLORER.classList.remove('hide-scrollbar');
         });
     });
-    console.info(parsedVaultFiles);
-    console.debug("DIR root " + '{{ site.obsidian_vault | escape }}')
 </script>

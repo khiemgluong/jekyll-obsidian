@@ -33,14 +33,14 @@
 
 <body>
     <div id="top-container">
-        <button id="homepage">
+        <button id="homepage" onclick="loadHomepage()">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                 viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                     d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
             </svg>
         </button>
-        <button id="search">
+        <button id="search" onclick="dispatchModalSelectEvt('search')">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
                 viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -48,7 +48,7 @@
             </svg>
 
         </button>
-        <button id="tags">
+        <button id="tags" onclick="dispatchModalSelectEvt('tags')">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                 <path
                     d="M3 2v4.586l7 7L14.586 9l-7-7zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586z" />
@@ -67,33 +67,70 @@
         </button>
     </div>
 </body>
-
+<!-- ---------------------------- Load homepage ---------------------------- -->
 <script>
-    document.getElementById('homepage').addEventListener('click', () => {
+    function loadHomepage() {
         const homepage = '{{ site.obsidian_homepage | escape }}'
         if (homepage) {
             switchPage(homepage);
             dispatchFileSelectEvt(homepage);
             console.log("Homepage: " + homepage);
         }
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = OBSIDIAN.querySelector('#modal');
-        const modalClose = modal.querySelector('#close');
-        const infoBtn = OBSIDIAN.querySelector('#sidebar #info');
+    }
+</script>
 
-        infoBtn.onclick = function () {
-            modal.style.display = "inherit";
+<!-- ------------------------- Sidebar DOM events -------------------------- -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalClose = MODALS.querySelector('#close');
+        const infoModalSelect = SIDEBAR.querySelector('#info');
+
+        infoModalSelect.onclick = function () {
+            MODALS.style.display = "inherit";
         }
         // When the user clicks on <span> (x), close the modal
         modalClose.onclick = function () {
-            modal.style.display = "none";
+            MODALS.style.display = "none";
         }
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function (event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
+            if (event.target == MODALS) {
+                MODALS.style.display = "none";
             }
         }
     });
+
+    function dispatchModalSelectEvt(modalType, modalData = '') {
+        switch (modalType) {
+            case 'search':
+                console.debug("selected search modal");
+                break;
+            case 'tags':
+                console.debug("selected tags modal");
+                break;
+            case 'media':
+                console.debug("selected media modal");
+                break;
+        }
+        const detail = { modalType, modalData };
+        const event = new CustomEvent('obsidian_modalSelect', { detail });
+        document.dispatchEvent(event);
+    }
+
+    const Modal = {
+        Info: "Info",
+        Search: "Search",
+        Media: "Media",
+    };
+    function toggleModals(modal) {
+        switch (modal) {
+            case Modal.Info:
+            default:
+                break;
+            case Modal.Search:
+                break;
+            case Modal.Media:
+                break;
+        }
+    }
 </script>

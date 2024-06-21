@@ -150,8 +150,14 @@
     // ! SITE DATA
     const VAULTPATH = '{{ site.obsidian_vault | escape }}';
 
+    const VAULT_FILES =
+        JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
+
     // ! ELEMENT SELECTORS
     const OBSIDIAN = document.getElementById('obsidian');
+
+    const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
+    const MODALS = OBSIDIAN.querySelector('#modals');
 
     const EXPLORER = OBSIDIAN.querySelector('#explorer');
     const FILE_TREE = EXPLORER.querySelector(' #file-tree');
