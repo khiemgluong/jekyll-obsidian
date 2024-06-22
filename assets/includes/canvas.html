@@ -5,6 +5,8 @@
             position: absolute;
             height: 10000px;
             width: 10000px;
+            left: 0;
+            top: 0;
             /* https://codepen.io/mapsandapps/pen/pbzooY */
             background-color: var(--bg);
             background-image: radial-gradient(rgb(108, 110, 112) 5%, transparent 0);
@@ -131,11 +133,12 @@
 
                     console.log(`FILEREAD Width: ${FILEREADWidth}px`);
                     console.log(`FILEREAD Height: ${FILEREADHeight}px`);
-                    FILEREAD.scrollTop = center.y;
-                    FILEREAD.scrollLeft = center.x;
+                    FILEREAD.scrollTop = center.y - FILEREADHeight / 2;
+                    FILEREAD.scrollLeft =
+                        center.x - FILEREADWidth / 2 - boundingBox.width / 2;
 
                     canvasContent.querySelectorAll('.card').forEach(card => {
-                        const newLeft = card.offsetLeft + boundingBox.width / 2;
+                        const newLeft = card.offsetLeft - boundingBox.width / 2;
                         card.style.left = `${newLeft}px`;
                     });
                 } else
@@ -195,36 +198,42 @@
     function adjustCanvasScaleOnScroll(e) {
         if (e.ctrlKey) {
             e.preventDefault();
+
             const canvasContent = CANVAS.querySelector('#canvas-content');
             let scale = parseFloat(canvasContent.style.transform.replace(/[^0-9.-]/g, ''));
             if (isNaN(scale)) scale = 1; // Default scale
 
-            // Get cursor position relative to the FILEREAD element
-            const rect = FILEREAD.getBoundingClientRect();
+            // Get cursor position relative to the canvas
+            const rect = CANVAS.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // Store old scale to calculate the difference
-            const oldScale = scale;
+            // Calculate the point on the canvas before scaling
+            const pointBeforeScale = {
+                x: (FILEREAD.scrollLeft + x) / scale,
+                y: (FILEREAD.scrollTop + y) / scale
+            };
 
             // Update the scale
             console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
             if (e.deltaY > 0) {
                 scale = Math.max(0.1, scale - 0.01); // Decrease scale
             } else {
-                scale = Math.min(2, scale + 0.01); // Increase scale
+                scale = Math.min(1, scale + 0.01); // Increase scale
             }
 
             // Apply the new scale
             canvasContent.style.transform = `scale(${scale})`;
-            // Calculate the ratio of the scale change
-            const scaleRatio = scale / oldScale;
-            // Adjust scroll to maintain cursor position
-            FILEREAD.scrollLeft = scaleRatio * (FILEREAD.scrollLeft + x) - x;
-            FILEREAD.scrollTop = scaleRatio * (FILEREAD.scrollTop + y) - y;
+            const scrollMultiplier = 0.025;
+            const deltaX = (pointBeforeScale.x * scale - (FILEREAD.scrollLeft + x)) * scrollMultiplier;
+            const deltaY = (pointBeforeScale.y * scale - (FILEREAD.scrollTop + y)) * scrollMultiplier;
+            console.info("deltaX: " + deltaX + " deltaY: " + deltaY);
+            FILEREAD.scrollLeft += deltaX;
+            FILEREAD.scrollTop += deltaY;
         }
     }
 
+    // Attaching mouse move event listener to the CANVAS
 
 </script>
 
@@ -235,6 +244,13 @@
             loadCanvas(homepage);
             console.log("canvas read loaded: " + homepage);
         }
+
+        CANVAS.addEventListener('mousemove', function (e) {
+            const rect = CANVAS.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            console.log(`Mouse X: ${mouseX}, Mouse Y: ${mouseY}`);
+        });
     });
 
     document.addEventListener('obsidian_canvasSelect', function (event) {
