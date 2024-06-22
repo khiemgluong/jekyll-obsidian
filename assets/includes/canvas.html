@@ -45,6 +45,7 @@
 
 
 <script>
+    let _scrollLeft = 0; let _scrollTop = 0;
     function loadCanvas(canvasPath) {
         const fullFilePath = getFullFilePath(canvasPath);
         generateBreadcrumbs(canvasPath);
@@ -58,8 +59,8 @@
             try {
                 FILEREAD.scrollTop = 0;
                 FILEREAD.scrollLeft = 0;
-                const canvas_parsed = JSON.parse(content);
-                if (!canvas_parsed.nodes || !Array.isArray(canvas_parsed.nodes)) {
+                const canvasParsed = JSON.parse(content);
+                if (!canvasParsed.nodes || !Array.isArray(canvasParsed.nodes)) {
                     console.error('Invalid or missing nodes array');
                     return;
                 }
@@ -69,24 +70,22 @@
                     canvasContent.removeChild(canvasContent.firstChild);
                 canvasContent.style.transform = `scale(1)`;
 
-                const keysList = canvas_parsed.nodes.map(node => Object.keys(node));
+                const keysList = canvasParsed.nodes.map(node => Object.keys(node));
                 console.log("Canvas keysList: " + keysList);
 
-                const canvasWidth = window.getComputedStyle(CANVAS).width;
-                console.warn("Canvas width: " + canvasWidth);
-                const canvasSizeHalved = parseInt(canvasWidth) / 2;
+                const canvasWidth = parseInt(window.getComputedStyle(CANVAS).width);
 
-                const minX = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.x), Infinity);
-                const maxX = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.x), -Infinity);
-                const minY = canvas_parsed.nodes.reduce((min, node) => Math.min(min, node.y), Infinity);
-                const maxY = canvas_parsed.nodes.reduce((max, node) => Math.max(max, node.y), -Infinity);
+                const minX = canvasParsed.nodes.reduce((min, node) => Math.min(min, node.x), Infinity);
+                const maxX = canvasParsed.nodes.reduce((max, node) => Math.max(max, node.x), -Infinity);
+                const minY = canvasParsed.nodes.reduce((min, node) => Math.min(min, node.y), Infinity);
+                const maxY = canvasParsed.nodes.reduce((max, node) => Math.max(max, node.y), -Infinity);
 
                 const centerX = (minX + maxX) / 2;
                 const centerY = (minY + maxY) / 2;
                 console.warn(`Center point: (${centerX}, ${centerY})`);
 
                 console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
-                canvas_parsed.nodes.forEach(node => {
+                canvasParsed.nodes.forEach(node => {
                     console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
                     const card = document.createElement('div');
                     switch (node.type) {
@@ -115,8 +114,8 @@
                     }
                     // Set the div's position and size
                     card.style.position = 'absolute';
-                    card.style.left = `${node.x + (-minX) + canvasSizeHalved}px`;
-                    card.style.top = `${node.y + (-minY) + canvasSizeHalved}px`;
+                    card.style.left = `${node.x + (-minX) + (canvasWidth / 2)}px`;
+                    card.style.top = `${node.y + (-minY) + (canvasWidth / 2)}px`;
                     card.style.width = `${node.width}px`;
                     card.style.height = `${node.height}px`;
 
@@ -131,18 +130,25 @@
                     const FILEREADWidth = FILEREAD.offsetWidth;
                     const FILEREADHeight = FILEREAD.offsetHeight;
 
-                    console.log(`FILEREAD Width: ${FILEREADWidth}px`);
-                    console.log(`FILEREAD Height: ${FILEREADHeight}px`);
-                    FILEREAD.scrollTop = center.y - FILEREADHeight / 2;
-                    FILEREAD.scrollLeft =
-                        center.x - FILEREADWidth / 2 - boundingBox.width / 2;
+                    const boundingBoxVolume = boundingBox.height * boundingBox.width;
+                    const canvasVolume = canvasWidth ** 2;
+
+                    const scale = (boundingBoxVolume / canvasVolume);
+
+                    canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
 
                     canvasContent.querySelectorAll('.card').forEach(card => {
                         const newLeft = card.offsetLeft - boundingBox.width / 2;
                         card.style.left = `${newLeft}px`;
+                        const newTop = card.offsetTop - boundingBox.height / 2;
+                        card.style.top = `${newTop}px`;
                     });
-                } else
-                    console.warn('The parent element has no children.');
+
+                    const scrollLeft = center.x - FILEREADWidth / 2 - boundingBox.width / 2;
+                    _scrollLeft = scrollLeft - scrollLeft * (scale);
+                    _scrollTop = center.y - FILEREADHeight / 2 - boundingBox.height / 2;
+                    FILEREAD.scrollLeft = _scrollLeft; FILEREAD.scrollTop = _scrollTop;
+                } else console.warn('The canvas has no children.');
 
                 FILEREAD.addEventListener('wheel', adjustCanvasScaleOnScroll);
                 console.warn("wheel event listener added to FILEREAD");
@@ -152,8 +158,14 @@
         });
     }
 </script>
+
 <!-- --------------------- Canvas movement and zooming --------------------- -->
 <script>
+    function resetCanvasPosition() {
+        if (_scrollLeft) FILEREAD.scrollLeft = _scrollLeft;
+        if (_scrollTop) FILEREAD.scrollTop = _scrollTop;
+    }
+
     function getBoundingBoxOfChildren(parentElement) {
         const children = parentElement.children;
         if (children.length === 0) {
@@ -224,7 +236,7 @@
 
             // Apply the new scale
             canvasContent.style.transform = `scale(${scale})`;
-            const scrollMultiplier = 0.025;
+            const scrollMultiplier = 0.02;
             const deltaX = (pointBeforeScale.x * scale - (FILEREAD.scrollLeft + x)) * scrollMultiplier;
             const deltaY = (pointBeforeScale.y * scale - (FILEREAD.scrollTop + y)) * scrollMultiplier;
             console.info("deltaX: " + deltaX + " deltaY: " + deltaY);

@@ -148,7 +148,10 @@
             if (index === filePathArr.length - 1) {
                 btn.textContent = extractFilenameFromPath(path);
                 btn.addEventListener('click', () => {
-                    FILEREAD.scrollTop = 0;
+                    if (filePath.endsWith('.md'))
+                        FILEREAD.scrollTop = 0;
+                    else if (filePath.endsWith('.canvas'))
+                        resetCanvasPosition();
                 });
             }
         });
