@@ -40,7 +40,7 @@
                     d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5" />
             </svg>
         </button>
-        <button id="search" onclick="dispatchModalSelectEvt('search')">
+        <button id="search" onclick="dispatchModalSelectEvt('search')" popovertarget="search-modal">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none"
                 viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -58,7 +58,7 @@
         </button>
     </div>
     <div id="bottom-container">
-        <button id="info">
+        <button id="info" onclick="dispatchModalSelectEvt('info')" popovertarget="info-modal">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                 viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -74,7 +74,6 @@
         if (homepage) {
             switchPage(homepage);
             dispatchFileSelectEvt(homepage);
-            console.log("Homepage: " + homepage);
         }
     }
 </script>
@@ -82,26 +81,17 @@
 <!-- ------------------------- Sidebar DOM events -------------------------- -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const modalClose = MODALS.querySelector('#close');
-        const infoModalSelect = SIDEBAR.querySelector('#info');
+        const homepage = '{{ site.obsidian_homepage | escape }}'
+        const breadcrumbs = SIDEBAR.querySelector('button#homepage');
 
-        infoModalSelect.onclick = function () {
-            MODALS.style.display = "inherit";
-        }
-        // When the user clicks on <span> (x), close the modal
-        modalClose.onclick = function () {
-            MODALS.style.display = "none";
-        }
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == MODALS) {
-                MODALS.style.display = "none";
-            }
-        }
+        if (!homepage) { breadcrumbs.style.display = "none"; }
     });
-
     function dispatchModalSelectEvt(modalType, modalData = '') {
         switch (modalType) {
+            case 'info':
+            default:
+                console.debug("selected info modal");
+                break;
             case 'search':
                 console.debug("selected search modal");
                 break;
