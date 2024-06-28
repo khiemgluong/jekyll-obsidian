@@ -38,10 +38,9 @@
         #modals>* {
             border: 0;
             box-shadow: 0px 0px 50px var(--color-button);
-            max-width: 50%;
             border-radius: 1rem;
             width: 40%;
-            height: 50%;
+            max-width: 50%;
         }
 
         #modals>*::backdrop {
@@ -73,23 +72,32 @@
 
         /* ---------------------------- Search Modal ----------------------------- */
 
-        /* #search-modal:popover-open {
+        #search-modal:popover-open {
             animation: slideIn 150ms ease-in-out;
         }
 
-        @keyframes slideIn {
-            0% {
-                transform: translateX(-50%);
-                opacity: 0;
-            }
+        #search-modal {
+            height: 30%;
+            max-height: 40%;
+        }
 
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        } */
+        #search-modal ul {
+            list-style-type: none;
+            margin-left: 5px;
+        }
+
+        #search-modal ul button {
+            font-size: medium;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
 
         /* ----------------------------- Info Modal ------------------------------ */
+        #modals #info-modal {
+            height: 25%;
+        }
 
         #modals #info-modal:popover-open {
             display: flex;
@@ -130,7 +138,7 @@
     </div>
 
     <div popover id="info-modal">
-        <button class="modal-close" popovertarget="search-modal" popovertargetaction="hide">&times;</button>
+        <button class="modal-close" popovertarget="info-modal" popovertargetaction="hide">&times;</button>
         <div>
             <a href="https://jekyllrb.com/" target="_blank">jekyll</a>
             -
@@ -185,7 +193,12 @@
                 break;
 
             case 'search':
-                getAllFilePaths(VAULT_FILES)
+                const searchModal = MODALS.querySelector('#search-modal');
+                const old_ul = searchModal.querySelector('ul');
+                if (old_ul) searchModal.removeChild(old_ul);
+                const ul = document.createElement('ul');
+                searchModal.appendChild(ul);
+                getAllFilePaths(VAULT_FILES, ul)
                 break;
 
         }
@@ -194,16 +207,19 @@
 
 <!-- --------------------------- Search modal JS --------------------------- -->
 <script>
-    function getAllFilePaths(vaultFiles) {
+    function getAllFilePaths(vaultFiles, ul) {
         vaultFiles.forEach(child => {
-
-
             if (child.type === 'dir') {
                 console.debug("Entering directory: " + child.path); // Log entering a directory
-                getAllFilePaths(child.children); // Recurse into this directory
+                getAllFilePaths(child.children, ul); // Recurse into this directory
             }
             if (child.type === 'file') {
                 console.debug("search file out " + child.path);
+                const li = document.createElement('li');
+                const button = document.createElement('button');
+                const decodedString = he.decode(child.path);
+                button.textContent = decodedString;
+                li.appendChild(button); ul.appendChild(li);
             }
         });
     }
