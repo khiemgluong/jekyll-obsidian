@@ -71,14 +71,39 @@
         }
 
         /* ---------------------------- Search Modal ----------------------------- */
+        #search-modal {
+            padding-left: 0;
+            padding-top: 0;
+            height: 30%;
+            max-height: 40%;
+        }
+
+        #search-modal #header {
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            left: 0;
+        }
+
+        #search-modal #header input[type="text"] {
+            flex-grow: 1;
+            margin-right: 10px;
+            padding: 10px;
+            border-bottom-right-radius: .8rem;
+            border-style: none;
+        }
+
+        #search-modal #header button {
+            padding: 4px;
+            font-size: xx-large;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
 
         #search-modal:popover-open {
             animation: slideIn 150ms ease-in-out;
-        }
-
-        #search-modal {
-            height: 30%;
-            max-height: 40%;
         }
 
         #search-modal ul {
@@ -86,7 +111,11 @@
             margin-left: 5px;
         }
 
-        #search-modal ul button {
+        #search-modal ul li {
+            margin-top: 4px;
+        }
+
+        #search-modal ul li button {
             font-size: medium;
             white-space: nowrap;
             overflow: hidden;
@@ -133,8 +162,12 @@
 <!-- -------------------------------- Modal -------------------------------- -->
 <div id="modals">
     <div popover id="search-modal">
-        <span>search</span>
-        <button class="modal-close" popovertarget="search-modal" popovertargetaction="hide">&times;</button>
+        <div id="header">
+            <form style="display: flex; flex-grow: 1;">
+                <input type="text" id="search-input" name="name" placeholder="Find a note..">
+            </form>
+            <button class="modal-close" popovertarget="search-modal" popovertargetaction="hide">&times;</button>
+        </div>
     </div>
 
     <div popover id="info-modal">
