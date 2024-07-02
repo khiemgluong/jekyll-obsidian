@@ -108,7 +108,7 @@
 
         #search-modal ul {
             list-style-type: none;
-            margin-left: 5px;
+            margin-left: 10px;
         }
 
         #search-modal ul li {
@@ -121,6 +121,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+        }
+
+        #search-modal ul li button:hover {
+            background-color: var(--bg-tinted);
         }
 
         /* ----------------------------- Info Modal ------------------------------ */
@@ -231,7 +235,7 @@
                 if (old_ul) searchModal.removeChild(old_ul);
                 const ul = document.createElement('ul');
                 searchModal.appendChild(ul);
-                getAllFilePaths(VAULT_FILES, ul)
+                generateSearchModalFilepaths(VAULT_FILES, ul)
                 break;
 
         }
@@ -240,18 +244,22 @@
 
 <!-- --------------------------- Search modal JS --------------------------- -->
 <script>
-    function getAllFilePaths(vaultFiles, ul) {
+    function generateSearchModalFilepaths(vaultFiles, ul) {
         vaultFiles.forEach(child => {
             if (child.type === 'dir') {
                 console.debug("Entering directory: " + child.path); // Log entering a directory
-                getAllFilePaths(child.children, ul); // Recurse into this directory
+                generateSearchModalFilepaths(child.children, ul); // Recurse into this directory
             }
             if (child.type === 'file') {
-                console.debug("search file out " + child.path);
                 const li = document.createElement('li');
                 const button = document.createElement('button');
                 const decodedString = he.decode(child.path);
                 button.textContent = decodedString;
+                button.addEventListener('click', () => {
+                    const searchModal = MODALS.querySelector('#search-modal');
+                    dispatchFileSelectEvt(decodedString);
+                    searchModal.hidePopover();
+                });
                 li.appendChild(button); ul.appendChild(li);
             }
         });
