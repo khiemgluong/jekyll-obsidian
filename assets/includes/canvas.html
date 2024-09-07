@@ -13,10 +13,16 @@
             background-size: 24px 24px;
         }
 
+        #canvas svg {
+            position: absolute;
+            z-index: 1;
+        }
+
         #obsidian #fileread #canvas #canvas-content {
             width: 100%;
             height: 100%;
             transform-origin: center center;
+            z-index: 5;
         }
 
         #obsidian #fileread #canvas .card {
@@ -47,6 +53,7 @@
 
 <script>
     let _scrollLeft = 0; let _scrollTop = 0;
+    var EDGES = null;
     function loadCanvas(canvasPath) {
         const fullFilePath = getFullFilePath(canvasPath);
         generateBreadcrumbs(canvasPath);
@@ -74,33 +81,6 @@
                 const nodesKeysList = canvasParsed.nodes.map(node => Object.keys(node));
                 console.log("Canvas keysList: " + nodesKeysList);
 
-                const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
-                console.log("Edges keysList: " + edgesKeysList);
-                const params = { width: 10000, height: 10000 };
-                const two = new Two(params).appendTo(canvasContent);
-                // canvasParsed.edges.forEach(edge => {
-                //     const fromNode = canvasParsed.nodes.find(node => node.id === edge.fromNode);
-                //     const toNode = canvasParsed.nodes.find(node => node.id === edge.toNode);
-
-                //     if (fromNode && toNode) {
-                //         console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
-                //         console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
-
-                //         // Create a spline from fromNode to toNode
-                //         const curve = two.makeCurve(
-                //             fromNode.x, fromNode.y,  // Starting point
-                //             (fromNode.x + toNode.x) / 2, (fromNode.y + toNode.y) / 2,  // Control point for curve
-                //             toNode.x, toNode.y,      // Ending point
-                //             true                     // Indicates whether the path is closed
-                //         );
-                //         curve.stroke = 'black';  // Set the color of the curve
-                //         curve.linewidth = 2;     // Set the width of the curve
-                //     }
-                // });
-
-                // // Draw the scene
-                // two.update();
-
                 const canvasWidth = parseInt(window.getComputedStyle(CANVAS).width);
 
                 const minX = canvasParsed.nodes.reduce((min, node) => Math.min(min, node.x), Infinity);
@@ -111,6 +91,47 @@
                 const centerX = (minX + maxX) / 2;
                 const centerY = (minY + maxY) / 2;
                 console.warn(`Center point: (${centerX}, ${centerY})`);
+
+                // <!-- ----------------------------- Draw Edges ------------------------------ -->
+                const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
+                console.log("Edges keysList: " + edgesKeysList);
+                const params = { width: canvasWidth, height: canvasWidth };
+                const two = new Two(params).appendTo(CANVAS);
+                canvasParsed.edges.forEach(edge => {
+                    const fromNode = canvasParsed.nodes.find(node => node.id === edge.fromNode);
+                    const toNode = canvasParsed.nodes.find(node => node.id === edge.toNode);
+
+                    if (fromNode && toNode) {
+                        console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
+                        console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
+                        console.debug("center X " + (fromNode.x + (-minX) + (canvasWidth / 2)));
+                        // Create a spline from fromNode to toNode
+                        const offsetX = (-minX) + (canvasWidth / 2) + fromNode.width / 2;
+                        const offsetY = (-minY) + (canvasWidth / 2) + fromNode.height / 2;
+                        const offsetY2 = canvasWidth / 2 + fromNode.height / 2;
+
+
+                        // const from_offsetX = fromNode.x + (-minX) + (canvasWidth / 2);
+                        // const to_offsetX = toNode.x + (-minX) + (canvasWidth / 2);
+                        // const from_offsetY = fromNode.y + (-minY) + (canvasWidth / 2);
+                        // const to_offsetY = toNode.y + (-minY) + (canvasWidth / 2);
+
+                        const curve = two.makeCurve(
+                            fromNode.x + offsetX, fromNode.y + offsetY,  // Offset the start point
+                            (fromNode.x + toNode.x) / 2 + offsetX, (fromNode.y + toNode.y) / 2 + offsetY,  // Midpoint with offset
+                            toNode.x + offsetX, toNode.y + offsetY,      // Offset the end point
+                            false  // Not a closed path
+                        );
+                        curve.stroke = 'black';  // Set the color of the curve
+                        curve.linewidth = 3;     // Set the width of the curve
+                        // curve.fill = null;
+                        curve.closed = false;
+                        console.error("final from " + (fromNode.x + offsetX) + ("\t" + fromNode.y + offsetY));
+                    }
+                });
+                two.update()
+                EDGES = CANVAS.querySelector('svg');
+                // <!-- --------------------------- Draw Edges END ---------------------------- -->
 
                 console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
                 canvasParsed.nodes.forEach(node => {
@@ -143,6 +164,9 @@
                     // Set the div's position and size
                     card.style.position = 'absolute';
                     card.style.left = `${node.x + (-minX) + (canvasWidth / 2)}px`;
+                    console.log("Card left " + node.x + " " + (-minX) + " " + canvasWidth / 2);
+                    console.log("retardid " + (node.x + (-minX) + (canvasWidth / 2)));
+
                     card.style.top = `${node.y + (-minY) + (canvasWidth / 2)}px`;
                     card.style.width = `${node.width}px`;
                     card.style.height = `${node.height}px`;
@@ -163,14 +187,14 @@
 
                     const scale = (boundingBoxVolume / canvasVolume);
 
-                    canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
-
-                    canvasContent.querySelectorAll('.card').forEach(card => {
-                        const newLeft = card.offsetLeft - boundingBox.width / 2;
-                        card.style.left = `${newLeft}px`;
-                        const newTop = card.offsetTop - boundingBox.height / 2;
-                        card.style.top = `${newTop}px`;
-                    });
+                    // canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
+                    // EDGES.style.transform = `scale(${(1 - scale) / 2})`;
+                    // canvasContent.querySelectorAll('.card').forEach(card => {
+                    //     const newLeft = card.offsetLeft - boundingBox.width / 2;
+                    //     card.style.left = `${newLeft}px`;
+                    //     const newTop = card.offsetTop - boundingBox.height / 2;
+                    //     card.style.top = `${newTop}px`;
+                    // });
 
                     const scrollLeft = center.x - FILEREADWidth / 2 - boundingBox.width / 2;
                     _scrollLeft = scrollLeft - scrollLeft * (scale);
@@ -264,10 +288,14 @@
 
             // Apply the new scale
             canvasContent.style.transform = `scale(${scale})`;
+            // const EDGES = CANVAS.querySelector('svg');
+            EDGES.style.transform = `scale(${scale})`;
+            EDGES.style.transformOrigin = 'center center';
+
             const scrollMultiplier = 0.02;
             const deltaX = (pointBeforeScale.x * scale - (FILEREAD.scrollLeft + x)) * scrollMultiplier;
             const deltaY = (pointBeforeScale.y * scale - (FILEREAD.scrollTop + y)) * scrollMultiplier;
-            console.info("deltaX: " + deltaX + " deltaY: " + deltaY);
+            // console.info("deltaX: " + deltaX + " deltaY: " + deltaY);
             FILEREAD.scrollLeft += deltaX;
             FILEREAD.scrollTop += deltaY;
         }
@@ -289,7 +317,7 @@
             const rect = CANVAS.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
-            console.log(`Mouse X: ${mouseX}, Mouse Y: ${mouseY}`);
+            // console.log(`Mouse X: ${mouseX}, Mouse Y: ${mouseY}`);
         });
     });
 
