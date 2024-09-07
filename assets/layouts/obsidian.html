@@ -135,8 +135,10 @@
             <div id="fileread">
                 <ul id="breadcrumb"> </ul>
                 {% include obsidian/fileread.html %}
-                <div id="note" style="display: flex;">
-                    {% include obsidian/note.html %}
+                <div id="notes">
+                    <div id="note" style="display: flex;">
+                        {% include obsidian/note.html %}
+                    </div>
                 </div>
                 <div id="canvas" style="display: none;">
                     {% include obsidian/canvas.html %}

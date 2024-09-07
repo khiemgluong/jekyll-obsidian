@@ -97,6 +97,15 @@
                 break;
             case 'tags':
                 console.debug("selected tags modal");
+                const clonedNote = NOTE.cloneNode(true); // `true` ensures deep cloning (copy all child nodes)
+
+                // Step 3: Modify the ID of the cloned element
+                // Generate a unique ID, perhaps by using a timestamp or an incrementing index
+                clonedNote.id = `note-${Date.now()}`;
+
+                // Step 4: Append the cloned element to its new parent
+                const notes = FILEREAD.querySelector('#notes');
+                notes.appendChild(clonedNote);
                 break;
             case 'media':
                 console.debug("selected media modal");

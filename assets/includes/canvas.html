@@ -43,6 +43,7 @@
     <div id="canvas-content"></div>
 </body>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.8.14/two.min.js"></script>
 
 <script>
     let _scrollLeft = 0; let _scrollTop = 0;
@@ -70,8 +71,35 @@
                     canvasContent.removeChild(canvasContent.firstChild);
                 canvasContent.style.transform = `scale(1)`;
 
-                const keysList = canvasParsed.nodes.map(node => Object.keys(node));
-                console.log("Canvas keysList: " + keysList);
+                const nodesKeysList = canvasParsed.nodes.map(node => Object.keys(node));
+                console.log("Canvas keysList: " + nodesKeysList);
+
+                const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
+                console.log("Edges keysList: " + edgesKeysList);
+                const params = { width: 10000, height: 10000 };
+                const two = new Two(params).appendTo(canvasContent);
+                // canvasParsed.edges.forEach(edge => {
+                //     const fromNode = canvasParsed.nodes.find(node => node.id === edge.fromNode);
+                //     const toNode = canvasParsed.nodes.find(node => node.id === edge.toNode);
+
+                //     if (fromNode && toNode) {
+                //         console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
+                //         console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
+
+                //         // Create a spline from fromNode to toNode
+                //         const curve = two.makeCurve(
+                //             fromNode.x, fromNode.y,  // Starting point
+                //             (fromNode.x + toNode.x) / 2, (fromNode.y + toNode.y) / 2,  // Control point for curve
+                //             toNode.x, toNode.y,      // Ending point
+                //             true                     // Indicates whether the path is closed
+                //         );
+                //         curve.stroke = 'black';  // Set the color of the curve
+                //         curve.linewidth = 2;     // Set the width of the curve
+                //     }
+                // });
+
+                // // Draw the scene
+                // two.update();
 
                 const canvasWidth = parseInt(window.getComputedStyle(CANVAS).width);
 
