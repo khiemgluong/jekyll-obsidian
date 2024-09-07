@@ -93,6 +93,8 @@
                 console.warn(`Center point: (${centerX}, ${centerY})`);
 
                 // <!-- ----------------------------- Draw Edges ------------------------------ -->
+                const svgElement = CANVAS.querySelector('svg');
+                if (svgElement) svgElement.remove();
                 const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
                 console.log("Edges keysList: " + edgesKeysList);
                 const params = { width: canvasWidth, height: canvasWidth };
@@ -102,31 +104,57 @@
                     const toNode = canvasParsed.nodes.find(node => node.id === edge.toNode);
 
                     if (fromNode && toNode) {
-                        console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
-                        console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
-                        console.debug("center X " + (fromNode.x + (-minX) + (canvasWidth / 2)));
-                        // Create a spline from fromNode to toNode
+                        // console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
+                        // console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
+                        // console.debug("center X " + (fromNode.x + (-minX) + (canvasWidth / 2)));
+
+                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
+                        switch (edge.fromSide) {
+                            case "top":
+                                break;
+                            case "bottom":
+                                break;
+                            case "right":
+                                break;
+                            case "left":
+                                break;
+                        }
+
                         const offsetX = (-minX) + (canvasWidth / 2) + fromNode.width / 2;
                         const offsetY = (-minY) + (canvasWidth / 2) + fromNode.height / 2;
-                        const offsetY2 = canvasWidth / 2 + fromNode.height / 2;
+                        // const offsetSide
 
+                        const offsetX2 = (-minX) + (canvasWidth / 2) + toNode.width / 2;
+                        const offsetY2 = (-minY) + (canvasWidth / 2) + toNode.height / 2;
 
-                        // const from_offsetX = fromNode.x + (-minX) + (canvasWidth / 2);
-                        // const to_offsetX = toNode.x + (-minX) + (canvasWidth / 2);
-                        // const from_offsetY = fromNode.y + (-minY) + (canvasWidth / 2);
-                        // const to_offsetY = toNode.y + (-minY) + (canvasWidth / 2);
 
                         const curve = two.makeCurve(
                             fromNode.x + offsetX, fromNode.y + offsetY,  // Offset the start point
                             (fromNode.x + toNode.x) / 2 + offsetX, (fromNode.y + toNode.y) / 2 + offsetY,  // Midpoint with offset
-                            toNode.x + offsetX, toNode.y + offsetY,      // Offset the end point
+                            toNode.x + offsetX2, toNode.y + offsetY2,      // Offset the end point
                             false  // Not a closed path
                         );
-                        curve.stroke = 'black';  // Set the color of the curve
-                        curve.linewidth = 3;     // Set the width of the curve
-                        // curve.fill = null;
+
+                        if ('color' in edge) {
+                            switch (parseInt(edge.color)) {
+                                case 1:
+                                    curve.stroke = '#ea3b50'; break;
+                                case 2:
+                                    curve.stroke = '#ee7e0f'; break;
+                                case 3:
+                                    curve.stroke = '#e0ac00'; break;
+                                case 4:
+                                    curve.stroke = '#09b94f'; break;
+                                case 5:
+                                    curve.stroke = '#18c5c2'; break;
+                                default:
+                                    curve.stroke = '#c0c0c0'; break;
+                            }
+                        } else curve.stroke = '#c0c0c0';
+                        curve.linewidth = 4;
+                        curve.fill = 'transparent';
+                        curve.fillOpacity = 0;
                         curve.closed = false;
-                        console.error("final from " + (fromNode.x + offsetX) + ("\t" + fromNode.y + offsetY));
                     }
                 });
                 two.update()
@@ -165,7 +193,6 @@
                     card.style.position = 'absolute';
                     card.style.left = `${node.x + (-minX) + (canvasWidth / 2)}px`;
                     console.log("Card left " + node.x + " " + (-minX) + " " + canvasWidth / 2);
-                    console.log("retardid " + (node.x + (-minX) + (canvasWidth / 2)));
 
                     card.style.top = `${node.y + (-minY) + (canvasWidth / 2)}px`;
                     card.style.width = `${node.width}px`;
