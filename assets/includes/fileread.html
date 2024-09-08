@@ -192,6 +192,13 @@
         });
     }
 
+    function removeExtraTrailingDotFromFilename(encodedFileName) {
+        const lastDotIndex = encodedFileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && encodedFileName.charAt(lastDotIndex - 1) === '.')
+            return encodedFileName.substring(0, lastDotIndex - 1) + encodedFileName.substring(lastDotIndex);
+        return encodedFileName;
+    }
+
 
     function generateCallouts(calloutsArr, cleanedHTML) {
         calloutsArr.forEach(callout => {
@@ -268,13 +275,14 @@
                             let encodedFileName =
                                 key.split('/').map(part => encodeURIComponent(part)).join('/');
                             const lastDotIndex = encodedFileName.lastIndexOf('.');
-                            if (lastDotIndex > 0)
-                                if (encodedFileName.charAt(lastDotIndex - 1) === '.') {
-                                    // Remove one of the consecutive periods
-                                    encodedFileName =
-                                        encodedFileName.substring(0, lastDotIndex - 1) +
-                                        encodedFileName.substring(lastDotIndex);
-                                }
+                            // if (lastDotIndex > 0)
+                            //     if (encodedFileName.charAt(lastDotIndex - 1) === '.') {
+                            //         // Remove one of the consecutive periods
+                            //         encodedFileName =
+                            //             encodedFileName.substring(0, lastDotIndex - 1) +
+                            //             encodedFileName.substring(lastDotIndex);
+                            //     }
+                            encodedFileName = removeExtraTrailingDotFromFilename(encodedFileName);
                             const fullEmbedPath = encodedVaultPath + encodedFileName;
                             const fileType = getFileType(encodedFileName);
                             console.log("fileType: " + fileType);
@@ -364,6 +372,9 @@
             document.dispatchEvent(event);
         } else if (filePath.endsWith('.canvas')) {
             const event = new CustomEvent('obsidian_canvasSelect', { detail });
+            document.dispatchEvent(event);
+        } else {
+            const event = new CustomEvent('obsidian_mediaSelect', { detail });
             document.dispatchEvent(event);
         }
     }

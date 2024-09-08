@@ -161,9 +161,15 @@
             display: flex;
             align-items: center;
         }
+
+        /* ----------------------------- Media Modal ----------------------------- */
+        #modals #media-modal {
+            height: 60%;
+            width: 80%;
+        }
     </style>
 </head>
-<!-- -------------------------------- Modal -------------------------------- -->
+<!-- -------------------------------- Modals ------------------------------- -->
 <div id="modals">
     <div popover id="search-modal">
         <div id="header">
@@ -191,6 +197,10 @@
                 <span style="margin-left: 10px;">GitHub</span></a>
         </div>
         <div id="vault-props"></div>
+    </div>
+    <div popover id="media-modal">
+        <div id="media"></div>
+        <div id="media-data"> </div>
     </div>
 </div>
 
@@ -239,6 +249,26 @@
                 break;
 
         }
+    });
+
+    document.addEventListener('obsidian_mediaSelect', function (event) {
+        console.log("Selected media: " + event.detail.filePath);
+
+        const mediaModal = MODALS.querySelector('#media-modal');
+        const media = mediaModal.querySelector("#media");
+        while (media.firstChild) media.removeChild(media.firstChild);
+
+        mediaModal.togglePopover();
+        const image = document.createElement('img');
+        const fullFilePath = getFullFilePath('/' + event.detail.filePath);
+        console.debug("fullNoteFilePath: " + fullFilePath)
+        image.src = removeExtraTrailingDotFromFilename(fullFilePath);
+        // Optionally, you can set additional attributes such as alt, width, etc.
+        // image.alt = "Media Image";
+        // image.width = 400; // Example of setting width
+        // Append the image to the media container
+        media.appendChild(image);
+
     });
 </script>
 
