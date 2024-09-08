@@ -108,30 +108,59 @@
                         // console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
                         // console.debug("center X " + (fromNode.x + (-minX) + (canvasWidth / 2)));
 
-                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
-                        switch (edge.fromSide) {
-                            case "top":
-                                break;
-                            case "bottom":
-                                break;
-                            case "right":
-                                break;
-                            case "left":
-                                break;
-                        }
-
                         const offsetX = (-minX) + (canvasWidth / 2) + fromNode.width / 2;
                         const offsetY = (-minY) + (canvasWidth / 2) + fromNode.height / 2;
-                        // const offsetSide
+                        var from_SideOffsetX = 0;
+                        var from_SideOffsetY = 0;
 
                         const offsetX2 = (-minX) + (canvasWidth / 2) + toNode.width / 2;
                         const offsetY2 = (-minY) + (canvasWidth / 2) + toNode.height / 2;
+                        var to_SideOffsetX = 0;
+                        var to_SideOffsetY = 0;
 
+                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
+                        switch (edge.fromSide) {
+                            case "top":
+                                from_SideOffsetX = offsetX;
+                                from_SideOffsetY = offsetY - fromNode.height / 2;
+                                break;
+                            case "bottom":
+                                from_SideOffsetX = offsetX;
+                                from_SideOffsetY = offsetY + fromNode.height / 2;
+                                break;
+                            case "right":
+                                from_SideOffsetX = offsetX + fromNode.width / 2;
+                                from_SideOffsetY = offsetY;
+                                break;
+                            case "left":
+                                from_SideOffsetX = offsetX + fromNode.width / 2;
+                                from_SideOffsetY = offsetY;
+                                break;
+                        }
+
+                        switch (edge.toSide) {
+                            case "top":
+                                to_SideOffsetX = offsetX2;
+                                to_SideOffsetY = offsetY2 - toNode.height / 2;
+                                break;
+                            case "bottom":
+                                to_SideOffsetX = offsetX2;
+                                to_SideOffsetY = offsetY + toNode.height / 2;
+                                break;
+                            case "right":
+                                to_SideOffsetX = offsetX2 + toNode.width / 2;
+                                to_SideOffsetY = offsetY2;
+                                break;
+                            case "left":
+                                to_SideOffsetX = offsetX2 + toNode.width / 2;
+                                to_SideOffsetY = offsetY2;
+                                break;
+                        }
 
                         const curve = two.makeCurve(
-                            fromNode.x + offsetX, fromNode.y + offsetY,  // Offset the start point
+                            fromNode.x + from_SideOffsetX, fromNode.y + from_SideOffsetY,  // Offset the start point
                             (fromNode.x + toNode.x) / 2 + offsetX, (fromNode.y + toNode.y) / 2 + offsetY,  // Midpoint with offset
-                            toNode.x + offsetX2, toNode.y + offsetY2,      // Offset the end point
+                            toNode.x + to_SideOffsetX, toNode.y + to_SideOffsetY,      // Offset the end point
                             false  // Not a closed path
                         );
 
