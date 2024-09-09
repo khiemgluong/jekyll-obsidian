@@ -252,11 +252,6 @@
 
     document.addEventListener('obsidian_mediaSelect', function (event) {
         console.log("Selected media: " + event.detail.filePath);
-
-        const mediaModal = MODALS.querySelector('#media-modal');
-        const media = mediaModal.querySelector("#media");
-        const mediaData = mediaModal.querySelector("#media-data");
-
         while (media.firstChild) media.removeChild(media.firstChild);
 
         mediaModal.togglePopover();
@@ -270,15 +265,29 @@
                 console.log("selected image media");
                 const image = document.createElement('img');
                 image.src = fullFilePath;
+                image.style.borderRadius = '1rem';
                 media.appendChild(image);
-                image.style.borderTopLeftRadius = '1rem';
-                image.style.borderTopRightRadius = '1rem';
-                mediaData.innerText = extractFilenameFromPath(fullFilePath);
+                break;
+            case 'audio':
+                const audio = document.createElement('audio');
+                audio.src = fullFilePath;
+                audio.controls = true;
+                media.appendChild(audio);
+                break;
+            case 'video':
+                const video = document.createElement('video');
+                video.src = fullFilePath;
+                video.controls = true;
+                video.style.borderRadius = '1rem';
+                media.appendChild(video);
                 break;
         }
+        mediaData.innerText = extractFilenameFromPath(fullFilePath);
+
         mediaModal.addEventListener('toggle', () => {
             if (!mediaModal.matches(':popover-open')) {
-                console.log('Popover was closed!');
+                console.log('media modal closed');
+                mediaModal.style.scale = scale;
                 mediaModal.removeEventListener('wheel', adjustMediaScaleOnScroll);
             }
         });
@@ -289,10 +298,19 @@
 </script>
 
 <script>
+    let scale = 1;
     function adjustMediaScaleOnScroll(e) {
         if (e.ctrlKey) {
+            //max scale: 1.6
             e.preventDefault();
-            console.log("scrolling media modal");
+            console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
+            // if (isNaN(scale)) scale = 1; 
+            if (e.deltaY < 0) {
+                scale = Math.max(1, scale - 0.01); // Decrease scale
+            } else {
+                scale = Math.min(1.6, scale + 0.01); // Increase scale
+            }
+            mediaModal.style.scale = scale;
         }
     }
 </script>
