@@ -8,7 +8,6 @@
     --color-linked-mention-text: #5f5f5f;
     --bg-linked-mention-highlight: #d6e9fa;
 
-    /* Modify this to fit your page */
     max-height: 93.5vh;
 
     display: inherit;
@@ -16,22 +15,22 @@
     height: auto;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-li {
+#obsidian h1,
+#obsidian h2,
+#obsidian h3,
+#obsidian h4,
+#obsidian h5,
+#obsidian h6,
+#obsidian p,
+#obsidian li {
     color: #565656;
 }
 
-table tr:nth-child(2n) {
+#obsidian table tr:nth-child(2n) {
     background-color: #f7f7f7;
 }
 
-li::before {
+#obsidian li::before {
     color: #ababab;
 }
 
@@ -47,23 +46,108 @@ li::before {
         --bg-linked-mention-highlight: #2a4f6e;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    li {
+    #obsidian h1,
+    #obsidian h2,
+    #obsidian h3,
+    #obsidian h4,
+    #obsidian h5,
+    #obsidian h6,
+    #obsidian p,
+    #obsidian li {
         color: #dadada
     }
 
-    table tr:nth-child(2n) {
+    #obsidian table tr:nth-child(2n) {
         background-color: #525252 !important;
     }
 
-    li::before {
+    #obsidian li::before {
         color: #666666
     }
 
+}
+
+#obsidian>* {
+    height: initial;
+}
+
+#obsidian #sidebar {
+    display: flex;
+    width: 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: var(--bg-tinted);
+    border-right: 1px solid var(--color-border);
+}
+
+#obsidian #explorer {
+    overflow-y: auto;
+    max-height: 100vh;
+    width: 15%;
+    background-color: var(--bg-tinted);
+    overscroll-behavior: none;
+}
+
+#obsidian #divider {
+    width: 4px;
+    border-left: 1px solid var(--color-border);
+    cursor: ew-resize;
+    position: relative;
+    transition: background-color 0.4s ease;
+}
+
+#obsidian #divider:hover {
+    background-color: var(--color-accent);
+}
+
+#obsidian #fileread {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--bg);
+    position: relative;
+}
+
+#obsidian #file-tree::-webkit-scrollbar,
+#obsidian #file-read::-webkit-scrollbar {
+    display: none;
+}
+
+/* ----------------------------- Breadcrumb ------------------------------ */
+#obsidian #fileread #breadcrumb {
+    list-style: none;
+    padding: 0;
+    z-index: 10;
+    color: var(--color-text);
+}
+
+#obsidian #fileread ul#breadcrumb {
+    padding: 6px 0 3px 0;
+    margin: 0;
+    list-style: none;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: var(--bg);
+    width: 100%;
+    text-align: center;
+}
+
+#obsidian #fileread ul#breadcrumb li,
+#obsidian #fileread ul#breadcrumb button {
+    display: inline;
+    font-size: medium;
+}
+
+#obsidian #fileread ul#breadcrumb button:hover {
+    color: var(--color-accent);
+}
+
+#obsidian #fileread ul#breadcrumb li+li:before {
+    padding: 5px;
+    color: var(--color-text);
+    content: "/\00a0";
 }

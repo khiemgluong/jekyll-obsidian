@@ -1,0 +1,154 @@
+---
+---
+
+#obsidian {
+    #modals {
+        >* {
+            border: 0;
+            box-shadow: 0px 0px 50px var(--color-button);
+            border-radius: 1rem;
+            width: 40%;
+            max-width: 50%;
+        }
+
+        >*::backdrop {
+            background-color: rgba(200, 200, 200, 0.5);
+            backdrop-filter: blur(2px);
+
+            @media (prefers-color-scheme: dark) {
+                background-color: rgba(50, 50, 50, 0.5);
+            }
+        }
+
+        >*:popover-open {
+            animation: slideIn 100ms ease-in-out;
+        }
+
+        .modal-close {
+            font-size: x-large;
+            line-height: 0.5em;
+            float: right;
+        }
+
+        // ---------------------------- Search Modal -----------------------------
+        #search-modal {
+            padding-left: 0;
+            padding-top: 0;
+            height: fit-content;
+            max-height: 45%;
+            background-color: var(--bg);
+
+            #header {
+                display: flex;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                left: 0;
+
+                input[type="text"] {
+                    flex-grow: 1;
+                    margin-right: 10px;
+                    padding: 10px;
+                    border-bottom-right-radius: 0.8rem;
+                    border-style: none;
+                }
+
+                button {
+                    padding: 4px;
+                    font-size: xx-large;
+                    cursor: pointer;
+                    background: none;
+                    border: none;
+                }
+            }
+
+            :popover-open {
+                animation: slideIn 150ms ease-in-out;
+            }
+
+            ul {
+                list-style-type: none;
+                margin-left: 10px;
+
+                li {
+                    margin-top: 4px;
+
+                    button {
+                        font-size: medium;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 100%;
+                        direction: rtl;
+                        text-align: left;
+
+                        &:hover {
+                            background-color: var(--bg-tinted);
+                            @media (prefers-color-scheme: dark) {
+                                background-color: red;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ----------------------------- Info Modal ------------------------------
+        #info-modal {
+            height: 25%;
+
+            :popover-open {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1em;
+            }
+
+            >div:first-child {
+                align-self: center;
+                font-size: x-large;
+            }
+
+            >div:not(:first-child),
+            >button:not(:first-child) {
+                align-self: flex-start;
+                font-size: large;
+            }
+
+            // Github Info
+            #github {
+                display: flex;
+                flex-direction: row;
+                height: fit-content;
+
+                a {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+
+        // ----------------------------- Media Modal -----------------------------
+        #media-modal {
+            height: max-content;
+            width: max-content;
+
+            #media-data {
+                font-size: small;
+                color: var(--color-text);
+            }
+        }
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(-40%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
