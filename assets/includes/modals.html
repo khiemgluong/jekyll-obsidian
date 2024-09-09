@@ -164,8 +164,8 @@
 
         /* ----------------------------- Media Modal ----------------------------- */
         #modals #media-modal {
-            height: 60%;
-            width: 80%;
+            height: max-content;
+            width: max-content;
         }
     </style>
 </head>
@@ -200,7 +200,7 @@
     </div>
     <div popover id="media-modal">
         <div id="media"></div>
-        <div id="media-data"> </div>
+        <div id="media-data" style="text-align: center;"> </div>
     </div>
 </div>
 
@@ -247,7 +247,6 @@
                 searchModal.appendChild(ul);
                 generateSearchModalFilepaths(VAULT_FILES, ul)
                 break;
-
         }
     });
 
@@ -256,20 +255,46 @@
 
         const mediaModal = MODALS.querySelector('#media-modal');
         const media = mediaModal.querySelector("#media");
+        const mediaData = mediaModal.querySelector("#media-data");
+
         while (media.firstChild) media.removeChild(media.firstChild);
 
         mediaModal.togglePopover();
-        const image = document.createElement('img');
+        mediaModal.addEventListener('wheel', adjustMediaScaleOnScroll);
+
         const fullFilePath = getFullFilePath('/' + event.detail.filePath);
+        switch (getFileType(fullFilePath)) {
+            default:
+                break;
+            case "image":
+                console.log("selected image media");
+                const image = document.createElement('img');
+                image.src = fullFilePath;
+                media.appendChild(image);
+                image.style.borderTopLeftRadius = '1rem';
+                image.style.borderTopRightRadius = '1rem';
+                mediaData.innerText = extractFilenameFromPath(fullFilePath);
+                break;
+        }
+        mediaModal.addEventListener('toggle', () => {
+            if (!mediaModal.matches(':popover-open')) {
+                console.log('Popover was closed!');
+                mediaModal.removeEventListener('wheel', adjustMediaScaleOnScroll);
+            }
+        });
+
         console.debug("fullNoteFilePath: " + fullFilePath)
-        image.src = removeExtraTrailingDotFromFilename(fullFilePath);
-        // Optionally, you can set additional attributes such as alt, width, etc.
-        // image.alt = "Media Image";
-        // image.width = 400; // Example of setting width
-        // Append the image to the media container
-        media.appendChild(image);
 
     });
+</script>
+
+<script>
+    function adjustMediaScaleOnScroll(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+            console.log("scrolling media modal");
+        }
+    }
 </script>
 
 <!-- --------------------------- Search modal JS --------------------------- -->

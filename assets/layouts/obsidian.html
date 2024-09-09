@@ -234,7 +234,11 @@
 
 <!-- ------------------------------- Getters ------------------------------- -->
 <script>
-    function getFullFilePath(filePath) { return fullFilePath = '/' + VAULTPATH + filePath; }
+    function getFullFilePath(filePath, trimTrailingPeriod = true) {
+        if (trimTrailingPeriod)
+            return removeExtraTrailingDotFromFilename(fullFilePath = '/' + VAULTPATH + filePath);
+        else return fullFilePath = '/' + VAULTPATH + filePath;
+    }
 
     function getFileType(filePath) {
         const extensionToType = {

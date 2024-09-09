@@ -96,7 +96,6 @@
                 const svgElement = CANVAS.querySelector('svg');
                 if (svgElement) svgElement.remove();
                 const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
-                console.log("Edges keysList: " + edgesKeysList);
                 const params = { width: canvasWidth, height: canvasWidth };
                 const two = new Two(params).appendTo(CANVAS);
                 canvasParsed.edges.forEach(edge => {
