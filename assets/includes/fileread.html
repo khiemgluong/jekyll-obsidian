@@ -192,6 +192,13 @@
         });
     }
 
+    function removeExtraTrailingDotFromFilename(encodedFileName) {
+        const lastDotIndex = encodedFileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && encodedFileName.charAt(lastDotIndex - 1) === '.')
+            return encodedFileName.substring(0, lastDotIndex - 1) + encodedFileName.substring(lastDotIndex);
+        return encodedFileName;
+    }
+
 
     function generateCallouts(calloutsArr, cleanedHTML) {
         calloutsArr.forEach(callout => {
@@ -268,37 +275,32 @@
                             let encodedFileName =
                                 key.split('/').map(part => encodeURIComponent(part)).join('/');
                             const lastDotIndex = encodedFileName.lastIndexOf('.');
-                            if (lastDotIndex > 0)
-                                if (encodedFileName.charAt(lastDotIndex - 1) === '.') {
-                                    // Remove one of the consecutive periods
-                                    encodedFileName =
-                                        encodedFileName.substring(0, lastDotIndex - 1) +
-                                        encodedFileName.substring(lastDotIndex);
-                                }
+
+                            encodedFileName = removeExtraTrailingDotFromFilename(encodedFileName);
                             const fullEmbedPath = encodedVaultPath + encodedFileName;
                             const fileType = getFileType(encodedFileName);
-                            console.log("fileType: " + fileType);
+                            const filePath = siteurl + fullEmbedPath;
                             let embedElem;
                             switch (fileType) {
                                 case 'pdf':
                                 default:
                                     embedElem = document.createElement('a');
-                                    embedElem.href = siteurl + fullEmbedPath;
+                                    embedElem.href = filePath;
                                     embedElem.className = 'url-link';
                                     embedElem.textContent = fileName;
                                     break;
                                 case 'image':
                                     embedElem = document.createElement('img');
-                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.src = filePath;
                                     break;
                                 case 'audio':
                                     embedElem = document.createElement('audio');
-                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.src = filePath;
                                     embedElem.controls = true;
                                     break;
                                 case 'video':
                                     embedElem = document.createElement('video');
-                                    embedElem.src = siteurl + fullEmbedPath;
+                                    embedElem.src = filePath;
                                     embedElem.controls = true;
                                     break;
                             }
@@ -364,6 +366,9 @@
             document.dispatchEvent(event);
         } else if (filePath.endsWith('.canvas')) {
             const event = new CustomEvent('obsidian_canvasSelect', { detail });
+            document.dispatchEvent(event);
+        } else {
+            const event = new CustomEvent('obsidian_mediaSelect', { detail });
             document.dispatchEvent(event);
         }
     }

@@ -96,7 +96,6 @@
                 const svgElement = CANVAS.querySelector('svg');
                 if (svgElement) svgElement.remove();
                 const edgesKeysList = canvasParsed.edges.map(edge => Object.keys(edge))
-                console.log("Edges keysList: " + edgesKeysList);
                 const params = { width: canvasWidth, height: canvasWidth };
                 const two = new Two(params).appendTo(CANVAS);
                 canvasParsed.edges.forEach(edge => {
@@ -104,34 +103,83 @@
                     const toNode = canvasParsed.nodes.find(node => node.id === edge.toNode);
 
                     if (fromNode && toNode) {
-                        // console.debug(`Matched nodes: ${fromNode.id} -> ${toNode.id}`);
-                        // console.debug(`Matched positions: (${fromNode.x}, ${fromNode.y}) -> (${toNode.x}, ${toNode.y})`);
-                        // console.debug("center X " + (fromNode.x + (-minX) + (canvasWidth / 2)));
-
-                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
-                        switch (edge.fromSide) {
-                            case "top":
-                                break;
-                            case "bottom":
-                                break;
-                            case "right":
-                                break;
-                            case "left":
-                                break;
+                        function getSideOffset(node, offsetX, offsetY, side) {
+                            let sideOffsetX = offsetX;
+                            let sideOffsetY = offsetY;
+                            switch (side) {
+                                case "top":
+                                    sideOffsetY = offsetY - node.height / 2; break;
+                                case "bottom":
+                                    sideOffsetY = offsetY + node.height / 2; break;
+                                case "right":
+                                    sideOffsetX = offsetX + node.width / 2; break;
+                                case "left":
+                                    sideOffsetX = offsetX - node.width / 2; break;
+                            }
+                            return { sideOffsetX, sideOffsetY };
                         }
 
-                        const offsetX = (-minX) + (canvasWidth / 2) + fromNode.width / 2;
-                        const offsetY = (-minY) + (canvasWidth / 2) + fromNode.height / 2;
-                        // const offsetSide
+                        // Calculate common offset values
+                        const offsetXFrom = (-minX) + (canvasWidth / 2) + fromNode.width / 2;
+                        const offsetYFrom = (-minY) + (canvasWidth / 2) + fromNode.height / 2;
 
-                        const offsetX2 = (-minX) + (canvasWidth / 2) + toNode.width / 2;
-                        const offsetY2 = (-minY) + (canvasWidth / 2) + toNode.height / 2;
+                        const offsetXTo = (-minX) + (canvasWidth / 2) + toNode.width / 2;
+                        const offsetYTo = (-minY) + (canvasWidth / 2) + toNode.height / 2;
 
+                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
+
+                        // Get the side offsets for fromNode
+                        const fromOffsets = getSideOffset(fromNode, offsetXFrom, offsetYFrom, edge.fromSide);
+                        const from_SideOffsetX = fromOffsets.sideOffsetX;
+                        const from_SideOffsetY = fromOffsets.sideOffsetY;
+
+                        // Get the side offsets for toNode
+                        const toOffsets = getSideOffset(toNode, offsetXTo, offsetYTo, edge.toSide);
+                        const to_SideOffsetX = toOffsets.sideOffsetX;
+                        const to_SideOffsetY = toOffsets.sideOffsetY;
+
+                        function getControlPointOffset(node, side) {
+                            const controlOffset = 5;
+                            let controlOffsetX = 0;
+                            let controlOffsetY = 0;
+
+                            switch (side) {
+                                case "top":
+                                    controlOffsetX = 0;
+                                    controlOffsetY = -controlOffset; break;
+                                case "bottom":
+                                    controlOffsetX = 0;
+                                    controlOffsetY = controlOffset; break;
+                                case "right":
+                                    controlOffsetX = controlOffset;
+                                    controlOffsetY = 0; break;
+                                case "left":
+                                    controlOffsetX = -controlOffset;
+                                    controlOffsetY = 0; break;
+                            }
+                            return { controlOffsetX, controlOffsetY };
+                        }
+
+                        // Calculate the start and end offsets based on node side
+                        const fromCurveOffset = getControlPointOffset(fromNode, edge.fromSide);
+                        const toCurveOffset = getControlPointOffset(toNode, edge.toSide);
 
                         const curve = two.makeCurve(
-                            fromNode.x + offsetX, fromNode.y + offsetY,  // Offset the start point
-                            (fromNode.x + toNode.x) / 2 + offsetX, (fromNode.y + toNode.y) / 2 + offsetY,  // Midpoint with offset
-                            toNode.x + offsetX2, toNode.y + offsetY2,      // Offset the end point
+                            fromNode.x + from_SideOffsetX,
+                            fromNode.y + from_SideOffsetY,
+
+                            // Control point for the fromNode, adjusted based on its side
+                            fromNode.x + from_SideOffsetX + fromCurveOffset.controlOffsetX,
+                            fromNode.y + from_SideOffsetY + fromCurveOffset.controlOffsetY,
+
+                            // Control point for the toNode, adjusted based on its side
+                            toNode.x + to_SideOffsetX + toCurveOffset.controlOffsetX,
+                            toNode.y + to_SideOffsetY + toCurveOffset.controlOffsetY,
+
+                            // End point at toNode
+                            toNode.x + to_SideOffsetX,
+                            toNode.y + to_SideOffsetY,
+
                             false  // Not a closed path
                         );
 
@@ -214,18 +262,11 @@
 
                     const scale = (boundingBoxVolume / canvasVolume);
 
-                    // canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
-                    // EDGES.style.transform = `scale(${(1 - scale) / 2})`;
-                    // canvasContent.querySelectorAll('.card').forEach(card => {
-                    //     const newLeft = card.offsetLeft - boundingBox.width / 2;
-                    //     card.style.left = `${newLeft}px`;
-                    //     const newTop = card.offsetTop - boundingBox.height / 2;
-                    //     card.style.top = `${newTop}px`;
-                    // });
+                    canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
+                    EDGES.style.transform = `scale(${(1 - scale) / 2})`;
 
-                    const scrollLeft = center.x - FILEREADWidth / 2 - boundingBox.width / 2;
-                    _scrollLeft = scrollLeft - scrollLeft * (scale);
-                    _scrollTop = center.y - FILEREADHeight / 2 - boundingBox.height / 2;
+                    _scrollLeft = center.x - boundingBox.width / 2;
+                    _scrollTop = center.y - boundingBox.height / 2;
                     FILEREAD.scrollLeft = _scrollLeft; FILEREAD.scrollTop = _scrollTop;
                 } else console.warn('The canvas has no children.');
 
@@ -327,9 +368,6 @@
             FILEREAD.scrollTop += deltaY;
         }
     }
-
-    // Attaching mouse move event listener to the CANVAS
-
 </script>
 
 <script>
