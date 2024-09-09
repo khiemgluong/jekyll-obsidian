@@ -254,12 +254,12 @@
         console.log("Selected media: " + event.detail.filePath);
         while (media.firstChild) media.removeChild(media.firstChild);
 
-        mediaModal.togglePopover();
-        mediaModal.addEventListener('wheel', adjustMediaScaleOnScroll);
-
         const fullFilePath = getFullFilePath('/' + event.detail.filePath);
+        var supportedType = true;
         switch (getFileType(fullFilePath)) {
             default:
+                window.open(fullFilePath, '_blank');
+                supportedType = false;
                 break;
             case "image":
                 console.log("selected image media");
@@ -283,17 +283,17 @@
                 break;
         }
         mediaData.innerText = extractFilenameFromPath(fullFilePath);
-
-        mediaModal.addEventListener('toggle', () => {
-            if (!mediaModal.matches(':popover-open')) {
-                console.log('media modal closed');
-                mediaModal.style.scale = scale;
-                mediaModal.removeEventListener('wheel', adjustMediaScaleOnScroll);
-            }
-        });
-
-        console.debug("fullNoteFilePath: " + fullFilePath)
-
+        if (supportedType) {
+            mediaModal.addEventListener('wheel', adjustMediaScaleOnScroll);
+            mediaModal.togglePopover();
+            mediaModal.addEventListener('toggle', () => {
+                if (!mediaModal.matches(':popover-open')) {
+                    scale = 1;
+                    mediaModal.style.scale = scale;
+                    mediaModal.removeEventListener('wheel', adjustMediaScaleOnScroll);
+                }
+            });
+        }
     });
 </script>
 
