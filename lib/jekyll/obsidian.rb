@@ -69,9 +69,7 @@ module Jekyll
         note = File.join(assets_dir, "includes", "note.html")
         canvas = File.join(assets_dir, "includes", "canvas.html")
         modals = File.join(assets_dir, "includes", "modals.html")
-
         sidebar = File.join(assets_dir, "includes", "sidebar.html")
-        layout = File.join(assets_dir, "layouts", "obsidian.html")
 
         copy_file_to_dir(explorer, obsidian_dir)
         copy_file_to_dir(fileread, obsidian_dir)
@@ -80,6 +78,7 @@ module Jekyll
         copy_file_to_dir(modals, obsidian_dir)
         copy_file_to_dir(sidebar, obsidian_dir)
 
+        layout = File.join(assets_dir, "layouts", "obsidian.html")
         copy_file_to_dir(layout, layouts_dir)
       end
 
