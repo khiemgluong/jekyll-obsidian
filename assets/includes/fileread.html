@@ -307,9 +307,10 @@
                             if (fileType !== 'pdf' && fileType !== 'unknown') {
                                 embedContainer = document.createElement('div');
                                 embedContainer.className = 'embed';
+
+                                embedContainer.appendChild(embedElem);
                                 pTag = document.createElement('p');
                                 pTag.textContent = fileName;
-                                embedContainer.appendChild(embedElem);
                                 embedContainer.appendChild(pTag);
                                 newHTML = newHTML.replace(embed, embedContainer.outerHTML);
                             } else newHTML = newHTML.replace(embed, embedElem.outerHTML);
@@ -317,7 +318,17 @@
                     }
                 }
             });
-            cleanedHTML.innerHTML = DOMPurify.sanitize(newHTML);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = DOMPurify.sanitize(newHTML);
+
+            // Remove all <p> tags that are empty
+            tempDiv.querySelectorAll('p').forEach(p => {
+                if (!p.textContent.trim()) {
+                    p.parentNode.removeChild(p);
+                }
+            });
+
+            cleanedHTML.innerHTML = tempDiv.innerHTML;
         } catch (e) {
             console.error("Error parsing embeds:", e);
         }

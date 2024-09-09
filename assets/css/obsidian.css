@@ -13,17 +13,7 @@
     display: inherit;
     width: 100%;
     height: auto;
-}
-
-#obsidian h1,
-#obsidian h2,
-#obsidian h3,
-#obsidian h4,
-#obsidian h5,
-#obsidian h6,
-#obsidian p,
-#obsidian li {
-    color: #565656;
+    color: var(--color-text);
 }
 
 #obsidian table tr:nth-child(2n) {
@@ -41,20 +31,9 @@
         --color-button: #a0a0a0;
         --bg-tinted: #1e1e1e;
         --color-accent: #71a6d2;
-        --color-text: #e0e0e0;
+        --color-text: #dadada;
         --color-linked-mention-text: #b0b0b0;
         --bg-linked-mention-highlight: #2a4f6e;
-    }
-
-    #obsidian h1,
-    #obsidian h2,
-    #obsidian h3,
-    #obsidian h4,
-    #obsidian h5,
-    #obsidian h6,
-    #obsidian p,
-    #obsidian li {
-        color: #dadada
     }
 
     #obsidian table tr:nth-child(2n) {
