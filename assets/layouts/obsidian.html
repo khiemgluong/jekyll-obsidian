@@ -4,6 +4,8 @@
 <head>
     <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js"></script>
+    <!-- <link rel="stylesheet" href="{{ '/assets/obsidian/css/obsidian.css' | relative_url }}"> -->
+    <link rel="stylesheet" href="{{ '/assets/obsidian/css/note.css' | relative_url }}">
     <!-- --------------------------- Obsidian styles --------------------------- -->
     <style>
         .page-content {
@@ -23,7 +25,6 @@
             --color-linked-mention-text: #5f5f5f;
             --bg-linked-mention-highlight: #d6e9fa;
 
-            /* Modify this to fit your page */
             max-height: 93.5vh;
 
             display: inherit;
@@ -31,22 +32,22 @@
             height: auto;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        p,
-        li {
+        #obsidian h1,
+        #obsidian h2,
+        #obsidian h3,
+        #obsidian h4,
+        #obsidian h5,
+        #obsidian h6,
+        #obsidian p,
+        #obsidian li {
             color: #565656;
         }
 
-        table tr:nth-child(2n) {
+        #obsidian table tr:nth-child(2n) {
             background-color: #f7f7f7;
         }
 
-        li::before {
+        #obsidian li::before {
             color: #ababab;
         }
 
@@ -62,22 +63,22 @@
                 --bg-linked-mention-highlight: #2a4f6e;
             }
 
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6,
-            p,
-            li {
+            #obsidian h1,
+            #obsidian h2,
+            #obsidian h3,
+            #obsidian h4,
+            #obsidian h5,
+            #obsidian h6,
+            #obsidian p,
+            #obsidian li {
                 color: #dadada
             }
 
-            table tr:nth-child(2n) {
+            #obsidian table tr:nth-child(2n) {
                 background-color: #525252 !important;
             }
 
-            li::before {
+            #obsidian li::before {
                 color: #666666
             }
 
@@ -127,8 +128,8 @@
             position: relative;
         }
 
-        #file-tree::-webkit-scrollbar,
-        #file-read::-webkit-scrollbar {
+        #obsidian #file-tree::-webkit-scrollbar,
+        #obsidian #file-read::-webkit-scrollbar {
             display: none;
         }
 

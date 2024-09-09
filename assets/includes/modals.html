@@ -2,8 +2,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
     <style>
-        /* Modal Content/Box */
-        #obsidian #modal-content {
+        /* #obsidian #modals {
             background-color: var(--bg);
             border: 1px solid var(--color-border);
             margin: auto;
@@ -17,25 +16,10 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0px 0px 50px var(--color-button);
-        }
-
-        #modal-content #close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            line-height: 2.5vh;
-            align-self: flex-end;
-        }
-
-        #modal-content #close:hover,
-        #modal-content #close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
+        } */
 
         /* --------------------------- Children Modal ---------------------------- */
-        #modals>* {
+        #obsidian #modals>* {
             border: 0;
             box-shadow: 0px 0px 50px var(--color-button);
             border-radius: 1rem;
@@ -43,12 +27,12 @@
             max-width: 50%;
         }
 
-        #modals>*::backdrop {
+        #obsidian #modals>*::backdrop {
             background-color: rgba(200, 200, 200, 0.5);
             backdrop-filter: blur(2px);
         }
 
-        #modals>*:popover-open {
+        #obsidian #modals>*:popover-open {
             animation: slideIn 100ms ease-in-out;
         }
 
@@ -64,21 +48,21 @@
             }
         }
 
-        #modals .modal-close {
+        #obsidian #modals .modal-close {
             font-size: x-large;
             line-height: .5em;
             float: right;
         }
 
         /* ---------------------------- Search Modal ----------------------------- */
-        #search-modal {
+        #obsidian #modals #search-modal {
             padding-left: 0;
             padding-top: 0;
             height: fit-content;
             max-height: 45%;
         }
 
-        #search-modal #header {
+        #obsidian #modals #search-modal #header {
             display: flex;
             align-items: center;
             position: sticky;
@@ -86,7 +70,7 @@
             left: 0;
         }
 
-        #search-modal #header input[type="text"] {
+        #obsidian #modals #search-modal #header input[type="text"] {
             flex-grow: 1;
             margin-right: 10px;
             padding: 10px;
@@ -94,7 +78,7 @@
             border-style: none;
         }
 
-        #search-modal #header button {
+        #obsidian #modals #search-modal #header button {
             padding: 4px;
             font-size: xx-large;
             cursor: pointer;
@@ -102,20 +86,20 @@
             border: none;
         }
 
-        #search-modal:popover-open {
+        #obsidian #modals #search-modal:popover-open {
             animation: slideIn 150ms ease-in-out;
         }
 
-        #search-modal ul {
+        #obsidian #modals #search-modal ul {
             list-style-type: none;
             margin-left: 10px;
         }
 
-        #search-modal ul li {
+        #obsidian #modals #search-modal ul li {
             margin-top: 4px;
         }
 
-        #search-modal ul li button {
+        #obsidian #modals #search-modal ul li button {
             font-size: medium;
             white-space: nowrap;
             overflow: hidden;
@@ -125,52 +109,52 @@
             text-align: left;
         }
 
-        #search-modal ul li button:hover {
+        #obsidian #modals #search-modal ul li button:hover {
             background-color: var(--bg-tinted);
         }
 
         /* ----------------------------- Info Modal ------------------------------ */
-        #modals #info-modal {
+        #obsidian #modals #info-modal {
             height: 25%;
         }
 
-        #modals #info-modal:popover-open {
+        #obsidian #modals #info-modal:popover-open {
             display: flex;
             flex-direction: column;
             align-items: stretch;
             gap: 1em;
         }
 
-        #modals #info-modal>div:first-child {
+        #obsidian #modals #info-modal>div:first-child {
             align-self: center;
             font-size: x-large;
         }
 
-        #modals #info-modal>div:not(:first-child),
-        #modals #info-modal>button:not(:first-child) {
+        #obsidian #modals #info-modal>div:not(:first-child),
+        #obsidian #modals #info-modal>button:not(:first-child) {
             align-self: flex-start;
             font-size: large;
         }
 
         /* Github Info */
-        #modal-content #info-modal #github {
+        #obsidian #modals #info-modal #github {
             display: flex;
             flex-direction: row;
             height: fit-content;
         }
 
-        #modal-content #info-modal #github a {
+        #obsidian #modals #info-modal #github a {
             display: flex;
             align-items: center;
         }
 
         /* ----------------------------- Media Modal ----------------------------- */
-        #modals #media-modal {
+        #obsidian #modals #media-modal {
             height: max-content;
             width: max-content;
         }
 
-        #modals #media-modal #media-data {
+        #obsidian #modals #media-modal #media-data {
             font-size: small;
             color: var(--color-text);
         }
