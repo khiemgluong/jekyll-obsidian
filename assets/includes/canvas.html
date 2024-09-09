@@ -262,18 +262,11 @@
 
                     const scale = (boundingBoxVolume / canvasVolume);
 
-                    // canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
-                    // EDGES.style.transform = `scale(${(1 - scale) / 2})`;
-                    // canvasContent.querySelectorAll('.card').forEach(card => {
-                    //     const newLeft = card.offsetLeft - boundingBox.width / 2;
-                    //     card.style.left = `${newLeft}px`;
-                    //     const newTop = card.offsetTop - boundingBox.height / 2;
-                    //     card.style.top = `${newTop}px`;
-                    // });
+                    canvasContent.style.transform = `scale(${(1 - scale) / 2})`;
+                    EDGES.style.transform = `scale(${(1 - scale) / 2})`;
 
-                    const scrollLeft = center.x - FILEREADWidth / 2 - boundingBox.width / 2;
-                    _scrollLeft = scrollLeft - scrollLeft * (scale);
-                    _scrollTop = center.y - FILEREADHeight / 2 - boundingBox.height / 2;
+                    _scrollLeft = center.x - boundingBox.width / 2;
+                    _scrollTop = center.y - boundingBox.height / 2;
                     FILEREAD.scrollLeft = _scrollLeft; FILEREAD.scrollTop = _scrollTop;
                 } else console.warn('The canvas has no children.');
 

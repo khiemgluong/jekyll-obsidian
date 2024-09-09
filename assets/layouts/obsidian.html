@@ -49,6 +49,7 @@
             max-height: 100vh;
             width: 15%;
             background-color: var(--bg-tinted);
+            overscroll-behavior: none;
         }
 
         #obsidian #divider {
@@ -83,12 +84,12 @@
         #obsidian #fileread #breadcrumb {
             list-style: none;
             padding: 0;
-            z-index: 2;
+            z-index: 10;
             color: var(--color-text);
         }
 
         #obsidian #fileread ul#breadcrumb {
-            padding: 8px 0;
+            padding: 6px 0 3px 0;
             margin: 0;
             list-style: none;
             position: sticky;
@@ -159,7 +160,7 @@
     const OBSIDIAN = document.getElementById('obsidian');
 
     const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
-    
+
     const MODALS = OBSIDIAN.querySelector('#modals');
     const mediaModal = MODALS.querySelector('#media-modal');
     const media = mediaModal.querySelector("#media");

@@ -121,6 +121,8 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            direction: rtl;
+            text-align: left;
         }
 
         #search-modal ul li button:hover {
@@ -167,6 +169,11 @@
             height: max-content;
             width: max-content;
         }
+
+        #modals #media-modal #media-data {
+            font-size: small;
+            color: var(--color-text);
+        }
     </style>
 </head>
 <!-- -------------------------------- Modals ------------------------------- -->
@@ -200,7 +207,7 @@
     </div>
     <div popover id="media-modal">
         <div id="media"></div>
-        <div id="media-data" style="text-align: center;"> </div>
+        <div id="media-data"> </div>
     </div>
 </div>
 
