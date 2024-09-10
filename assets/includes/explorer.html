@@ -79,7 +79,8 @@
     }
     let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
-        buildFileTree(FILE_TREE, sortObsidianVaultFiles(VAULT_FILES));
+        const sortedVaultFiles = sortObsidianVaultFiles(VAULT_FILES);
+        buildFileTree(FILE_TREE, sortedVaultFiles);
 
         const collapseExpand = EXPLORER.querySelector('#vault-name #collapseExpand');
         collapseExpand.innerHTML = DOMPurify.sanitize(getSVGIcon(Icon.ChevronExpand));
