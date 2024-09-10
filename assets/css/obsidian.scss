@@ -1,0 +1,137 @@
+---
+---
+
+#obsidian {
+	--bg: white;
+	--color-border: #e0e0e0;
+	--color-button: #606060;
+	--bg-tinted: #f6f6f6;
+	--color-accent: #469fd3;
+	--color-text: #363636;
+	--color-linked-mention-text: #5f5f5f;
+	--bg-linked-mention-highlight: #d6e9fa;
+	max-height: 93.5vh;
+	display: inherit;
+	width: 100%;
+	height: auto;
+	color: var(--color-text);
+	table {
+		tr {
+			&:nth-child(2n) {
+				background-color: #f7f7f7;
+			}
+		}
+	}
+	li {
+		&::before {
+			color: #ababab;
+		}
+	}
+	>* {
+		height: initial;
+	}
+	#sidebar {
+		display: flex;
+		width: 2rem;
+		flex-direction: column;
+		align-items: flex-start;
+		background-color: var(--bg-tinted);
+		border-right: 1px solid var(--color-border);
+	}
+	#explorer {
+		overflow-y: auto;
+		max-height: 100vh;
+		width: 15%;
+		background-color: var(--bg-tinted);
+		overscroll-behavior: none;
+	}
+	#divider {
+		width: 4px;
+		border-left: 1px solid var(--color-border);
+		cursor: ew-resize;
+		position: relative;
+		transition: background-color 0.4s ease;
+		&:hover {
+			background-color: var(--color-accent);
+		}
+	}
+	#fileread {
+		flex: 1;
+		overflow-y: auto;
+		max-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background-color: var(--bg);
+		position: relative;
+		#breadcrumb {
+			list-style: none;
+			padding: 0;
+			z-index: 10;
+			color: var(--color-text);
+		}
+		ul#breadcrumb {
+			padding: 6px 0 3px 0;
+			margin: 0;
+			list-style: none;
+			position: sticky;
+			top: 0;
+			left: 0;
+			background-color: var(--bg);
+			width: 100%;
+			text-align: center;
+			li {
+				display: inline;
+				font-size: medium;
+			}
+			button {
+				display: inline;
+				font-size: medium;
+				&:hover {
+					color: var(--color-accent);
+				}
+			}
+			li+li {
+				&:before {
+					padding: 5px;
+					color: var(--color-text);
+					content: "/\00a0";
+				}
+			}
+		}
+	}
+	#file-tree {
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+	#file-read {
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+}
+@media (prefers-color-scheme: dark) {
+	#obsidian {
+		--bg: #1e1e1e;
+		--color-border: #404040;
+		--color-button: #a0a0a0;
+		--bg-tinted: #1e1e1e;
+		--color-accent: #71a6d2;
+		--color-text: #dadada;
+		--color-linked-mention-text: #b0b0b0;
+		--bg-linked-mention-highlight: #2a4f6e;
+		table {
+			tr {
+				&:nth-child(2n) {
+					background-color: #525252 !important;
+				}
+			}
+		}
+		li {
+			&::before {
+				color: #666666;
+			}
+		}
+	}
+}

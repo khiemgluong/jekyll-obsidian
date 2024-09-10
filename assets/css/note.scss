@@ -1,6 +1,6 @@
 ---
----
- 
+--- 
+
 #obsidian {
 	#fileread {
 		#note {
@@ -68,8 +68,8 @@
 
 				ul {
 					button.sentence {
+						border: 1px solid var(--color-border);
 						&:first-child {
-							border: 1px solid var(--color-border);
 							border-top-left-radius: .6rem;
 							border-top-right-radius: .6rem;
 							width: 100%;

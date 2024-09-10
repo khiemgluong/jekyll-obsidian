@@ -61,22 +61,16 @@ module Jekyll
         layouts_dir = File.join(File.dirname(site.dest), "_layouts")
         FileUtils.mkdir_p(layouts_dir) unless File.directory?(layouts_dir)
 
+        css_dir = File.join(File.dirname(site.dest), "assets", "obsidian", "css")
+        FileUtils.mkdir_p(css_dir) unless File.directory?(css_dir)
+
         project_root = File.expand_path("../..", File.dirname(__FILE__))
         assets_dir = File.join(project_root, "assets")
         puts assets_dir
-        explorer = File.join(assets_dir, "includes", "explorer.html")
-        fileread = File.join(assets_dir, "includes", "fileread.html")
-        note = File.join(assets_dir, "includes", "note.html")
-        canvas = File.join(assets_dir, "includes", "canvas.html")
-        modals = File.join(assets_dir, "includes", "modals.html")
-        sidebar = File.join(assets_dir, "includes", "sidebar.html")
 
-        copy_file_to_dir(explorer, obsidian_dir)
-        copy_file_to_dir(fileread, obsidian_dir)
-        copy_file_to_dir(note, obsidian_dir)
-        copy_file_to_dir(canvas, obsidian_dir)
-        copy_file_to_dir(modals, obsidian_dir)
-        copy_file_to_dir(sidebar, obsidian_dir)
+        copy_files_from_dir(File.join(assets_dir, "css"), css_dir)
+
+        copy_files_from_dir(File.join(assets_dir, "includes"), obsidian_dir)
 
         layout = File.join(assets_dir, "layouts", "obsidian.html")
         copy_file_to_dir(layout, layouts_dir)
@@ -90,6 +84,13 @@ module Jekyll
         else
           puts "Error: #{file} does not exist"
           exit
+        end
+      end
+
+      def copy_files_from_dir(source_dir, destination_dir)
+        Dir.glob(File.join(source_dir, '*')).each do |file_path|
+          next if File.directory?(file_path) # Skip directories
+          copy_file_to_dir(file_path, destination_dir)
         end
       end
 
