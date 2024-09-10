@@ -147,8 +147,10 @@
 
         // ----------------------------- Media Modal -----------------------------
         #media-modal {
-            height: max-content;
             width: max-content;
+            height: max-content;
+            max-width: 80% !important;
+            max-height: 80% !important;
 
             #media{
                 img, video{
