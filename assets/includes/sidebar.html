@@ -1,6 +1,6 @@
 <head>
     <style>
-        button {
+        #obsidian #sidebar button {
             background: none;
             border: none;
             padding: 0;
@@ -9,8 +9,8 @@
             color: var(--color-button);
         }
 
-        #sidebar #top-container,
-        #sidebar #bottom-container {
+        #obsidian #sidebar #top-container,
+        #obsidian #sidebar #bottom-container {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -18,15 +18,14 @@
             width: 100%;
         }
 
-        #sidebar #top-container {
+        #obsidian #sidebar #top-container {
             justify-content: flex-start;
             gap: 0.5vh;
-            /* Align children to the top */
+            margin-top: 2px;
         }
 
-        #sidebar #bottom-container {
+        #obsidian #sidebar #bottom-container {
             justify-content: flex-end;
-            /* Align children to the bottom */
         }
     </style>
 </head>

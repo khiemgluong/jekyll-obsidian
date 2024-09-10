@@ -21,9 +21,11 @@
     --color-button: light-dark(#606060, #a0a0a0);
     --bg-tinted: light-dark(#f6f6f6, #181818);
     --color-accent: #5f6ce9;
+    --color-accent-hover: #7a85eb;
     --color-text: light-dark(#363636, #dadada);
     --color-linked-mention-text: light-dark(#5f5f5f, #b0b0b0);
     --bg-linked-mention-highlight: light-dark(#eaeaea, #333);
+    --explorer-button-hover: light-dark(#e4e4e4, #262626);
     max-height: 93.5vh;
     display: inherit;
     width: 100%;
@@ -31,10 +33,11 @@
     color: var(--color-text);
 
     table {
-        th{
+        th {
             background-color: light-dark(#f0f0f0, #303030);
             color: var(--color-text);
         }
+
         tr {
             &:nth-child(2n) {
                 background-color: light-dark(#f7f7f7, #363636);

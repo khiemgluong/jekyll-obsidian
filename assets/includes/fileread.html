@@ -2,59 +2,7 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-    <style>
-        #obsidian #fileread #note-content .url-link {
-            display: flex;
-            font-size: large;
-            color: var(--color-button);
-            padding-bottom: 0.5rem;
-        }
-
-        /* Backlink styles */
-        #obsidian #fileread .backlink {
-            color: var(--color-accent);
-            font-size: inherit;
-        }
-
-        /* Embed styles */
-        #obsidian #fileread .embed {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #obsidian #fileread .embed audio {
-            width: 80%;
-        }
-
-        #obsidian #fileread .embed p {
-            font-size: small;
-            color: var(--color-button);
-        }
-
-        #obsidian #fileread .embed p:hover {
-            color: var(--color-text);
-        }
-
-        /* Callout style */
-        #note-content blockquote svg {
-            vertical-align: text-bottom;
-        }
-
-        #note-content blockquote .svg_Warning,
-        #note-content blockquote .svg_Question {
-            color: #ed7908;
-        }
-
-        #note-content blockquote .svg_Info,
-        #note-content blockquote .svg_Todo,
-        #note-content blockquote .svg_Note {
-            color: #086ddd;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ '/assets/obsidian/css/fileread.css' | relative_url }}">
 </head>
 
 <!-- --------------------------- Data Extractors --------------------------- -->

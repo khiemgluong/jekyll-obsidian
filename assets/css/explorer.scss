@@ -39,14 +39,14 @@
 
     #file-tree {
         position: relative;
-
+    
         ul {
             list-style-type: none;
-            padding-left: 0px;
-            margin-left: 0px;
-
+            padding-left: 0;
+            margin-left: 0;
+    
             button {
-                padding-left: 0px;
+                padding-left: 0;
                 vertical-align: middle;
                 user-select: none;
                 background: none;
@@ -63,7 +63,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 max-width: 100%;
-
+    
                 svg {
                     vertical-align: middle;
                     margin-right: 4px;
@@ -72,49 +72,45 @@
                     max-width: 16px;
                     max-height: 16px;
                 }
-
+    
                 span {
                     vertical-align: middle;
                 }
             }
-
+    
             ul {
                 li {
                     &.file {
                         border-left: 1px solid var(--color-border);
+                        padding-left: 12px;
+                        padding-top: 2px;
                     }
                 }
             }
-
+    
             li {
                 &.file {
                     margin-left: 0px;
+                    padding-bottom: 2px;
+    
+                    &:hover {
+                        background-color: var(--explorer-button-hover);
+                    }
+                }
+    
+                &.dir button:hover {
+                    background-color: var(--explorer-button-hover);
                 }
             }
         }
-
-        &>ul {
-            &>li {
-                &.file {
-                    margin-left: 14px;
-                }
-            }
+    
+        > ul > li.file {
+            margin-left: 14px;
+        }
+    
+        ul li,
+        ul ul li {
+            padding-bottom: 2px;
         }
     }
-
-    #file-tree ul ul,
-    #file-tree ul li.file {
-        padding-left: 12px;
-        padding-top: 2px;
-    }
-
-    #file-tree ul li.file:hover,
-    #file-tree ul li.dir button:hover {
-        background-color: #e4e4e4;
-    }
-
-    #file-tree ul li,
-    #file-tree ul ul li {
-        padding-bottom: 2px;
-    }
-}
+}    
