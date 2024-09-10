@@ -1,154 +1,6 @@
 <head>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <link rel="stylesheet" href="{{ '/assets/obsidian/css/modals.css' | relative_url }}"> -->
-    <style>
-        #obsidian #modals>* {
-            border: 0;
-            box-shadow: 0px 0px 50px var(--color-button);
-            border-radius: 1rem;
-            width: 40%;
-            max-width: 50%;
-        }
-
-        #obsidian #modals>*::backdrop {
-            background-color: rgba(200, 200, 200, 0.5);
-            backdrop-filter: blur(2px);
-        }
-
-        @media (prefers-color-scheme: dark) {
-
-            #obsidian #modals>*::backdrop {
-                background-color: rgba(50, 50, 50, 0.5);
-            }
-        }
-
-        #obsidian #modals>*:popover-open {
-            animation: slideIn 100ms ease-in-out;
-        }
-
-        @keyframes slideIn {
-            0% {
-                transform: translateX(-40%);
-                opacity: 0;
-            }
-
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        #obsidian #modals .modal-close {
-            font-size: x-large;
-            line-height: .5em;
-            float: right;
-        }
-
-        /* ---------------------------- Search Modal ----------------------------- */
-        #obsidian #modals #search-modal {
-            padding-left: 0;
-            padding-top: 0;
-            height: fit-content;
-            max-height: 45%;
-        }
-
-        #obsidian #modals #search-modal #header {
-            display: flex;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            left: 0;
-        }
-
-        #obsidian #modals #search-modal #header input[type="text"] {
-            flex-grow: 1;
-            margin-right: 10px;
-            padding: 10px;
-            border-bottom-right-radius: .8rem;
-            border-style: none;
-        }
-
-        #obsidian #modals #search-modal #header button {
-            padding: 4px;
-            font-size: xx-large;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-
-        #obsidian #modals #search-modal:popover-open {
-            animation: slideIn 150ms ease-in-out;
-        }
-
-        #obsidian #modals #search-modal ul {
-            list-style-type: none;
-            margin-left: 10px;
-        }
-
-        #obsidian #modals #search-modal ul li {
-            margin-top: 4px;
-        }
-
-        #obsidian #modals #search-modal ul li button {
-            font-size: medium;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            direction: rtl;
-            text-align: left;
-        }
-
-        #obsidian #modals #search-modal ul li button:hover {
-            background-color: var(--bg-tinted);
-        }
-
-        /* ----------------------------- Info Modal ------------------------------ */
-        #obsidian #modals #info-modal {
-            height: 25%;
-        }
-
-        #obsidian #modals #info-modal:popover-open {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 1em;
-        }
-
-        #obsidian #modals #info-modal>div:first-child {
-            align-self: center;
-            font-size: x-large;
-        }
-
-        #obsidian #modals #info-modal>div:not(:first-child),
-        #obsidian #modals #info-modal>button:not(:first-child) {
-            align-self: flex-start;
-            font-size: large;
-        }
-
-        /* Github Info */
-        #obsidian #modals #info-modal #github {
-            display: flex;
-            flex-direction: row;
-            height: fit-content;
-        }
-
-        #obsidian #modals #info-modal #github a {
-            display: flex;
-            align-items: center;
-        }
-
-        /* ----------------------------- Media Modal ----------------------------- */
-        #obsidian #modals #media-modal {
-            height: max-content;
-            width: max-content;
-        }
-
-        #obsidian #modals #media-modal #media-data {
-            font-size: small;
-            color: var(--color-text);
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="{{ '/assets/obsidian/css/modals.css' | relative_url }}">
 </head>
 <!-- -------------------------------- Modals ------------------------------- -->
 <div id="modals">
@@ -246,7 +98,6 @@
                 console.log("selected image media");
                 const image = document.createElement('img');
                 image.src = fullFilePath;
-                image.style.borderRadius = '1rem';
                 media.appendChild(image);
                 break;
             case 'audio':
@@ -259,7 +110,6 @@
                 const video = document.createElement('video');
                 video.src = fullFilePath;
                 video.controls = true;
-                video.style.borderRadius = '1rem';
                 media.appendChild(video);
                 break;
         }

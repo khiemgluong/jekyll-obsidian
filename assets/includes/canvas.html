@@ -108,13 +108,13 @@
                             let sideOffsetY = offsetY;
                             switch (side) {
                                 case "top":
-                                    sideOffsetY = offsetY - node.height / 2; break;
+                                    sideOffsetY = (offsetY - node.height / 2) + 5; break;
                                 case "bottom":
-                                    sideOffsetY = offsetY + node.height / 2; break;
+                                    sideOffsetY = (offsetY + node.height / 2) - 5; break;
                                 case "right":
-                                    sideOffsetX = offsetX + node.width / 2; break;
+                                    sideOffsetX = (offsetX + node.width / 2) - 5; break;
                                 case "left":
-                                    sideOffsetX = offsetX - node.width / 2; break;
+                                    sideOffsetX = (offsetX - node.width / 2) + 5; break;
                             }
                             return { sideOffsetX, sideOffsetY };
                         }
@@ -346,24 +346,20 @@
                 y: (FILEREAD.scrollTop + y) / scale
             };
 
-            // Update the scale
             console.info("Scroll direction: " + (e.deltaY > 0 ? "down" : "up"));
             if (e.deltaY > 0) {
-                scale = Math.max(0.1, scale - 0.01); // Decrease scale
+                scale = Math.max(0.1, scale - 0.01);
             } else {
-                scale = Math.min(1, scale + 0.01); // Increase scale
+                scale = Math.min(1, scale + 0.01);
             }
 
-            // Apply the new scale
             canvasContent.style.transform = `scale(${scale})`;
-            // const EDGES = CANVAS.querySelector('svg');
             EDGES.style.transform = `scale(${scale})`;
             EDGES.style.transformOrigin = 'center center';
 
             const scrollMultiplier = 0.02;
             const deltaX = (pointBeforeScale.x * scale - (FILEREAD.scrollLeft + x)) * scrollMultiplier;
             const deltaY = (pointBeforeScale.y * scale - (FILEREAD.scrollTop + y)) * scrollMultiplier;
-            // console.info("deltaX: " + deltaX + " deltaY: " + deltaY);
             FILEREAD.scrollLeft += deltaX;
             FILEREAD.scrollTop += deltaY;
         }
