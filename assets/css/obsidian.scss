@@ -20,13 +20,13 @@
 
     table {
         th {
-            background-color: light-dark(#f0f0f0, #303030);
+            background-color: light-dark(#f0f0f0, #121212);
             color: var(--color-text);
         }
 
         tr {
             &:nth-child(2n) {
-                background-color: light-dark(#f7f7f7, #363636);
+                background-color: light-dark(#f7f7f7, #161616);
             }
         }
     }

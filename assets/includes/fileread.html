@@ -320,9 +320,11 @@
             if (heading) detail.heading = heading;
             const event = new CustomEvent('obsidian_noteSelect', { detail });
             document.dispatchEvent(event);
+            Cookies.set('last-file', filePath, { expires: 300, path: '', sameSite: 'Strict' })
         } else if (filePath.endsWith('.canvas')) {
             const event = new CustomEvent('obsidian_canvasSelect', { detail });
             document.dispatchEvent(event);
+            Cookies.set('last-file', filePath, { expires: 300, path: '', sameSite: 'Strict' })
         } else {
             const event = new CustomEvent('obsidian_mediaSelect', { detail });
             document.dispatchEvent(event);

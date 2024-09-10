@@ -130,8 +130,14 @@
         let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
         note.style.paddingLeft = `${padding}vw`;
         note.style.paddingRight = `${padding}vw`;
-        console.log("Explorer width:", explorerWidth);
-        console.debug("DOMContentLoaded obsidian.html loaded");
+
+        var lastFileCookie = Cookies.get('last-file');
+        if (lastFileCookie) {
+            console.info("last file: " + lastFileCookie);
+            dispatchFileSelectEvt(lastFileCookie, null);
+        } else {
+            console.info('No color-scheme cookie found.');
+        }
     });
 </script>
 

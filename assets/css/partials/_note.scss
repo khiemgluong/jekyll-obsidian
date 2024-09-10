@@ -17,6 +17,10 @@
 				cursor: pointer;
 			}
 
+			table td{
+				color: var(--color-text);
+			}
+
 			#linked-mentions {
 				font-size: 1.2em;
 				width: 100%;
