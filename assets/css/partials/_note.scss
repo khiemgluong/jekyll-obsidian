@@ -32,6 +32,10 @@
 				padding-top: 4px;
 				margin-bottom: 5px;
 
+				h4{
+					color: var(--color-button);
+				}
+
 				.title {
 					width: 100%;
 
@@ -75,11 +79,16 @@
 					button.sentence {
 						border: 1px solid var(--color-border);
 						background-color: var(--bg);
+						width: 100%;
 
 						&:first-child {
 							border-top-left-radius: .6rem;
 							border-top-right-radius: .6rem;
-							width: 100%;
+						}
+
+						&:not(:first-child):not(:last-child) {
+							border-top: none;
+							border-bottom: none;
 						}
 
 						&:last-child {

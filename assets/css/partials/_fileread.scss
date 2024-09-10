@@ -1,5 +1,10 @@
 #obsidian {
 	#fileread {
+		button {
+			border: none;
+			background-color: transparent;
+		}
+
 		#breadcrumb {
 			list-style: none;
 			padding: 0;
@@ -26,8 +31,6 @@
 			button {
 				display: inline;
 				font-size: medium;
-				border: none;
-				background-color: transparent;
 				color: var(--color-button);
 
 				&:hover {

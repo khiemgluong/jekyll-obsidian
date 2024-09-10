@@ -1,7 +1,8 @@
 #obsidian {
     #fileread {
         #canvas {
-            --canvas-backdrop: rgba(200, 200, 200, 0.1);
+            --canvas-backdrop: light-dark(rgba(200, 200, 200, 0.1),
+            rgba(100, 100, 100, 0.1));
             position: absolute;
             height: 10000px;
             width: 10000px;
