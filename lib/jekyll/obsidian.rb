@@ -9,10 +9,6 @@ require_relative "obsidian/version"
 
 module Jekyll
   module Obsidian
-    Jekyll::Hooks.register :site, :after_init do |site|
-      sass_dir = File.expand_path("../../assets/css/", __FILE__) # Path to your SCSS files within the gem
-      site.sass.load_paths << sass_dir if site.respond_to?(:sass)
-    end
     class FileTreeGenerator < Jekyll::Generator
       safe true
       priority :lowest
@@ -65,18 +61,24 @@ module Jekyll
         layouts_dir = File.join(File.dirname(site.dest), "_layouts")
         FileUtils.mkdir_p(layouts_dir) unless File.directory?(layouts_dir)
 
-        css_dir = File.join(File.dirname(site.dest), "assets", "obsidian", "css")
-        FileUtils.mkdir_p(css_dir) unless File.directory?(css_dir)
+        scss_dir = File.join(File.dirname(site.dest), "assets", "obsidian")
+        FileUtils.mkdir_p(scss_dir) unless File.directory?(scss_dir)
+
+        partials_dir = File.join(File.dirname(site.dest), "_sass", "obsidian")
+        FileUtils.mkdir_p(partials_dir) unless File.directory?(partials_dir)
 
         project_root = File.expand_path("../..", File.dirname(__FILE__))
-        assets_dir = File.join(project_root, "assets")
-        puts assets_dir
+        plugin_dir = File.join(project_root, "assets")
+        # puts plugin_dir
 
-        copy_files_from_dir(File.join(assets_dir, "css"), css_dir)
+        main_scss = File.join(plugin_dir, "css", "obsidian.scss")
+        copy_file_to_dir(main_scss, scss_dir)
 
-        copy_files_from_dir(File.join(assets_dir, "includes"), obsidian_dir)
+        copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir)
 
-        layout = File.join(assets_dir, "layouts", "obsidian.html")
+        copy_files_from_dir(File.join(plugin_dir, "includes"), obsidian_dir)
+
+        layout = File.join(plugin_dir, "layouts", "obsidian.html")
         copy_file_to_dir(layout, layouts_dir)
       end
 
@@ -84,7 +86,14 @@ module Jekyll
 
       def copy_file_to_dir(file, dir)
         if File.exist?(file)
-          FileUtils.cp(file, dir)
+          destination_file = File.join(dir, File.basename(file))
+
+          if File.exist?(destination_file)
+            puts "Skip: #{destination_file} already exists"
+          else
+            FileUtils.cp(file, dir)
+            puts "File copied to #{dir}"
+          end
         else
           puts "Error: #{file} does not exist"
           exit
@@ -93,7 +102,7 @@ module Jekyll
 
       def copy_files_from_dir(source_dir, destination_dir)
         Dir.glob(File.join(source_dir, '*')).each do |file_path|
-          next if File.directory?(file_path) # Skip directories
+          next if File.directory?(file_path)
           copy_file_to_dir(file_path, destination_dir)
         end
       end

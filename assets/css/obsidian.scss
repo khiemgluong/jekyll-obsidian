@@ -1,26 +1,12 @@
 ---
 ---
 
-:root {
-    &:has(input[name="color-scheme"][value="system"]:checked) {
-        color-scheme: light dark;
-    }
-
-    &:has(input[name="color-scheme"][value="light"]:checked) {
-        color-scheme: light;
-    }
-
-    &:has(input[name="color-scheme"][value="dark"]:checked) {
-        color-scheme: dark;
-    }
-}
-
 #obsidian {
     --bg: light-dark(white, #1e1e1e);
     --color-border: light-dark(#e0e0e0, #404040);
     --color-button: light-dark(#606060, #a0a0a0);
     --bg-tinted: light-dark(#f6f6f6, #181818);
-    --color-accent: #5f6ce9 ;
+    --color-accent: #5f6ce9;
     --color-accent-hover: #7a85eb;
     --color-text: light-dark(#363636, #dadada);
     --color-linked-mention-text: light-dark(#5f5f5f, #b0b0b0);
@@ -148,4 +134,22 @@
             display: none;
         }
     }
+
+    &:has(input[name="color-scheme"][value="system"]:checked) {
+        color-scheme: light dark;
+    }
+
+    &:has(input[name="color-scheme"][value="light"]:checked) {
+        color-scheme: light;
+    }
+
+    &:has(input[name="color-scheme"][value="dark"]:checked) {
+        color-scheme: dark;
+    }
 }
+
+@import "obsidian/modals";
+@import "obsidian/explorer";
+@import "obsidian/fileread";
+@import "obsidian/note";
+@import "obsidian/sidebar";
