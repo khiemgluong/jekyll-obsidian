@@ -36,11 +36,14 @@
                     background-color: var(--canvas-backdrop);
 
                     p {
-                        font-size: large;
+                        font-size: larger;
+                        font-weight: bold;
                         width: max-content;
-                        padding: 3px;
+                        padding: 4px 12px;
                         color: var(--color-text);
                         background-color: var(--bg-tinted);
+                        border-radius: 0.8rem;
+                        border: 2px solid var(--color-border);
                     }
                 }
 
