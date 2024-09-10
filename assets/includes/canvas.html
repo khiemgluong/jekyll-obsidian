@@ -126,14 +126,10 @@
                         const offsetXTo = (-minX) + (canvasWidth / 2) + toNode.width / 2;
                         const offsetYTo = (-minY) + (canvasWidth / 2) + toNode.height / 2;
 
-                        console.debug("from edge side: " + edge.fromSide + "\t" + " to edge side: " + edge.toSide);
-
-                        // Get the side offsets for fromNode
                         const fromOffsets = getSideOffset(fromNode, offsetXFrom, offsetYFrom, edge.fromSide);
                         const from_SideOffsetX = fromOffsets.sideOffsetX;
                         const from_SideOffsetY = fromOffsets.sideOffsetY;
 
-                        // Get the side offsets for toNode
                         const toOffsets = getSideOffset(toNode, offsetXTo, offsetYTo, edge.toSide);
                         const to_SideOffsetX = toOffsets.sideOffsetX;
                         const to_SideOffsetY = toOffsets.sideOffsetY;
@@ -145,10 +141,8 @@
 
                             switch (side) {
                                 case "top":
-                                    controlOffsetX = 0;
                                     controlOffsetY = -controlOffset; break;
                                 case "bottom":
-                                    controlOffsetX = 0;
                                     controlOffsetY = controlOffset; break;
                                 case "right":
                                     controlOffsetX = controlOffset;
@@ -168,11 +162,9 @@
                             fromNode.x + from_SideOffsetX,
                             fromNode.y + from_SideOffsetY,
 
-                            // Control point for the fromNode, adjusted based on its side
                             fromNode.x + from_SideOffsetX + fromCurveOffset.controlOffsetX,
                             fromNode.y + from_SideOffsetY + fromCurveOffset.controlOffsetY,
 
-                            // Control point for the toNode, adjusted based on its side
                             toNode.x + to_SideOffsetX + toCurveOffset.controlOffsetX,
                             toNode.y + to_SideOffsetY + toCurveOffset.controlOffsetY,
 
@@ -271,7 +263,6 @@
                 } else console.warn('The canvas has no children.');
 
                 FILEREAD.addEventListener('wheel', adjustCanvasScaleOnScroll);
-                console.warn("wheel event listener added to FILEREAD");
             } catch (e) {
                 console.error("Error parsing canvas:", e);
             }

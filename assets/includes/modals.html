@@ -9,12 +9,16 @@
             <form style="display: flex; flex-grow: 1;">
                 <input type="text" id="search-input" name="name" placeholder="Find a note..">
             </form>
-            <button class="modal-close" popovertarget="search-modal" popovertargetaction="hide">&times;</button>
+            <button class="modal-close" popovertarget="search-modal" popovertargetaction="hide">
+                &times;
+            </button>
         </div>
     </div>
 
     <div popover id="info-modal">
-        <button class="modal-close" popovertarget="info-modal" popovertargetaction="hide">&times;</button>
+        <button class="modal-close" popovertarget="info-modal" popovertargetaction="hide">
+            &times;
+        </button>
         <p><a href="https://github.com/khiemgluong/jekyll-obsidian" target="_blank">jekyll-obsidian</a></p>
         <p>View <a href="https://obsidian.md/" target="_blank">Obsidian</a> vaults, on your <a
                 href="https://jekyllrb.com/" target="_blank">Jekyll</a> website.</p>
@@ -42,28 +46,36 @@
         if (number < 1) return 'no size';
         const units = ['B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB'];
         const digits = Math.floor((Math.log(number) / Math.log(1024)));
-        const unitIndex = Math.min(digits, units.length - 1); // Ensure we don't exceed the units array
+        const unitIndex = Math.min(digits, units.length - 1); // Ensure we don't exceed the array
         const sizeInUnit = number / Math.pow(1024, unitIndex);
-        // Format the number to have up to 3 digits (including after the decimal point if applicable)
+        // Format the number to have up to 3 digits
         const formattedSize = sizeInUnit.toFixed(sizeInUnit >= 100 ? 0 : sizeInUnit >= 10 ? 1 : 2);
         return `${formattedSize} ${units[unitIndex]}`;
+    }
+</script>
+
+<script>
+    function applyColorScheme(colorScheme) {
+        switch (colorScheme) {
+            case 'system':
+                MODALS.querySelector('#systemScheme').checked = true;
+                break;
+            case 'dark':
+                MODALS.querySelector('#darkScheme').checked = true;
+                break;
+            case 'light':
+                MODALS.querySelector('#lightScheme').checked = true;
+                break;
+        }
+        return colorScheme;
     }
 </script>
 
 <!-- ----------------------- Modals event listeners ------------------------ -->
 <script>
     document.getElementById('color-scheme').addEventListener('change', function () {
-        switch (this.value) {
-            case 'system':
-                document.getElementById('systemScheme').checked = true;
-                break;
-            case 'dark':
-                document.getElementById('darkScheme').checked = true;
-                break;
-            case 'light':
-                document.getElementById('lightScheme').checked = true;
-                break;
-        }
+        applyColorScheme(this.value);
+        Cookies.set('color-scheme', this.value, { expires: 30, path: '', sameSite: 'Strict' })
     });
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -76,6 +88,13 @@
         const vaultProps = infoModal.querySelector('#vault-props');
         vaultProps.textContent =
             `${parsedVaultData.files} files | ${parsedVaultData.dirs} folders | ${formattedSize}`;
+
+        var colorSchemeCookie = Cookies.get('color-scheme');
+        if (colorSchemeCookie) {
+            document.getElementById('color-scheme').value = applyColorScheme(colorSchemeCookie);
+        } else {
+            console.info('No color-scheme cookie found.');
+        }
     });
 
     document.addEventListener('obsidian_modalSelect', function (event) {
