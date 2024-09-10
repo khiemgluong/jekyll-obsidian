@@ -226,7 +226,11 @@
                             break;
                         case "group":
                             card.classList.add('card', 'group');
-                            // card.textContent = node.label;
+                            if (node.label !== "") {
+                                const groupLabel = document.createElement('p')
+                                groupLabel.textContent = node.label;
+                                card.appendChild(groupLabel);
+                            }
                             break;
                     }
                     // Set the div's position and size
