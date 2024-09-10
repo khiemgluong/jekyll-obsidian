@@ -10,7 +10,7 @@ require_relative "obsidian/version"
 module Jekyll
   module Obsidian
     Jekyll::Hooks.register :site, :after_init do |site|
-      sass_dir = File.expand_path("../../assets/obsidian/css/", __FILE__) # Path to your SCSS files within the gem
+      sass_dir = File.expand_path("../../assets/css/", __FILE__) # Path to your SCSS files within the gem
       site.sass.load_paths << sass_dir if site.respond_to?(:sass)
     end
     class FileTreeGenerator < Jekyll::Generator
