@@ -46,12 +46,12 @@
 
 				button {
 					&:hover {
-						background-color: var(--bg-linked-mention-highlight);
+						background-color: var(--linked-mention-hover) !important;
 					}
 
 					ul {
 						li.sentence {
-							color: var(--color-linked-mention-text);
+							color: var(--linked-mention-color);
 							width: 96%;
 							padding: 8px 5px;
 							font-size: 1rem;
@@ -70,6 +70,8 @@
 				ul {
 					button.sentence {
 						border: 1px solid var(--color-border);
+						background-color: var(--bg);
+
 						&:first-child {
 							border-top-left-radius: .6rem;
 							border-top-right-radius: .6rem;

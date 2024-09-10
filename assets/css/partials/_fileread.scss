@@ -1,5 +1,48 @@
 #obsidian {
 	#fileread {
+		#breadcrumb {
+			list-style: none;
+			padding: 0;
+			z-index: 10;
+			color: var(--color-text);
+		}
+
+		ul#breadcrumb {
+			padding: 6px 0 3px 0;
+			margin: 0;
+			list-style: none;
+			position: sticky;
+			top: 0;
+			left: 0;
+			background-color: var(--bg);
+			width: 100%;
+			text-align: center;
+
+			li {
+				display: inline;
+				font-size: medium;
+			}
+
+			button {
+				display: inline;
+				font-size: medium;
+				border: none;
+				background-color: transparent;
+
+				&:hover {
+					color: var(--color-accent);
+				}
+			}
+
+			li+li {
+				&:before {
+					padding: 5px;
+					color: var(--color-text);
+					content: "/\00a0";
+				}
+			}
+		}
+
 		#note-content {
 			.url-link {
 				display: flex;
@@ -7,25 +50,34 @@
 				color: var(--color-button);
 				padding-bottom: 0.5rem;
 			}
-            blockquote {
-                svg {
-                    vertical-align: text-bottom;
-                }
-                .svg_Warning, .svg_Question {
-                    color: #ed7908;
-                }
-                .svg_Info,.svg_Todo,.svg_Note {
-                    color: #086ddd;
-                }
-            }
+
+			blockquote {
+				svg {
+					vertical-align: text-bottom;
+				}
+
+				.svg_Warning,
+				.svg_Question {
+					color: #ed7908;
+				}
+
+				.svg_Info,
+				.svg_Todo,
+				.svg_Note {
+					color: #086ddd;
+				}
+			}
 		}
+
 		.backlink {
 			color: var(--color-accent);
 			font-size: inherit;
-            &:hover{
-                color: var(--color-accent-hover);
-            }
+
+			&:hover {
+				color: var(--color-accent-hover);
+			}
 		}
+
 		.embed {
 			width: 100%;
 			max-width: 100%;
@@ -33,12 +85,15 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
+
 			audio {
 				width: 80%;
 			}
+
 			p {
 				font-size: small;
 				color: var(--color-button);
+
 				&:hover {
 					color: var(--color-text);
 				}

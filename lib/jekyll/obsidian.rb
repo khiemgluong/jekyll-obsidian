@@ -76,23 +76,23 @@ module Jekyll
 
         copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir)
 
-        copy_files_from_dir(File.join(plugin_dir, "includes"), obsidian_dir)
-
         layout = File.join(plugin_dir, "layouts", "obsidian.html")
-        copy_file_to_dir(layout, layouts_dir)
+        copy_file_to_dir(layout, layouts_dir,true)
+
+        copy_files_from_dir(File.join(plugin_dir, "includes"), obsidian_dir,true)
       end
 
       private
 
-      def copy_file_to_dir(file, dir)
+      def copy_file_to_dir(file, dir, overwrite=false)
         if File.exist?(file)
           destination_file = File.join(dir, File.basename(file))
 
-          if File.exist?(destination_file)
-            puts "Skip: #{destination_file} already exists"
+          if !overwrite && File.exist?(destination_file)
+            puts "#{File.basename(file)} currently exists"
           else
             FileUtils.cp(file, dir)
-            puts "File copied to #{dir}"
+            puts "#{File.basename(file)} copied over"
           end
         else
           puts "Error: #{file} does not exist"
@@ -100,10 +100,10 @@ module Jekyll
         end
       end
 
-      def copy_files_from_dir(source_dir, destination_dir)
+      def copy_files_from_dir(source_dir, destination_dir, overwrite=false)
         Dir.glob(File.join(source_dir, '*')).each do |file_path|
           next if File.directory?(file_path)
-          copy_file_to_dir(file_path, destination_dir)
+          copy_file_to_dir(file_path, destination_dir,overwrite)
         end
       end
 
