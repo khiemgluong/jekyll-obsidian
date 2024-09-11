@@ -59,6 +59,7 @@
     const OBSIDIAN = document.getElementById('obsidian');
 
     const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
+    const DIVIDER = OBSIDIAN.querySelector("#divider");
 
     const MODALS = OBSIDIAN.querySelector('#modals');
     const mediaModal = MODALS.querySelector('#media-modal');
@@ -68,15 +69,13 @@
     const EXPLORER = OBSIDIAN.querySelector('#explorer');
     const FILE_TREE = EXPLORER.querySelector(' #file-tree');
 
-    const DIVIDER = OBSIDIAN.querySelector(' #divider');
-
     const FILEREAD = OBSIDIAN.querySelector(' #fileread');
     const NOTE = FILEREAD.querySelector('#note');
     const CANVAS = FILEREAD.querySelector('#canvas');
 
     // ! GLOBAL CONSTS
     const minWidth = 10; const maxWidth = 50;
-    const minPadding = 4; const maxPadding = 22.5;
+    const minPadding = 3.5; const maxPadding = 23;
 </script>
 
 <!-- -------------------------- Utility functions -------------------------- -->
@@ -89,11 +88,11 @@
 
 <!-- ------------------------ Divider drag handler ------------------------- -->
 <script>
-    let isDragging = false;
+    let isDraggingDivider = false;
     let startX, startWidth;
 
     DIVIDER.addEventListener('mousedown', (e) => {
-        isDragging = true;
+        isDraggingDivider = true;
         startX = e.clientX;
         startWidth = EXPLORER.getBoundingClientRect().width;
         document.addEventListener('mousemove', onMouseMove);
@@ -101,7 +100,7 @@
     });
 
     function onMouseMove(e) {
-        if (!isDragging) return;
+        if (!isDraggingDivider) return;
 
         let offset = e.clientX - startX;
         let newWidthPx = startWidth + offset;
@@ -112,7 +111,7 @@
     }
 
     function onMouseUp() {
-        isDragging = false;
+        isDraggingDivider = false;
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     }
@@ -120,6 +119,13 @@
 
 <!-- --------------------------- On content load --------------------------- -->
 <script>
+    window.addEventListener('resize', function () {
+        let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
+        let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
+        let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;
+        updateNotePadding(explorerWidthPercent);
+    });
+
     document.addEventListener('DOMContentLoaded', (event) => {
         let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
         let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
@@ -129,6 +135,11 @@
         OBSIDIAN.style.display = '';
         var loadingDiv = document.getElementById('loading-spinner');
         loadingDiv.style.display = 'none';
+
+        if (window.innerWidth < 481) {
+            DIVIDER.style.display = 'none';
+            EXPLORER.style.display = 'none';
+        }
 
         var lastFileCookie = Cookies.get('last-file');
         if (lastFileCookie) {

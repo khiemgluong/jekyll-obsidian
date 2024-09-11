@@ -6,6 +6,58 @@
     </div>
     <div id="file-tree"></div>
 </body>
+
+<!-- ------------------------- Touch screen docker ------------------------- -->
+<script>
+
+    let touchStartX = 0;
+    let touchCurrentX = 0;
+    let isDraggingTouch = false;
+    const activationDistance = 250; // Distance in pixels to activate the drawer
+
+    document.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
+    document.addEventListener('touchend', handleTouchEnd, false);
+
+    function handleTouchStart(evt) {
+        const firstTouch = evt.touches[0];
+        touchStartX = firstTouch.clientX; // Get the initial touch position
+
+        // Optionally check if the touch is near the left edge
+        if (touchStartX < 25) {
+            isDraggingTouch = true;
+            EXPLORER.style.display = '';
+        }
+    }
+
+    function handleTouchMove(evt) {
+        if (!isDraggingTouch) return;
+
+        touchCurrentX = evt.touches[0].clientX;
+        let diffX = touchCurrentX - touchStartX;
+        console.log("diff x " + diffX);
+        // Optionally: Update UI elements here if you want to show drag progress
+    }
+
+    function handleTouchEnd(evt) {
+        if (!isDraggingTouch) return;
+
+        let diffX = touchCurrentX - touchStartX;
+        if (diffX > activationDistance) {
+            activateDrawer();
+        } else EXPLORER.style.display = 'none';
+
+        isDraggingTouch = false;
+        touchStartX = 0; touchCurrentX = 0;
+    }
+
+    function activateDrawer() {
+        EXPLORER.style.width = 'calc(100% - 2rem)';
+        FILEREAD.style.display = 'none';
+        console.log('Drawer activated!');
+    }
+
+</script>
 <!-- ------------------------- File tree generator ------------------------- -->
 <script lang="text/javascript">
     function buildFileTree(rootElement, tree, expandRoot = false) {

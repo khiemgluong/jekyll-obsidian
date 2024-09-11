@@ -329,5 +329,9 @@
             const event = new CustomEvent('obsidian_mediaSelect', { detail });
             document.dispatchEvent(event);
         }
+        if (window.innerWidth < 481) {
+            EXPLORER.style.display = 'none';
+            FILEREAD.style.display = '';
+        }
     }
 </script>
