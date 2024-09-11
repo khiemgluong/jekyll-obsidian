@@ -46,17 +46,15 @@
         if (!isDraggingTouch) return;
         touchCurrentX = evt.touches[0].clientX;
 
-        if (explorerDisplayed) {
-            // Dragging to reveal the explorer from right to left
-            let diffX = window.innerWidth - touchCurrentX;
-            let padding = linearMapInRange(diffX, 0, activationDistance, 100, 1);
-            console.log("diff x " + diffX + " padding: " + padding);
-            EXPLORER.style.width = `calc(${padding}% - 2rem)`;
-        } else {
+        if (!explorerDisplayed) {
             // Dragging to adjust the explorer width from left to right
             let diffX = touchCurrentX - touchStartX;
             let padding = linearMapInRange(diffX, 0, activationDistance, 1, 100);
-            console.log("diff x " + diffX + " padding: " + padding);
+            EXPLORER.style.width = `calc(${padding}% - 2rem)`;
+        } else {
+            // Dragging to reveal the explorer from right to left
+            let diffX = window.innerWidth - touchCurrentX;
+            let padding = linearMapInRange(diffX, 0, activationDistance, 100, 1);
             EXPLORER.style.width = `calc(${padding}% - 2rem)`;
         }
     }
@@ -64,13 +62,24 @@
     function handleTouchEnd(evt) {
         if (!isDraggingTouch) return;
 
-        let diffX = touchCurrentX - touchStartX;
-        if (diffX > activationDistance) {
-            EXPLORER.style.width = 'calc(100% - 2rem)';
-            FILEREAD.style.display = 'none';
+        if (!explorerDisplayed) {
+            let diffX = touchCurrentX - touchStartX;
+            if (diffX > activationDistance) {
+                EXPLORER.style.width = 'calc(100% - 2rem)';
+                FILEREAD.style.display = 'none';
+            } else {
+                EXPLORER.style.display = 'none';
+                EXPLORER.style.width = '1%';
+            }
         } else {
-            EXPLORER.style.display = 'none';
-            EXPLORER.style.width = '1%';
+            let diffX = window.innerWidth - touchCurrentX;
+            if (diffX > activationDistance) {
+                EXPLORER.style.display = 'none';
+                EXPLORER.style.width = '1%';
+            } else {
+                FILEREAD.style.display = '';
+                EXPLORER.style.width = 'calc(100% - 2rem)';
+            }
         }
         isDraggingTouch = false;
         touchStartX = 0; touchCurrentX = 0;
@@ -170,7 +179,6 @@
                 : getSVGIcon(Icon.ChevronExpand)));
         });
 
-        // scroll listener
         EXPLORER.addEventListener('scroll', () => {
             if (EXPLORER.scrollTop < 250) {
                 EXPLORER.classList.add('hide-scrollbar');

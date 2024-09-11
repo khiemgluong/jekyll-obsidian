@@ -119,36 +119,34 @@
 
 <!-- --------------------------- On content load --------------------------- -->
 <script>
-    window.addEventListener('resize', function () {
-        let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
-        let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
-        let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;
-        updateNotePadding(explorerWidthPercent);
-    });
+    window.addEventListener('resize', function () { refreshScreenSize(); });
 
     document.addEventListener('DOMContentLoaded', (event) => {
-        let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
-        let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
-        let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;
-        updateNotePadding(explorerWidthPercent);
+        refreshScreenSize();
 
         OBSIDIAN.style.display = '';
         var loadingDiv = document.getElementById('loading-spinner');
         loadingDiv.style.display = 'none';
 
+        var lastFileCookie = Cookies.get('last-file');
+        if (lastFileCookie) {
+            dispatchFileSelectEvt(lastFileCookie, null);
+        } else console.info('No color-scheme cookie found.');
+    });
+
+    function refreshScreenSize() {
+        let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
+        let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
+        let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;
+        updateNotePadding(explorerWidthPercent);
         if (window.innerWidth < 481) {
             DIVIDER.style.display = 'none';
             EXPLORER.style.display = 'none';
-        }
-
-        var lastFileCookie = Cookies.get('last-file');
-        if (lastFileCookie) {
-            console.info("last file: " + lastFileCookie);
-            dispatchFileSelectEvt(lastFileCookie, null);
         } else {
-            console.info('No color-scheme cookie found.');
+            DIVIDER.style.display = '';
+            EXPLORER.style.display = '';
         }
-    });
+    }
 </script>
 
 <!-- ------------------------------- Getters ------------------------------- -->
