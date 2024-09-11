@@ -13,7 +13,8 @@
     let touchStartX = 0;
     let touchCurrentX = 0;
     let isDraggingTouch = false;
-    const activationDistance = 250; // Distance in pixels to activate the drawer
+    let explorerDisplayed = false;
+    let activationDistance = 0;
 
     document.addEventListener('touchstart', handleTouchStart, false);
     document.addEventListener('touchmove', handleTouchMove, false);
@@ -21,22 +22,43 @@
 
     function handleTouchStart(evt) {
         const firstTouch = evt.touches[0];
-        touchStartX = firstTouch.clientX; // Get the initial touch position
+        touchStartX = firstTouch.clientX; // Get initial touch pos
 
-        // Optionally check if the touch is near the left edge
-        if (touchStartX < 25) {
-            isDraggingTouch = true;
-            EXPLORER.style.display = '';
+        explorerDisplayed = isDisplayNone(EXPLORER);
+        activationDistance = window.innerWidth - 100;
+
+        if (!explorerDisplayed) {
+            if (touchStartX < 40) {
+                isDraggingTouch = true;
+                EXPLORER.style.display = '';
+            }
         }
+        else {
+            if (touchStartX > window.innerWidth - 40) {
+                isDraggingTouch = true;
+                FILEREAD.style.display = '';
+            }
+        }
+
     }
 
     function handleTouchMove(evt) {
         if (!isDraggingTouch) return;
-
         touchCurrentX = evt.touches[0].clientX;
-        let diffX = touchCurrentX - touchStartX;
-        console.log("diff x " + diffX);
-        // Optionally: Update UI elements here if you want to show drag progress
+
+        if (explorerDisplayed) {
+            // Dragging to reveal the explorer from right to left
+            let diffX = window.innerWidth - touchCurrentX;
+            let padding = linearMapInRange(diffX, 0, activationDistance, 100, 1);
+            console.log("diff x " + diffX + " padding: " + padding);
+            EXPLORER.style.width = `calc(${padding}% - 2rem)`;
+        } else {
+            // Dragging to adjust the explorer width from left to right
+            let diffX = touchCurrentX - touchStartX;
+            let padding = linearMapInRange(diffX, 0, activationDistance, 1, 100);
+            console.log("diff x " + diffX + " padding: " + padding);
+            EXPLORER.style.width = `calc(${padding}% - 2rem)`;
+        }
     }
 
     function handleTouchEnd(evt) {
@@ -44,17 +66,19 @@
 
         let diffX = touchCurrentX - touchStartX;
         if (diffX > activationDistance) {
-            activateDrawer();
-        } else EXPLORER.style.display = 'none';
-
+            EXPLORER.style.width = 'calc(100% - 2rem)';
+            FILEREAD.style.display = 'none';
+        } else {
+            EXPLORER.style.display = 'none';
+            EXPLORER.style.width = '1%';
+        }
         isDraggingTouch = false;
         touchStartX = 0; touchCurrentX = 0;
     }
 
-    function activateDrawer() {
-        EXPLORER.style.width = 'calc(100% - 2rem)';
-        FILEREAD.style.display = 'none';
-        console.log('Drawer activated!');
+    function isDisplayNone(element) {
+        const style = getComputedStyle(element);
+        return style.display !== 'none';
     }
 
 </script>

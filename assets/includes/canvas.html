@@ -32,7 +32,6 @@
                 canvasContent.style.transform = `scale(1)`;
 
                 const nodesKeysList = canvasParsed.nodes.map(node => Object.keys(node));
-                console.log("Canvas keysList: " + nodesKeysList);
 
                 const canvasWidth = parseInt(window.getComputedStyle(CANVAS).width);
 
@@ -154,9 +153,8 @@
                 EDGES = CANVAS.querySelector('svg');
                 // <!-- --------------------------- Draw Edges END ---------------------------- -->
 
-                console.log(`minX: ${minX}, maxX: ${maxX}, minY: ${minY}, maxY: ${maxY}`);
                 canvasParsed.nodes.forEach(node => {
-                    console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
+                    // console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
                     const card = document.createElement('div');
                     switch (node.type) {
                         case "text":
