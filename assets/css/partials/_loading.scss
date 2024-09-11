@@ -1,16 +1,16 @@
 /* https://codepen.io/mandelid/pen/kNBYLJ */
 
-#loading {
-    position: relative;
+#loading-spinner {
+    position: absolute;
     top: 35%;
-    left: 45%;
+    left: 40%;
     z-index: 10;
     display: inline-block;
     width: 300px;
     height: 300px;
-    border: 15px solid rgba(255, 255, 255, .3);
+    border: 16px solid rgba(255, 255, 255, .3);
     border-radius: 50%;
-    border-top-color: #fff;
+    border-top-color: #5f6ce9;
     animation: spin 1s linear infinite;
     -webkit-animation: spin 1s linear infinite;
 }

@@ -22,8 +22,8 @@
     {%- include header.html -%}
 
     <main class="page-content" aria-label="Content">
-        <div id="loading"></div>
-        <div id="obsidian">
+        <div id="loading-spinner"></div>
+        <div id="obsidian" style="display: none;">
             <div id="sidebar">
                 {% include obsidian/sidebar.html -%}
                 {%- include obsidian/modals.html -%}
@@ -131,6 +131,10 @@
         let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
         note.style.paddingLeft = `${padding}vw`;
         note.style.paddingRight = `${padding}vw`;
+
+        OBSIDIAN.style.display = '';
+        var loadingDiv = document.getElementById('loading-spinner');
+        loadingDiv.style.display = 'none';
 
         var lastFileCookie = Cookies.get('last-file');
         if (lastFileCookie) {
