@@ -186,12 +186,10 @@
                             }
                             break;
                     }
-                    // Set the div's position and size
                     card.style.position = 'absolute';
-                    card.style.left = `${node.x + (-minX) + (canvasWidth / 2)}px`;
-                    console.log("Card left " + node.x + " " + (-minX) + " " + canvasWidth / 2);
-
                     card.style.top = `${node.y + (-minY) + (canvasWidth / 2)}px`;
+                    card.style.left = `${node.x + (-minX) + (canvasWidth / 2)}px`;
+
                     card.style.width = `${node.width}px`;
                     card.style.height = `${node.height}px`;
 
@@ -201,7 +199,6 @@
                 const boundingBox = getBoundingBoxOfChildren(canvasContent);
                 if (boundingBox) {
                     const center = getCenterOfBoundingBox(boundingBox);
-                    console.info(`Bounding box height: ${boundingBox.height}, width: ${boundingBox.width}`);
                     console.info(`Canvas center: x=${center.x}, y=${center.y}`);
                     const FILEREADWidth = FILEREAD.offsetWidth;
                     const FILEREADHeight = FILEREAD.offsetHeight;

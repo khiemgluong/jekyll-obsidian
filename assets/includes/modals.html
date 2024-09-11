@@ -80,9 +80,16 @@
         if (ul) {
             const liElements = Array.from(ul.querySelectorAll('li'));
             liElements.forEach(li => {
-                const fileName = extractFilenameFromPath(li.innerText);
+                const fileName = extractFilenameFromPath(li.innerText).toLowerCase();
                 console.log(li.innerText + '\t' + fileName);
-
+                if (fileName.includes(this.value.toLowerCase())) {
+                    li.removeAttribute('hidden');
+                } else li.setAttribute('hidden', '');
+            });
+            searchModal.addEventListener('toggle', () => {
+                if (!searchModal.matches(':popover-open')) {
+                    document.getElementById('search-input').value = '';
+                }
             });
         }
     });

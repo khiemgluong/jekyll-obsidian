@@ -31,6 +31,7 @@
             padding-left: 0;
             padding-top: 0;
             height: fit-content;
+            min-height: 25%;
             max-height: 45%;
             overscroll-behavior: none;
 
@@ -83,7 +84,8 @@
                         text-align: left;
 
                         &:hover {
-                            background-color: var(--bg-tinted);
+                            background-color: var(--explorer-button-hover);
+                            font-weight: bold;
                         }
                     }
                 }

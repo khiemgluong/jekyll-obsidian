@@ -5,6 +5,10 @@
 			background-color: transparent;
 		}
 
+		a:hover{
+			color: var(--color-text);
+		}
+
 		#breadcrumb {
 			list-style: none;
 			padding: 0;
