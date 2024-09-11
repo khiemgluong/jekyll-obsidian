@@ -104,15 +104,11 @@
         if (!isDragging) return;
 
         let offset = e.clientX - startX;
-        let newWidth = startWidth + offset;
-        let explorerWidth = newWidth / window.innerWidth * 100;
-        // Clamp width 
-        explorerWidth = Math.max(minWidth, Math.min(explorerWidth, maxWidth));
-        EXPLORER.style.width = `${explorerWidth}%`;
-
-        let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
-        NOTE.style.paddingLeft = `${padding}vw`;
-        NOTE.style.paddingRight = `${padding}vw`;
+        let newWidthPx = startWidth + offset;
+        let newWidthPercent = newWidthPx / window.innerWidth * 100;
+        newWidthPercent = Math.max(minWidth, Math.min(newWidthPercent, maxWidth));
+        EXPLORER.style.width = `${newWidthPercent}%`;
+        updateNotePadding(newWidthPercent);
     }
 
     function onMouseUp() {
@@ -127,10 +123,8 @@
     document.addEventListener('DOMContentLoaded', (event) => {
         let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
         let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
-        let explorerWidth = (explorerWidthPx / parentWidthPx) * 100;
-        let padding = linearMapInRange(explorerWidth, minWidth, maxWidth, maxPadding, minPadding);
-        note.style.paddingLeft = `${padding}vw`;
-        note.style.paddingRight = `${padding}vw`;
+        let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;
+        updateNotePadding(explorerWidthPercent);
 
         OBSIDIAN.style.display = '';
         var loadingDiv = document.getElementById('loading-spinner');

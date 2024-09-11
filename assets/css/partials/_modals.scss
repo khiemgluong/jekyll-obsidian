@@ -5,9 +5,29 @@
             box-shadow: 0px 0px 50px var(--bg-tinted);
             border-radius: 1rem;
             width: 40%;
-            max-width: 50%;
             background-color: var(--bg);
             border: 1px double var(--color-button);
+
+            @media (min-width:320px) {
+                min-width: 80%;
+            }
+
+            @media (min-width:481px) {
+                min-width: 70%;
+            }
+
+            @media (min-width:961px) {
+                min-width: 60%;
+            }
+
+            @media (min-width:1025px) {
+                min-width: 50%;
+            }
+
+            @media (min-width:1281px) {
+                min-width: 0;
+                max-width: 30%;
+            }
         }
 
         >*::backdrop {
@@ -24,7 +44,8 @@
             font-size: x-large;
             line-height: 0.5em;
             float: right;
-            &:hover{
+
+            &:hover {
                 font-weight: bold;
             }
         }

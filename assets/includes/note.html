@@ -7,6 +7,17 @@
 </body>
 
 <script>
+    function updateNotePadding(widthPercentage) {
+        if (window.innerWidth < 481) {
+            NOTE.style.paddingLeft = `${minPadding}vw`;
+            NOTE.style.paddingRight = `${minPadding}vw`;
+        } else {
+            let padding = linearMapInRange(widthPercentage, minWidth, maxWidth, maxPadding, minPadding);
+            NOTE.style.paddingLeft = `${padding}vw`;
+            NOTE.style.paddingRight = `${padding}vw`;
+        }
+    }
+
     function loadNote(filePath, header = "") {
         console.log("filePath: " + filePath);
         if (filePath.startsWith('/'))

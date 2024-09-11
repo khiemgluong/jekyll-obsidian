@@ -12,10 +12,9 @@
     --linked-mention-color: light-dark(#5f5f5f, #b0b0b0);
     --linked-mention-hover: light-dark(#eaeaea, #333);
     --explorer-button-hover: light-dark(#e4e4e4, #262626);
-    max-height: 93.5vh;
+    height: calc(100vh - 62px);//adjust the subtractor based on your header height
     display: inherit;
     width: 100%;
-    height: auto;
     color: var(--color-text);
 
     table {
