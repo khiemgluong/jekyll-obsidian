@@ -22,6 +22,7 @@
     {%- include header.html -%}
 
     <main class="page-content" aria-label="Content">
+        <div id="loading"></div>
         <div id="obsidian">
             <div id="sidebar">
                 {% include obsidian/sidebar.html -%}
@@ -156,7 +157,7 @@
             // PDFs
             'pdf': 'pdf',
             // SVGs
-            'svg':'svg',
+            'svg': 'svg',
             // Audios
             'mp3': 'audio', 'wav': 'audio', 'ogg': 'audio',
             // Videos

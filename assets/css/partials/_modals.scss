@@ -24,6 +24,9 @@
             font-size: x-large;
             line-height: 0.5em;
             float: right;
+            &:hover{
+                font-weight: bold;
+            }
         }
 
         // ---------------------------- Search Modal -----------------------------
