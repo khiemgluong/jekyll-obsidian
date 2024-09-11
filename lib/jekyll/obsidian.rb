@@ -72,9 +72,9 @@ module Jekyll
         # puts plugin_dir
 
         main_scss = File.join(plugin_dir, "css", "obsidian.scss")
-        copy_file_to_dir(main_scss, scss_dir)
+        copy_file_to_dir(main_scss, scss_dir,true)
 
-        copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir)
+        copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir,true)
 
         layout = File.join(plugin_dir, "layouts", "obsidian.html")
         copy_file_to_dir(layout, layouts_dir,true)

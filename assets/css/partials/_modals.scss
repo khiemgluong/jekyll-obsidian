@@ -11,12 +11,9 @@
         }
 
         >*::backdrop {
-            background-color: rgba(200, 200, 200, 0.5);
+            background-color: light-dark(rgba(200, 200, 200, 0.5),
+                    rgba(50, 50, 50, 0.5));
             backdrop-filter: blur(2px);
-
-            @media (prefers-color-scheme: dark) {
-                background-color: rgba(50, 50, 50, 0.5);
-            }
         }
 
         >*:popover-open {
@@ -35,6 +32,8 @@
             padding-top: 0;
             height: fit-content;
             max-height: 45%;
+            overscroll-behavior: none;
+
             #header {
                 display: flex;
                 align-items: center;
@@ -47,7 +46,11 @@
                     margin-right: 10px;
                     padding: 10px;
                     border-bottom-right-radius: 0.8rem;
-                    border-style: none;
+                    border-top: none;
+                    border-right: 1px solid var(--color-button);
+                    border-bottom: 1px solid var(--color-button);
+                    border-left: none;
+                    background-color: var(--bg);
                 }
 
                 button {
@@ -81,9 +84,6 @@
 
                         &:hover {
                             background-color: var(--bg-tinted);
-                            @media (prefers-color-scheme: dark) {
-                                background-color: #0a0a0a;
-                            }
                         }
                     }
                 }
@@ -96,15 +96,16 @@
             color: var(--color-text);
             font-size: large;
 
-            >*{
+            >* {
                 margin-left: 8px;
             }
 
-            p{
+            p {
                 margin-top: 2px;
                 margin-bottom: 5px;
             }
-            a:hover{
+
+            a:hover {
                 color: #5a8fbb;
             }
 
@@ -138,6 +139,7 @@
 
                 option {
                     background-color: white;
+
                     &:hover {
                         // background-color: var(--bg-tinted);
                     }
@@ -152,8 +154,10 @@
             max-width: 80% !important;
             max-height: 80% !important;
 
-            #media{
-                img, video{
+            #media {
+
+                img,
+                video {
                     border-radius: .8rem;
                 }
             }

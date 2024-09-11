@@ -73,6 +73,20 @@
 
 <!-- ----------------------- Modals event listeners ------------------------ -->
 <script>
+    document.getElementById('search-input').addEventListener('input', function () {
+        console.log("search value " + this.value);
+        const searchModal = MODALS.querySelector('#search-modal');
+        const ul = searchModal.querySelector('ul');
+        if (ul) {
+            const liElements = Array.from(ul.querySelectorAll('li'));
+            liElements.forEach(li => {
+                const fileName = extractFilenameFromPath(li.innerText);
+                console.log(li.innerText + '\t' + fileName);
+
+            });
+        }
+    });
+
     document.getElementById('color-scheme').addEventListener('change', function () {
         applyColorScheme(this.value);
         Cookies.set('color-scheme', this.value, { expires: 30, path: '', sameSite: 'Strict' })
