@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.0.3] - 2024-09-12
+- Fixed loading-spinner style
+- Updated README
+
 ## [1.0.2] - 2024-09-12
 - Turned off overwriting for generated html files
 - Moved const variable declarators to head

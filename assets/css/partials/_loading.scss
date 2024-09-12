@@ -2,12 +2,12 @@
 
 #loading-spinner {
     position: absolute;
-    top: 35%;
-    left: 40%;
+    top: calc(100vh - 65%);
+    left: calc(100vw - 68%);
     z-index: 10;
     display: inline-block;
-    width: 300px;
-    height: 300px;
+    width: 30vw;
+    height: 30vw;
     border: 16px solid rgba(255, 255, 255, .3);
     border-radius: 50%;
     border-top-color: #5f6ce9;

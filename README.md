@@ -48,6 +48,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
     layout: obsidian
     title: Your Obsidian Vault
     permalink: /your-obsidian-vault/
+    sitemap: false
     ---
     ```
 5. In your `_config.yml`, set `obsidian_vault` to the root of the Obsidian vault
