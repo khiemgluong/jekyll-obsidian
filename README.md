@@ -2,6 +2,8 @@
 
 **View <a href="https://obsidian.md/" target="_blank">Obsidian</a> vaults, on your <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> website.**
 
+![jekyll-obsidian](./screenshots/jekyll-obsidian.png)
+
 jekyll-obsidian is designed to emulate as much of Obsidian's original look and feel, allowing your Obsidian vaults to be hosted on a static Jekyll site.
 
 It should work out of the box if you use the default `minima` theme. Otherwise, you can modify the generated obsidian.scss and its partials. These .scss files are not overwritten when the site is served, and if you want to reset the styles, simply delete that modified .scss file and the gem will regenerate the default one.
