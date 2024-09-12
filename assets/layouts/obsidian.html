@@ -84,6 +84,7 @@
     let startX, startWidth;
 
     DIVIDER.addEventListener('mousedown', (e) => {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         isDraggingDivider = true;
         startX = e.clientX;
         startWidth = EXPLORER.getBoundingClientRect().width;
@@ -93,6 +94,7 @@
 
     function onMouseMove(e) {
         if (!isDraggingDivider) return;
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
 
         let offset = e.clientX - startX;
         let newWidthPx = startWidth + offset;
@@ -127,6 +129,8 @@
     });
 
     function refreshScreenSize() {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+
         let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
         let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
         let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;

@@ -316,6 +316,7 @@
     }
 
     function dispatchFileSelectEvt(filePath, heading) {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         const detail = { filePath };
         if (filePath.endsWith('.md')) {
             if (heading) detail.heading = heading;

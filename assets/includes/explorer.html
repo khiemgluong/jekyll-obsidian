@@ -21,6 +21,7 @@
     document.addEventListener('touchend', handleTouchEnd, false);
 
     function handleTouchStart(evt) {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         const firstTouch = evt.touches[0];
         touchStartX = firstTouch.clientX; // Get initial touch pos
 
@@ -44,6 +45,7 @@
 
     function handleTouchMove(evt) {
         if (!isDraggingTouch) return;
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         touchCurrentX = evt.touches[0].clientX;
 
         if (!explorerDisplayed) {
@@ -61,6 +63,7 @@
 
     function handleTouchEnd(evt) {
         if (!isDraggingTouch) return;
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
 
         if (!explorerDisplayed) {
             let diffX = touchCurrentX - touchStartX;
@@ -94,10 +97,9 @@
 <!-- ------------------------- File tree generator ------------------------- -->
 <script lang="text/javascript">
 
-    const EXPLORER = OBSIDIAN.querySelector('#explorer');
-    const FILE_TREE = EXPLORER.querySelector(' #file-tree');
-
     function buildFileTree(rootElement, tree, expandRoot = false) {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+        const FILE_TREE = EXPLORER.querySelector(' #file-tree');
         const old_ul = rootElement.querySelector('ul');
         if (old_ul) rootElement.removeChild(old_ul);
         const ul = document.createElement('ul');
@@ -152,6 +154,8 @@
     }
 
     function sortObsidianVaultFiles(tree) {
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+        const FILE_TREE = EXPLORER.querySelector(' #file-tree');
         tree.sort((a, b) => {
             if (a.type === 'dir' && b.type === 'file') {
                 return -1;
@@ -166,10 +170,13 @@
         });
         return tree;
     }
-    const VAULT_FILES =
-        JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
+
     let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
+        const VAULT_FILES =
+            JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+        const FILE_TREE = EXPLORER.querySelector(' #file-tree');
         const sortedVaultFiles = sortObsidianVaultFiles(VAULT_FILES);
         buildFileTree(FILE_TREE, sortedVaultFiles);
 
