@@ -24,6 +24,9 @@ module Jekyll
         enable_embeds = site.config["obsidian_embeds"]
 
         # --------------------------------- site data -------------------------------- #
+        data_dir = File.join(File.dirname(site.dest), "_data", "obsidian")
+        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+
         site.data["obsidian"] = {} unless site.data["obsidian"]
 
         counts = {dirs: 0, files: 0, size: 0}
@@ -33,21 +36,23 @@ module Jekyll
         puts "Total size of files: #{counts[:size]} B"
         site.data["obsidian_counts"] = counts.to_json
 
-        site.data["obsidian"]["vault_files"] = obsidian_files.to_json
+        vault_files_json = File.join(data_dir, "vault_files.json")
+        File.write(vault_files_json, obsidian_files.to_json)
 
         backlinks, embeds = build_links(vault, obsidian_files, obsidian_files)
         puts "Obsidian links built"
 
         if enable_backlinks || enable_backlinks.nil?
-          site.data["obsidian"]["backlinks"] = escape_backlinks(backlinks).to_json
+          backlinks_json = File.join(data_dir, "backlinks.json")
+          File.write(backlinks_json, escape_backlinks(backlinks).to_json)
           puts "Backlinks built."
         else
           puts "Backlinks disabled"
         end
 
         if enable_embeds || enable_embeds.nil?
-          site.data["obsidian"]["embeds"] = escape_embeds(embeds).to_json
-          # save_embeds_to_json(site.dest, embeds)
+          embeds_json = File.join(data_dir, "embeds.json")
+          File.write(embeds_json, escape_embeds(embeds).to_json)
           puts "Embeds built."
         else
           puts "Embeds disabled"

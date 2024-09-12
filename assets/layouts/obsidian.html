@@ -125,7 +125,7 @@
         var lastFileCookie = Cookies.get('last-file');
         if (lastFileCookie) {
             dispatchFileSelectEvt(lastFileCookie, null);
-        } else console.info('No color-scheme cookie found.');
+        } else console.info('No last file found.');
     });
 
     function refreshScreenSize() {
