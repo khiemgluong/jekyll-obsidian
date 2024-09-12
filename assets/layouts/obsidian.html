@@ -2,6 +2,35 @@
 <html lang="{{ page.lang | default: site.lang | default: " en" }}">
 
 <head>
+    <script>
+        // ! SITE DATA
+        const VAULTPATH = '{{ site.obsidian_vault | escape }}';
+        const VAULT_FILES =
+            JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
+
+        // ! ELEMENT SELECTORS
+        const OBSIDIAN = document.getElementById('obsidian');
+
+        const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
+        const DIVIDER = OBSIDIAN.querySelector("#divider");
+
+        const MODALS = OBSIDIAN.querySelector('#modals');
+        const mediaModal = MODALS.querySelector('#media-modal');
+        const media = mediaModal.querySelector("#media");
+        const mediaData = mediaModal.querySelector("#media-data");
+
+        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+        const FILE_TREE = EXPLORER.querySelector(' #file-tree');
+
+        const FILEREAD = OBSIDIAN.querySelector(' #fileread');
+        const NOTE = FILEREAD.querySelector('#note');
+        const CANVAS = FILEREAD.querySelector('#canvas');
+
+        // ! GLOBAL CONSTS
+        const minWidth = 10; const maxWidth = 50;
+        const minPadding = 3.5; const maxPadding = 23;
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/he@latest/he.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js "></script>
@@ -47,36 +76,6 @@
     </main>
     <!-- {%- include footer.html -%} -->
 </body>
-
-<script defer>
-    // ! SITE DATA
-    const VAULTPATH = '{{ site.obsidian_vault | escape }}';
-
-    const VAULT_FILES =
-        JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
-
-    // ! ELEMENT SELECTORS
-    const OBSIDIAN = document.getElementById('obsidian');
-
-    const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
-    const DIVIDER = OBSIDIAN.querySelector("#divider");
-
-    const MODALS = OBSIDIAN.querySelector('#modals');
-    const mediaModal = MODALS.querySelector('#media-modal');
-    const media = mediaModal.querySelector("#media");
-    const mediaData = mediaModal.querySelector("#media-data");
-
-    const EXPLORER = OBSIDIAN.querySelector('#explorer');
-    const FILE_TREE = EXPLORER.querySelector(' #file-tree');
-
-    const FILEREAD = OBSIDIAN.querySelector(' #fileread');
-    const NOTE = FILEREAD.querySelector('#note');
-    const CANVAS = FILEREAD.querySelector('#canvas');
-
-    // ! GLOBAL CONSTS
-    const minWidth = 10; const maxWidth = 50;
-    const minPadding = 3.5; const maxPadding = 23;
-</script>
 
 <!-- -------------------------- Utility functions -------------------------- -->
 <script>

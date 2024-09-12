@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.0.2] - 2024-09-12
+- Turned off overwriting for generated html files
+- Moved const variable declarators to head
 
 ## [1.0.1] - 2024-09-12
 - Added `defer` attribute to script body responsible for initialization of constant variables
