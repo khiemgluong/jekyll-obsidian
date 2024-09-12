@@ -128,20 +128,7 @@
                         );
 
                         if ('color' in edge) {
-                            switch (parseInt(edge.color)) {
-                                case 1:
-                                    curve.stroke = '#ea3b50'; break;
-                                case 2:
-                                    curve.stroke = '#ee7e0f'; break;
-                                case 3:
-                                    curve.stroke = '#e0ac00'; break;
-                                case 4:
-                                    curve.stroke = '#09b94f'; break;
-                                case 5:
-                                    curve.stroke = '#18c5c2'; break;
-                                default:
-                                    curve.stroke = '#c0c0c0'; break;
-                            }
+                            curve.stroke = getColorByIndex(edge.color);
                         } else curve.stroke = '#c0c0c0';
                         curve.linewidth = 4;
                         curve.fill = 'transparent';
@@ -154,8 +141,8 @@
                 // <!-- --------------------------- Draw Edges END ---------------------------- -->
 
                 canvasParsed.nodes.forEach(node => {
-                    // console.log(`id: ${node.id}, type: ${node.type},x: ${node.x}, y: ${node.y}`);
                     const card = document.createElement('div');
+                    if ('color' in node) card.style.borderColor = getColorByIndex(node.color);
                     switch (node.type) {
                         case "text":
                         default:
@@ -211,6 +198,11 @@
 
                     _scrollLeft = center.x - boundingBox.width / 2;
                     _scrollTop = center.y - boundingBox.height / 2;
+
+                    if (window.innerWidth < 481) {
+                        _scrollLeft += window.innerWidth;
+                        _scrollTop += window.innerHeight / 2;
+                    }
                     FILEREAD.scrollLeft = _scrollLeft; FILEREAD.scrollTop = _scrollTop;
                 } else console.warn('The canvas has no children.');
 
@@ -234,7 +226,6 @@
         if (children.length === 0) {
             return null;
         }
-
         // Initialize the bounding box with the first child's bounding rectangle
         const firstChildRect = children[0].getBoundingClientRect();
         let minX = firstChildRect.left;
@@ -259,8 +250,18 @@
             width: maxX - minX,
             height: maxY - minY,
         };
-
         return boundingBox;
+    }
+
+    function getColorByIndex(colorInt) {
+        switch (parseInt(colorInt)) {
+            case 1: return '#ea3b50';
+            case 2: return '#ee7e0f';
+            case 3: return '#e0ac00';
+            case 4: return '#09b94f';
+            case 5: return '#18c5c2';
+            default: return '#c0c0c0';
+        }
     }
 
     // Function to calculate the center of the bounding box
