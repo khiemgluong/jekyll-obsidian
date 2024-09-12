@@ -129,6 +129,15 @@ module Jekyll
              children: collect_files(entry_path, File.join(path, entry), counts)}
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
+
+            if File.extname(entry) == ".md"
+              new_name = entry.sub(".md", ".mdnote")
+              new_path = File.join(rootdir, new_name)
+              File.rename(entry_path, new_path)
+              entry_path = new_path
+              entry = new_name
+            end
+
             counts[:files] += 1
             counts[:size] += File.size(entry_path)
             {name: entry, type: "file", path: File.join(path, entry), size: File.size(entry_path)}
@@ -144,7 +153,7 @@ module Jekyll
           elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path) || excluded_file_exts(file[:name])
-            if file[:name].end_with?(".md", ".canvas")
+            if file[:name].end_with?(".mdnote", ".canvas")
               begin
                 content = File.read(entry_path)
               rescue Errno::ENOENT
@@ -169,7 +178,7 @@ module Jekyll
                   end
                 end
               end
-            elsif !file[:name].end_with?(".md", ".canvas")
+            elsif !file[:name].end_with?(".mdnote", ".canvas")
               if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
                 embeds[file[:path]] = {"embed_paths" => [entry_path]}
               else
@@ -191,7 +200,7 @@ module Jekyll
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
-          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
+          elsif file[:type] == "file" && file[:name].end_with?(".mdnote", ".canvas")
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
             return file if file_name_without_extension == stripped_link
           end

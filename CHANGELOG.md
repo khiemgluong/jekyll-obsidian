@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.0.8] - 2024-09-12
+Renamed .md to .mdnote so jekyll do not generate pages from it
+
 ## [1.0.6] - 2024-09-12
 - Moved EXPLORER and FILE_TREE to explorer.html
 
