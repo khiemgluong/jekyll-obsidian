@@ -51,11 +51,18 @@ If bundler is not being used to manage dependencies, install the gem by executin
     sitemap: false
     ---
     ```
-5. In your `_config.yml`, set `obsidian_vault` to the root of the Obsidian vault
+5. Add `gem 'jekyll-obsidian'` into your site's Gemfile, preferably within `group :jekyll_plugins`
+    ```ruby
+    group :jekyll_plugins do
+    gem 'jekyll-obsidian'
+    end
+    ```
+
+6. In your `_config.yml`, set `obsidian_vault` to the root of the Obsidian vault
     > obsidian_vault: "Your Obsidian Vault"
 
     > obsidian_vault: "vaults/Another Obsidian Vault"
-6. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
+7. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
 
 ## Options
 `obsidian_homepage`

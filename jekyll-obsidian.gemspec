@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Obsidian integration for Jekyll"
   spec.description = "Jekyll site implementation of obsidian as close to how it looks in the app"
-  spec.homepage = "https://khiemgluong.github.io"
+  spec.homepage = "https://khiemgluong.github.io/blade-ballad/"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
