@@ -33,20 +33,26 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Setup
 1. First run `bundle exec jekyll build` to generate the necessary .css files for the _sass/obsidan partials.
-2. Drop your Obsidian vault folder into your site
-3. Create a .markdown front matter file using the generated obsidian layout
+
+2. Add the following to your site's `_config.yml`:
+    ```yml
+    plugins:
+        - jekyll-obsidian
     ```
+3. Drop your Obsidian vault folder into your site
+4. Create a .markdown front matter file using the generated layout
+    ```yml
     ---
     layout: obsidian
     title: Your Obsidian Vault
     permalink: /your-obsidian-vault/
     ---
     ```
-4. In your `_config.yml`, set `obsidian_vault` to the root of the Obsidian vault
+5. In your `_config.yml`, set `obsidian_vault` to the root of the Obsidian vault
     > obsidian_vault: "Your Obsidian Vault"
 
     > obsidian_vault: "vaults/Another Obsidian Vault"
-5. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
+6. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
 
 ## Options
 `obsidian_homepage`
