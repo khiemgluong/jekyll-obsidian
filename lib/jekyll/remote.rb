@@ -1,20 +1,20 @@
-require 'google/apis/drive_v3'
-require 'googleauth'
-require 'googleauth/stores/file_token_store'
-require 'fileutils'
+require "google/apis/drive_v3"
+require "googleauth"
+require "googleauth/stores/file_token_store"
+require "fileutils"
 # ------------------- Isn't actually implemented right now ------------------- #
 module Remote
-  OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
-  APPLICATION_NAME = 'Drive API Ruby Quickstart'
-  CREDENTIALS_PATH = '.json'
-  TOKEN_PATH = 'token.yaml'
+  OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
+  APPLICATION_NAME = "Drive API Ruby Quickstart"
+  CREDENTIALS_PATH = ".json"
+  TOKEN_PATH = "token.yaml"
   SCOPE = Google::Apis::DriveV3::AUTH_DRIVE_METADATA_READONLY
 
   def self.authorize
     client_id = Google::Auth::ClientId.from_file(CREDENTIALS_PATH)
     token_store = Google::Auth::Stores::FileTokenStore.new(file: TOKEN_PATH)
     authorizer = Google::Auth::UserAuthorizer.new(client_id, SCOPE, token_store)
-    user_id = 'default'
+    user_id = "default"
     credentials = authorizer.get_credentials(user_id)
     if credentials.nil?
       url = authorizer.get_authorization_url(base_url: OOB_URI)

@@ -72,19 +72,19 @@ module Jekyll
         # puts plugin_dir
 
         main_scss = File.join(plugin_dir, "css", "obsidian.scss")
-        copy_file_to_dir(main_scss, scss_dir,true)
+        copy_file_to_dir(main_scss, scss_dir, true)
 
-        copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir,true)
+        copy_files_from_dir(File.join(plugin_dir, "css", "partials"), partials_dir, true)
 
         layout = File.join(plugin_dir, "layouts", "obsidian.html")
-        copy_file_to_dir(layout, layouts_dir,true)
+        copy_file_to_dir(layout, layouts_dir, true)
 
-        copy_files_from_dir(File.join(plugin_dir, "includes"), obsidian_dir,true)
+        copy_files_from_dir(File.join(plugin_dir, "includes"), obsidian_dir, true)
       end
 
       private
 
-      def copy_file_to_dir(file, dir, overwrite=false)
+      def copy_file_to_dir(file, dir, overwrite = false)
         if File.exist?(file)
           destination_file = File.join(dir, File.basename(file))
 
@@ -100,10 +100,10 @@ module Jekyll
         end
       end
 
-      def copy_files_from_dir(source_dir, destination_dir, overwrite=false)
-        Dir.glob(File.join(source_dir, '*')).each do |file_path|
+      def copy_files_from_dir(source_dir, destination_dir, overwrite = false)
+        Dir.glob(File.join(source_dir, "*")).each do |file_path|
           next if File.directory?(file_path)
-          copy_file_to_dir(file_path, destination_dir,overwrite)
+          copy_file_to_dir(file_path, destination_dir, overwrite)
         end
       end
 

@@ -5,7 +5,7 @@ require_relative "lib/jekyll/obsidian/version"
 Gem::Specification.new do |spec|
   spec.name = "jekyll-obsidian"
   spec.version = Jekyll::Obsidian::VERSION
-  spec.authors = ["smarttarded"]
+  spec.authors = ["Khiem Luong"]
   spec.email = ["khiemgluong@gmail.com"]
 
   spec.summary = "Obsidian integration for Jekyll"
@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
-  spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
+  # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/khiemgluong/jekyll-obsidian/"
