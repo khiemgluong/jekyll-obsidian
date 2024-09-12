@@ -131,6 +131,8 @@
                 if (old_ul) searchModal.removeChild(old_ul);
                 const ul = document.createElement('ul');
                 searchModal.appendChild(ul);
+                const VAULT_FILES =
+                JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
                 generateSearchModalFilepaths(VAULT_FILES, ul)
                 break;
         }

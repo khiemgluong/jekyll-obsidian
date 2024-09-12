@@ -49,12 +49,7 @@
 </body>
 
 <!-- ----------------------- Constants initilization ----------------------- -->
-<script defer>
-    // ! SITE DATA
-    const VAULTPATH = '{{ site.obsidian_vault | escape }}';
-    const VAULT_FILES =
-        JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
-
+<script>
     // ! ELEMENT SELECTORS
     const OBSIDIAN = document.getElementById('obsidian');
 
@@ -154,6 +149,7 @@
 <!-- ------------------------------- Getters ------------------------------- -->
 <script>
     function getFullFilePath(filePath, trimTrailingPeriod = true) {
+        const VAULTPATH = '{{ site.obsidian_vault | escape }}';
         if (trimTrailingPeriod)
             return removeExtraTrailingDotFromFilename(fullFilePath = '/' + VAULTPATH + filePath);
         else return fullFilePath = '/' + VAULTPATH + filePath;

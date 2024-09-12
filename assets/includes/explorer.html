@@ -162,6 +162,8 @@
         });
         return tree;
     }
+    const VAULT_FILES =
+    JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
     let expandOrCollapseFileTree = false;
     document.addEventListener('DOMContentLoaded', () => {
         const sortedVaultFiles = sortObsidianVaultFiles(VAULT_FILES);

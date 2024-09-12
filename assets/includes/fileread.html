@@ -202,6 +202,7 @@
     }
 
     function generateEmbeds(embedsArr, cleanedHTML) {
+        const VAULTPATH = '{{ site.obsidian_vault | escape }}';
         const embeds = '{{ site.data.obsidian.embeds | escape }}';
         const siteurl = '{{ site.url | escape }}' + '/';
         const encodedVaultPath =

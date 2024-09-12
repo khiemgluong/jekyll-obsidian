@@ -1,6 +1,9 @@
 ## [Unreleased]
 
-## [1.0.3] - 2024-09-12
+## [1.0.5] - 2024-09-12
+- removed VAULTPATH and VAULT_FILES from global constants
+
+## [1.0.4] - 2024-09-12
 - Moved const initialization outside of head with defer attribte (again)
 
 ## [1.0.3] - 2024-09-12
