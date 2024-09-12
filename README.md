@@ -64,9 +64,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
     obsidian_vault: "vaults/Another Obsidian Vault"
     ```
 
-7. Also in `_config.yml`, set the `exclude` to that obsidian vault
-
-8. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
+7. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
 
 ## Options
 `obsidian_homepage`
