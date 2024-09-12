@@ -1,6 +1,9 @@
 ## [Unreleased]
 
 ## [1.0.3] - 2024-09-12
+- Moved const initialization outside of head with defer attribte (again)
+
+## [1.0.3] - 2024-09-12
 - Fixed loading-spinner style
 - Updated README
 
