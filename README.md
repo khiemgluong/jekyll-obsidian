@@ -40,7 +40,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
     plugins:
         - jekyll-obsidian
     ```
-2. Drop your Obsidian vault folder into your site
+2. Drop your Obsidian vault folder into your site, make sure to remove the .git folder and .gitignore file
 3. Create a .markdown front matter file using the generated layout
     ```yml
     ---
@@ -65,7 +65,6 @@ If bundler is not being used to manage dependencies, install the gem by executin
 6. Run `bundle install` or `bundle update jekyll-obsidian`, if you already installed it
 
 7. Run `bundle exec jekyll build` to generate the necessary `.css` and `.json` files.
-    > This will rename all your obsidian .md files to .mdnote, so Jekyll doesn't convert it to an html page
 
 8. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
 

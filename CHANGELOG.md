@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.2.0] - 2024-09-12
+- Completely refactored obsidian.rb so that backlinks and embeds are built after all files are copied to _site
+
 ## [1.1.1] - 2024-09-12
 - Removed jekyll hook on post write
 

@@ -204,12 +204,15 @@
     function generateSearchModalFilepaths(vaultFiles, ul) {
         vaultFiles.forEach(child => {
             if (child.type === 'dir') {
-                generateSearchModalFilepaths(child.children, ul); 
+                generateSearchModalFilepaths(child.children, ul);
             }
             if (child.type === 'file') {
                 const li = document.createElement('li');
                 const button = document.createElement('button');
                 const decodedString = he.decode(child.path);
+                // if (decodedString.endsWith('.mdnote')) {
+                //     button.textContent = decodedString.slice(0, -4);
+                // } else 
                 button.textContent = decodedString;
                 button.addEventListener('click', () => {
                     const searchModal = MODALS.querySelector('#search-modal');

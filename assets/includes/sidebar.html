@@ -37,10 +37,14 @@
 <!-- ---------------------------- Load homepage ---------------------------- -->
 <script>
     function loadHomepage() {
-        const homepage = '{{ site.obsidian_homepage | escape }}'
+        let homepage = '{{ site.obsidian_homepage | escape }}';
         if (homepage) {
-            switchPage(homepage);
-            dispatchFileSelectEvt(homepage);
+            if (homepage.endsWith('.md'))
+                homepage = homepage.replace('.md', '.mdnote');
+            if (homepage.endsWith('.mdnote')) {
+                switchPage(homepage);
+                loadNote(homepage);
+            }
         }
     }
 </script>
