@@ -21,9 +21,8 @@
     document.addEventListener('touchend', handleTouchEnd, false);
 
     function handleTouchStart(evt) {
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         const firstTouch = evt.touches[0];
-        touchStartX = firstTouch.clientX; // Get initial touch pos
+        touchStartX = firstTouch.clientX;
 
         explorerDisplayed = isDisplayNone(EXPLORER);
         activationDistance = window.innerWidth - 120;
@@ -45,7 +44,6 @@
 
     function handleTouchMove(evt) {
         if (!isDraggingTouch) return;
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
         touchCurrentX = evt.touches[0].clientX;
 
         if (!explorerDisplayed) {
@@ -63,7 +61,6 @@
 
     function handleTouchEnd(evt) {
         if (!isDraggingTouch) return;
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
 
         if (!explorerDisplayed) {
             let diffX = touchCurrentX - touchStartX;

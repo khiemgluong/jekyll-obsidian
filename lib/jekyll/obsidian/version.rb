@@ -2,6 +2,6 @@
 
 module Jekyll
   module Obsidian
-    VERSION = "1.0.10"
+    VERSION = "1.1.0"
   end
 end

@@ -9,6 +9,14 @@ require_relative "obsidian/version"
 
 module Jekyll
   module Obsidian
+    Jekyll::Hooks.register :site, :post_write do |site|
+      vault = site.config["obsidian_vault"]
+      vault_path = File.join(site.dest, vault)
+      Dir.glob(File.join(vault_path, "**", "*.md")).each do |md_file|
+        new_file_path = md_file.sub(/\.md$/, ".mdnote")
+        File.rename(md_file, new_file_path)
+      end
+    end
     class FileTreeGenerator < Jekyll::Generator
       safe true
       priority :lowest
@@ -31,30 +39,26 @@ module Jekyll
 
         counts = {dirs: 0, files: 0, size: 0}
         obsidian_files = collect_files(vault, "", counts)
-        puts "Total dir count: #{counts[:dirs]}"
-        puts "Total file count: #{counts[:files]}"
-        puts "Total size of files: #{counts[:size]} B"
-        site.data["obsidian_counts"] = counts.to_json
+        vault_data_json = File.join(data_dir, "vault_data.json")
+        File.write(vault_data_json, JSON.pretty_generate(counts.to_json))
 
         vault_files_json = File.join(data_dir, "vault_files.json")
         File.write(vault_files_json, JSON.pretty_generate(obsidian_files.to_json))
+        vault_path = File.join(site.dest, vault)
 
-        backlinks, embeds = build_links(vault, obsidian_files, obsidian_files)
-        puts "Obsidian links built"
+        backlinks, embeds = build_links(vault_path, obsidian_files, obsidian_files)
 
         if enable_backlinks || enable_backlinks.nil?
-          # site.data["obsidian"]["backlinks"] = escape_backlinks(backlinks).to_json
           backlinks_json = File.join(data_dir, "backlinks.json")
-          File.write(backlinks_json, JSON.pretty_generate(escape_backlinks(backlinks).to_json))
+          File.write(backlinks_json, escape_backlinks(backlinks))
           puts "Backlinks built."
         else
           puts "Backlinks disabled"
         end
 
         if enable_embeds || enable_embeds.nil?
-          # site.data["obsidian"]["embeds"] = escape_embeds(embeds).to_json
           embeds_json = File.join(data_dir, "embeds.json")
-          File.write(embeds_json, JSON.pretty_generate(escape_embeds(embeds).to_json))
+          File.write(embeds_json, escape_embeds(embeds))
           puts "Embeds built."
         else
           puts "Embeds disabled"
@@ -76,7 +80,6 @@ module Jekyll
 
         project_root = File.expand_path("../..", File.dirname(__FILE__))
         plugin_dir = File.join(project_root, "assets")
-        # puts plugin_dir
 
         main_scss = File.join(plugin_dir, "css", "obsidian.scss")
         copy_file_to_dir(main_scss, scss_dir)
@@ -137,14 +140,9 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            if File.extname(entry) == ".md"
-              new_name = entry.sub(".md", ".mdnote")
-              new_path = File.join(rootdir, new_name)
-              File.rename(entry_path, new_path)
-              entry_path = new_path
-              entry = new_name
-            end
-
+            file_name = entry
+            file_name += "note" if File.extname(entry) == ".md"
+            entry = file_name
             counts[:files] += 1
             counts[:size] += File.size(entry_path)
             {name: entry, type: "file", path: File.join(path, entry), size: File.size(entry_path)}
@@ -227,7 +225,7 @@ module Jekyll
           }
           escaped_backlinks[escaped_path] = escaped_data
         end
-        escaped_backlinks
+        JSON.pretty_generate(escaped_backlinks.to_json)
       end
 
       def escape_embeds(embeds)
@@ -236,7 +234,7 @@ module Jekyll
           escaped_path = escape_path(path)
           escaped_embeds[escaped_path] = {}
         end
-        escaped_embeds
+        JSON.pretty_generate(escaped_embeds.to_json)
       end
 
       def escape_path(path)

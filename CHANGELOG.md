@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.1.0] - 2024-09-12
+- Fixed parsing of backlinks from renamed .md files
+
 ## [1.0.10] - 2024-09-12
 - Fixed parsing of generated JSON files
 

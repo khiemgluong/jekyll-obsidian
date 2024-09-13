@@ -54,6 +54,7 @@
     const OBSIDIAN = document.getElementById('obsidian');
 
     const SIDEBAR = OBSIDIAN.querySelector('#sidebar');
+
     const DIVIDER = OBSIDIAN.querySelector("#divider");
 
     const MODALS = OBSIDIAN.querySelector('#modals');
@@ -84,7 +85,7 @@
     let startX, startWidth;
 
     DIVIDER.addEventListener('mousedown', (e) => {
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
+        EXPLORER = OBSIDIAN.querySelector('#explorer');
         isDraggingDivider = true;
         startX = e.clientX;
         startWidth = EXPLORER.getBoundingClientRect().width;
@@ -94,8 +95,6 @@
 
     function onMouseMove(e) {
         if (!isDraggingDivider) return;
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
-
         let offset = e.clientX - startX;
         let newWidthPx = startWidth + offset;
         let newWidthPercent = newWidthPx / window.innerWidth * 100;
@@ -113,24 +112,19 @@
 
 <!-- --------------------------- On content load --------------------------- -->
 <script>
+    let EXPLORER = OBSIDIAN.querySelector('#explorer');
     window.addEventListener('resize', function () { refreshScreenSize(); });
 
     document.addEventListener('DOMContentLoaded', (event) => {
+        EXPLORER = OBSIDIAN.querySelector('#explorer');
         refreshScreenSize();
 
         OBSIDIAN.style.display = '';
         var loadingDiv = document.getElementById('loading-spinner');
         loadingDiv.style.display = 'none';
-
-        var lastFileCookie = Cookies.get('last-file');
-        if (lastFileCookie) {
-            dispatchFileSelectEvt(lastFileCookie, null);
-        } else console.info('No last file found.');
     });
 
     function refreshScreenSize() {
-        const EXPLORER = OBSIDIAN.querySelector('#explorer');
-
         let explorerWidthPx = parseFloat(getComputedStyle(EXPLORER).width);
         let parentWidthPx = parseFloat(getComputedStyle(EXPLORER.parentElement).width);
         let explorerWidthPercent = (explorerWidthPx / parentWidthPx) * 100;

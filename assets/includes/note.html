@@ -139,15 +139,21 @@
 <!-- ------------------------ Note event listeners ------------------------- -->
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        let homepage = '{{ site.obsidian_homepage | escape }}';
-        if (homepage) {
-            if (homepage.endsWith('.md'))
-                homepage = homepage.replace('.md', '.mdnote');
+        var lastFileCookie = Cookies.get('last-file');
+        if (lastFileCookie) {
+            dispatchFileSelectEvt(lastFileCookie, null);
+        } else {
+            console.info('No last file found.');
+            let homepage = '{{ site.obsidian_homepage | escape }}';
+            if (homepage) {
+                if (homepage.endsWith('.md'))
+                    homepage = homepage.replace('.md', '.mdnote');
 
-            if (homepage.endsWith('.mdnote')) {
-                switchPage(homepage);
-                loadNote(homepage);
-                console.log("note loaded: " + homepage);
+                if (homepage.endsWith('.mdnote')) {
+                    switchPage(homepage);
+                    loadNote(homepage);
+                    console.log("note loaded: " + homepage);
+                }
             }
         }
     });

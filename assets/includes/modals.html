@@ -101,14 +101,12 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         const infoModal = MODALS.querySelector('#info-modal');
-        const vaultData = '{{ site.data.obsidian_counts | escape }}';
-        const parsedVaultData =
-            JSON.parse(vaultData.replace(/&quot;/g, '"'));
+        const VAULTDATA = JSON.parse('{{ site.data.obsidian.vault_data | escape }}'.replace(/&quot;/g, '"'));
 
-        const formattedSize = formatNumberToBytes(parsedVaultData.size);
+        const formattedSize = formatNumberToBytes(VAULTDATA.size);
         const vaultProps = infoModal.querySelector('#vault-props');
         vaultProps.textContent =
-            `${parsedVaultData.files} files | ${parsedVaultData.dirs} folders | ${formattedSize}`;
+            `${VAULTDATA.files} files | ${VAULTDATA.dirs} folders | ${formattedSize}`;
 
         var colorSchemeCookie = Cookies.get('color-scheme');
         if (colorSchemeCookie) {
@@ -206,8 +204,7 @@
     function generateSearchModalFilepaths(vaultFiles, ul) {
         vaultFiles.forEach(child => {
             if (child.type === 'dir') {
-                console.debug("Entering directory: " + child.path); // Log entering a directory
-                generateSearchModalFilepaths(child.children, ul); // Recurse into this directory
+                generateSearchModalFilepaths(child.children, ul); 
             }
             if (child.type === 'file') {
                 const li = document.createElement('li');
