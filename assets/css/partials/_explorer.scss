@@ -38,11 +38,10 @@
     }
 
     #file-tree {
+        position: relative;
         &::-webkit-scrollbar {
             display: none;
         }
-
-        position: relative;
 
         ul {
             list-style-type: none;

@@ -12,7 +12,11 @@
             NOTE.style.paddingLeft = `${minPadding}vw`;
             NOTE.style.paddingRight = `${minPadding}vw`;
         } else {
-            let padding = linearMapInRange(widthPercentage, minWidth, maxWidth, maxPadding, minPadding);
+            let padding = linearMapInRange(widthPercentage,
+                minWidth,
+                maxWidth,
+                maxPadding,
+                minPadding);
             NOTE.style.paddingLeft = `${padding}vw`;
             NOTE.style.paddingRight = `${padding}vw`;
         }
@@ -76,7 +80,6 @@
             const entry = backlinks_parsed[parsedFilePath];
             entry.backlink_paths.forEach(path => {
                 if (path === filePath && parsedFilePath.endsWith('.mdnote')) {
-                    console.log("linked mention: " + parsedFilePath);
                     linked_mentions.push(parsedFilePath.replace("/:|", "'"));
                 }
             });
@@ -110,26 +113,33 @@
                             const line_backlinks = extractBacklinks(line);
                             if (line_backlinks) {
                                 line_backlinks.forEach(line_backlink => {
+                                    const ulBtns =
+                                        Array.from(ul_linkedMention.querySelectorAll('button'));
+                                    const btnText = ulBtns.map(button => button.textContent);
                                     const stripped_backlink =
-                                        line_backlink.toLowerCase().replace(/\|.*?\]\]/, ']]').replace(/#.*?\]\]/, ']]');
-                                    if (stripped_backlink === backlink.toLowerCase()) {
-                                        const btnLinkedMention = document.createElement('button');
-                                        btnLinkedMention.textContent = line;
-                                        btnLinkedMention.classList.add('sentence');
-                                        btnLinkedMention.dataset.filePath = linkedMentionPathFull;
+                                        line_backlink.toLowerCase()
+                                            .replace(/\|.*?\]\]/, ']]')
+                                            .replace(/#.*?\]\]/, ']]');
+                                    if (stripped_backlink === backlink.toLowerCase())
+                                        if (!btnText.includes(line)) {
+                                            const btn = document.createElement('button');
+                                            btn.textContent = line;
+                                            btn.classList.add('sentence');
+                                            btn.dataset.filePath = linkedMentionPathFull;
 
-                                        btnLinkedMention.addEventListener('click', function () {
-                                            const filePath = this.dataset.filePath.replace(VAULTPATH, '');
-                                            console.info("linked mention clicked: " + filePath);
-                                            dispatchFileSelectEvt(filePath);
-                                        });
-                                        ul_linkedMention.appendChild(btnLinkedMention);
-                                    }
+                                            btn.addEventListener('click', function () {
+                                                const filePath =
+                                                    this.dataset.filePath.replace(VAULTPATH, '');
+                                                dispatchFileSelectEvt(filePath);
+                                            });
+                                            ul_linkedMention.appendChild(btn);
+                                        }
                                 });
                             }
                         }
                     });
-                }).catch(error => {
+                })
+                .catch(error => {
                     console.error('Error fetching file:', error);
                 });
         });
