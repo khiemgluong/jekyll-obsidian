@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.1.1] - 2024-09-12
+- Removed jekyll hook on post write
+
 ## [1.1.0] - 2024-09-12
 - Fixed parsing of backlinks from renamed .md files
 

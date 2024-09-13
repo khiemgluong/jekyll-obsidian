@@ -9,14 +9,14 @@ require_relative "obsidian/version"
 
 module Jekyll
   module Obsidian
-    Jekyll::Hooks.register :site, :post_write do |site|
-      vault = site.config["obsidian_vault"]
-      vault_path = File.join(site.dest, vault)
-      Dir.glob(File.join(vault_path, "**", "*.md")).each do |md_file|
-        new_file_path = md_file.sub(/\.md$/, ".mdnote")
-        File.rename(md_file, new_file_path)
-      end
-    end
+    # Jekyll::Hooks.register :site, :post_write do |site|
+    #   vault = site.config["obsidian_vault"]
+    #   vault_path = File.join(site.dest, vault)
+    #   Dir.glob(File.join(vault_path, "**", "*.md")).each do |md_file|
+    #     new_file_path = md_file.sub(/\.md$/, ".mdnote")
+    #     File.rename(md_file, new_file_path)
+    #   end
+    # end
     class FileTreeGenerator < Jekyll::Generator
       safe true
       priority :lowest
@@ -44,9 +44,8 @@ module Jekyll
 
         vault_files_json = File.join(data_dir, "vault_files.json")
         File.write(vault_files_json, JSON.pretty_generate(obsidian_files.to_json))
-        vault_path = File.join(site.dest, vault)
 
-        backlinks, embeds = build_links(vault_path, obsidian_files, obsidian_files)
+        backlinks, embeds = build_links(vault, obsidian_files, obsidian_files)
 
         if enable_backlinks || enable_backlinks.nil?
           backlinks_json = File.join(data_dir, "backlinks.json")
@@ -140,9 +139,14 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            file_name = entry
-            file_name += "note" if File.extname(entry) == ".md"
-            entry = file_name
+            if File.extname(entry) == ".md"
+              new_name = entry.sub(".md", ".mdnote")
+              new_path = File.join(rootdir, new_name)
+              File.rename(entry_path, new_path)
+              entry_path = new_path
+              entry = new_name
+            end
+
             counts[:files] += 1
             counts[:size] += File.size(entry_path)
             {name: entry, type: "file", path: File.join(path, entry), size: File.size(entry_path)}
