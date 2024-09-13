@@ -23,18 +23,21 @@
     function handleTouchStart(evt) {
         const firstTouch = evt.touches[0];
         touchStartX = firstTouch.clientX;
+        let touchStartY = firstTouch.clientY;
 
         explorerDisplayed = isDisplayNone(EXPLORER);
         activationDistance = window.innerWidth - 120;
 
         if (!explorerDisplayed) {
-            if (touchStartX < 40) {
+            if (touchStartX < 40 && touchStartY > 150
+                && touchStartY < window.innerHeight - 45) {
                 isDraggingTouch = true;
                 EXPLORER.style.display = '';
             }
         }
         else {
-            if (touchStartX > window.innerWidth - 40) {
+            if (touchStartX > window.innerWidth - 40
+                && touchStartY > 100) {
                 isDraggingTouch = true;
                 FILEREAD.style.display = '';
             }

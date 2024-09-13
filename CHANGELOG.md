@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [1.1.2] - 2024-09-13
+- Fixed duplicate linked mentions
+- Added text color to linked mention
+- Improved mobile explorer dock touch events
+
 ## [1.1.1] - 2024-09-12
 - Removed jekyll hook on post write
 

@@ -331,3 +331,73 @@
         loadCanvas(event.detail.filePath);
     });
 </script>
+
+<!-- --------------------------- Drag Listeners ---------------------------- -->
+<!-- <script>
+    const fileRead = document.querySelector('#fileread');
+    let isMouseDown = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let lastTime = 0;
+
+    fileRead.addEventListener('mousedown', (event) => {
+        isMouseDown = true;
+        const canvasContent = CANVAS.querySelector('#canvas-content');
+        canvasContent.style.pointerEvents = 'none';
+        canvasContent.style.userSelect = 'none';
+
+        lastMouseX = event.offsetX;
+        lastMouseY = event.offsetY;
+        lastTime = performance.now(); // Record the time when mouse is pressed
+
+        console.log(`Mouse pressed at: ${lastMouseX}, ${lastMouseY}`);
+    });
+
+    // Mouse move event to track the mouse movement
+    fileRead.addEventListener('mousemove', (event) => {
+        if (isMouseDown) {
+            const currentMouseX = event.offsetX;
+            const currentMouseY = event.offsetY;
+            const currentTime = performance.now();
+
+            let deltaX = currentMouseX - lastMouseX;
+            let deltaY = currentMouseY - lastMouseY;
+            const deltaTime = currentTime - lastTime;
+
+            let velocityX = deltaX / deltaTime;
+            velocityX = velocityX.toFixed(1)
+            let velocityY = deltaY / deltaTime;
+            velocityY = velocityY.toFixed(1)
+
+            // if (Math.abs(deltaX) > 1) deltaX = Math.sign(deltaX) * 1;
+            // if (Math.abs(deltaY) > 1) deltaY = Math.sign(deltaY) * 1;
+
+            // if (Math.abs(velocityX) > 1) velocityX = Math.sign(velocityX) * 1;
+            // if (Math.abs(velocityY) > 1) velocityY = Math.sign(velocityY) * 1;
+
+            console.log(`Velocity X: ${velocityX} px/ms, Velocity Y: ${velocityY} px/ms`);
+            FILEREAD.scrollLeft -= velocityX * 20; FILEREAD.scrollTop -= velocityY * 20;
+
+            lastMouseX = currentMouseX;
+            lastMouseY = currentMouseY;
+            lastTime = currentTime;
+        }
+    });
+
+    // Mouse up event to stop tracking
+    fileRead.addEventListener('mouseup', () => {
+        isMouseDown = false;
+        const canvasContent = CANVAS.querySelector('#canvas-content');
+        canvasContent.style.pointerEvents = 'auto';
+        canvasContent.style.userSelect = 'auto';
+        console.log('Mouse released');
+    });
+
+    fileRead.addEventListener('mouseleave', () => {
+        console.log('Mouse left the element!');
+        isMouseDown = false;
+        const canvasContent = CANVAS.querySelector('#canvas-content');
+        canvasContent.style.pointerEvents = 'auto';
+        canvasContent.style.userSelect = 'auto';
+    });
+</script> -->

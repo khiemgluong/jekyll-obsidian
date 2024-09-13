@@ -89,6 +89,9 @@
 
 						&:not(:first-child):not(:last-child) {
 							border-top: none;
+						}
+
+						&:nth-last-child(2) {
 							border-bottom: none;
 						}
 
