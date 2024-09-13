@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.0.10] - 2024-09-12
+- Fixed parsing of generated JSON files
+
 ## [1.0.9] - 2024-09-12
 - Site data generated as json files saved into _data
 

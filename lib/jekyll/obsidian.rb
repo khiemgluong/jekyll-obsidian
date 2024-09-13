@@ -37,22 +37,24 @@ module Jekyll
         site.data["obsidian_counts"] = counts.to_json
 
         vault_files_json = File.join(data_dir, "vault_files.json")
-        File.write(vault_files_json, obsidian_files.to_json)
+        File.write(vault_files_json, JSON.pretty_generate(obsidian_files.to_json))
 
         backlinks, embeds = build_links(vault, obsidian_files, obsidian_files)
         puts "Obsidian links built"
 
         if enable_backlinks || enable_backlinks.nil?
+          # site.data["obsidian"]["backlinks"] = escape_backlinks(backlinks).to_json
           backlinks_json = File.join(data_dir, "backlinks.json")
-          File.write(backlinks_json, escape_backlinks(backlinks).to_json)
+          File.write(backlinks_json, JSON.pretty_generate(escape_backlinks(backlinks).to_json))
           puts "Backlinks built."
         else
           puts "Backlinks disabled"
         end
 
         if enable_embeds || enable_embeds.nil?
+          # site.data["obsidian"]["embeds"] = escape_embeds(embeds).to_json
           embeds_json = File.join(data_dir, "embeds.json")
-          File.write(embeds_json, escape_embeds(embeds).to_json)
+          File.write(embeds_json, JSON.pretty_generate(escape_embeds(embeds).to_json))
           puts "Embeds built."
         else
           puts "Embeds disabled"
@@ -240,23 +242,6 @@ module Jekyll
       def escape_path(path)
         escaped_path = path.gsub("'", "/:|").gsub('"', "/:|")
         (escaped_path[0] == "/") ? escaped_path.slice(1..-1) : escaped_path
-      end
-
-      # ------------------- Write Ruby Hash objects to JSON files ------------------ #
-      def save_backlinks_to_json(sitedest, backlinks)
-        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
-        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
-        json_file_path = File.join(data_dir, "backlinks.json")
-        escaped_backlinks = escape_backlinks(backlinks)
-        File.write(json_file_path, JSON.pretty_generate(escaped_backlinks))
-      end
-
-      def save_embeds_to_json(sitedest, embeds)
-        data_dir = File.join(File.dirname(sitedest), "_data", "obsidian")
-        FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
-        json_file_path = File.join(data_dir, "embeds.json")
-        escaped_embeds = escape_embeds(embeds)
-        File.write(json_file_path, JSON.pretty_generate(escaped_embeds))
       end
     end
   end

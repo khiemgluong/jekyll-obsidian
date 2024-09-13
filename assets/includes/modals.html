@@ -132,7 +132,7 @@
                 const ul = document.createElement('ul');
                 searchModal.appendChild(ul);
                 const VAULT_FILES =
-                JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
+                    JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
                 generateSearchModalFilepaths(VAULT_FILES, ul)
                 break;
         }
@@ -227,9 +227,8 @@
 
 <script>
     async function downloadVaultFiles() {
-        const vaultFiles = '{{ site.data.obsidian.vault_files | escape }}';
-        const parsedVaultFiles = JSON.parse(vaultFiles.replace(/&quot;/g, '"'));
-
+        const VAULT_FILES =
+            JSON.parse('{{ site.data.obsidian.vault_files | escape }}'.replace(/&quot;/g, '"'));
         // Function to recursively collect all file paths
         const filesToFetch = [];
         function collectFiles(fileNode) {
@@ -241,10 +240,10 @@
             }
         }
 
-        if (Array.isArray(parsedVaultFiles)) {
-            parsedVaultFiles.forEach(collectFiles);
+        if (Array.isArray(VAULT_FILES)) {
+            VAULT_FILES.forEach(collectFiles);
         } else {
-            collectFiles(parsedVaultFiles);
+            collectFiles(VAULT_FILES);
         }
 
         const zip = new JSZip();

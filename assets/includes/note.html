@@ -53,9 +53,9 @@
                 });
             }
 
-            if (BACKLINKS_JSON) {
-                mapBacklinksToJson(BACKLINKS_JSON);
-                generateLinkedMentions(filePath, BACKLINKS_JSON);
+            if (BACKLINKS) {
+                mapBacklinksToJson(BACKLINKS);
+                generateLinkedMentions(filePath, BACKLINKS);
             }
         }).catch(error => {
             console.error('Error fetching file:', error);

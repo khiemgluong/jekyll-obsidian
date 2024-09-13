@@ -151,7 +151,7 @@
                                 const cardDiv = parseStringToMarkdown(node.text);
                                 card.innerHTML = DOMPurify.sanitize(cardDiv.innerHTML);
                                 cardDiv.remove();
-                                if (BACKLINKS_JSON) mapBacklinksToJson(BACKLINKS_JSON);
+                                if (BACKLINKS) mapBacklinksToJson(BACKLINKS);
                             }
                             break;
                         case "file":
