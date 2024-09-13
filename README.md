@@ -47,7 +47,6 @@ If bundler is not being used to manage dependencies, install the gem by executin
     layout: obsidian
     title: Your Obsidian Vault
     permalink: /your-obsidian-vault/
-    sitemap: false
     ---
     ```
 4. Add `gem 'jekyll-obsidian'` into your site's Gemfile, preferably within `group :jekyll_plugins`
