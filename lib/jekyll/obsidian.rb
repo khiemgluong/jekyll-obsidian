@@ -139,7 +139,7 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            if entry.match(/\.\./) # Checks for two or more consecutive periods
+            if /\.\./.match?(entry) # Checks for two or more consecutive periods
               base_name = File.basename(entry, File.extname(entry)).gsub(/\.{2,}/, ".")
               base_name = base_name.chomp(".")
               trimmed_name = base_name.chomp(".") + File.extname(entry)
@@ -193,13 +193,13 @@ module Jekyll
 
               embeds_ = content.scan(/!\[\[(.*?)\]\]/).flatten
               embeds_.each do |embed|
-                if embed.match(/\.\./) 
+                if /\.\./.match?(embed)
                   base_name = File.basename(embed, File.extname(embed)).gsub(/\.\.+/, ".")
                   base_name = base_name.chomp(".")
                   trimmed_name = base_name + File.extname(embed)
                   content = content.gsub("![[#{embed}]]", "![[#{trimmed_name}]]")
                   puts("trimmed_name #{trimmed_name} #{content}")
-                  updated = true 
+                  updated = true
                 end
               end
               if updated
@@ -207,13 +207,11 @@ module Jekyll
                 puts "Updated file: #{entry_path}"
               end
 
+            elsif embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
+              embeds[file[:path]] = {"embed_paths" => [entry_path]}
             else
-              if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
-                embeds[file[:path]] = {"embed_paths" => [entry_path]}
-              else
-                unless embeds[file[:path]]["embed_paths"].include?(entry_path)
-                  embeds[file[:path]]["embed_paths"] << entry_path
-                end
+              unless embeds[file[:path]]["embed_paths"].include?(entry_path)
+                embeds[file[:path]]["embed_paths"] << entry_path
               end
             end
           else
