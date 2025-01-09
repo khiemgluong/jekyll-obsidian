@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.1.6] - 2025-01-09
+- Strings of file links in File Search are formatted similar to native app 
+- Updated .scss @import to @forward due to future deprecation
+
 ## [1.1.3] - 2025-01-09
 - Fixed embeds with consecutive trailing periods
 

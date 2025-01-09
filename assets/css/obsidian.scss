@@ -1,6 +1,14 @@
 ---
 ---
 
+@forward "obsidian/loading";
+@forward "obsidian/modals";
+@forward "obsidian/canvas";
+@forward "obsidian/explorer";
+@forward "obsidian/fileread";
+@forward "obsidian/note";
+@forward "obsidian/sidebar";
+
 #obsidian {
     --bg: light-dark(white, #1e1e1e);
     --color-border: light-dark(#e0e0e0, #404040);
@@ -94,10 +102,3 @@
     }
 }
 
-@forward "obsidian/loading";
-@forward "obsidian/modals";
-@forward "obsidian/canvas";
-@forward "obsidian/explorer";
-@forward "obsidian/fileread";
-@forward "obsidian/note";
-@forward "obsidian/sidebar";
