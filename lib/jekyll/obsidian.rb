@@ -147,6 +147,19 @@ module Jekyll
               entry = new_name
             end
 
+
+            if entry.include?(".")
+              base_name = File.basename(entry, File.extname(entry))
+              trimmed_name = base_name.chomp(".") + File.extname(entry)
+              puts "file path: #{trimmed_name} #{entry}"
+              if trimmed_name != entry
+                new_path = File.join(rootdir, trimmed_name)
+                File.rename(entry_path, new_path)
+                entry_path = new_path
+                entry = trimmed_name
+              end
+            end
+
             counts[:files] += 1
             counts[:size] += File.size(entry_path)
             {name: entry, type: "file", path: File.join(path, entry), size: File.size(entry_path)}
