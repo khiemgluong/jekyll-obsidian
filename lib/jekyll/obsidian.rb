@@ -13,7 +13,7 @@ module Jekyll
     #   vault = site.config["obsidian_vault"]
     #   vault_path = File.join(site.dest, vault)
     #   Dir.glob(File.join(vault_path, "**", "*.md")).each do |md_file|
-    #     new_file_path = md_file.sub(/\.md$/, ".mdnote")
+    #     new_file_path = md_file.sub(/\.md$/, ".")
     #     File.rename(md_file, new_file_path)
     #   end
     # end
@@ -139,14 +139,6 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            if File.extname(entry) == ".md"
-              new_name = entry.sub(".md", ".mdnote")
-              new_path = File.join(rootdir, new_name)
-              File.rename(entry_path, new_path)
-              entry_path = new_path
-              entry = new_name
-            end
-
             if entry.match(/\.\./) # Checks for two or more consecutive periods
               base_name = File.basename(entry, File.extname(entry)).gsub(/\.{2,}/, ".")
               base_name = base_name.chomp(".")
@@ -175,7 +167,7 @@ module Jekyll
           elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path) || excluded_file_exts(file[:name])
-            if file[:name].end_with?(".mdnote", ".canvas")
+            if file[:name].end_with?(".md", ".canvas")
               begin
                 content = File.read(entry_path)
                 updated = false
@@ -237,7 +229,7 @@ module Jekyll
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
-          elsif file[:type] == "file" && file[:name].end_with?(".mdnote", ".canvas")
+          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
             return file if file_name_without_extension == stripped_link
           end

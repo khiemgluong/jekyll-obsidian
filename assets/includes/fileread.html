@@ -94,7 +94,7 @@
             if (index === filePathArr.length - 1) {
                 btn.textContent = extractFilenameFromPath(path);
                 btn.addEventListener('click', () => {
-                    if (filePath.endsWith('.mdnote'))
+                    if (filePath.endsWith('.md'))
                         FILEREAD.scrollTop = 0;
                     else if (filePath.endsWith('.canvas'))
                         resetCanvasPosition();
@@ -316,7 +316,7 @@
     function dispatchFileSelectEvt(filePath, heading) {
         const EXPLORER = OBSIDIAN.querySelector('#explorer');
         const detail = { filePath };
-        if (filePath.endsWith('.mdnote')) {
+        if (filePath.endsWith('.md')) {
             if (heading) detail.heading = heading;
             const event = new CustomEvent('obsidian_noteSelect', { detail });
             document.dispatchEvent(event);
