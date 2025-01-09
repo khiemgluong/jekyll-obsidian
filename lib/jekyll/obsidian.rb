@@ -139,13 +139,13 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            # if File.extname(entry) == ".md"
-            #   new_name = entry.sub(".md", ".mdnote")
-            #   new_path = File.join(rootdir, new_name)
-            #   File.rename(entry_path, new_path)
-            #   entry_path = new_path
-            #   entry = new_name
-            # end
+            if File.extname(entry) == ".md"
+              new_name = entry.sub(".md", ".mdnote")
+              new_path = File.join(rootdir, new_name)
+              File.rename(entry_path, new_path)
+              entry_path = new_path
+              entry = new_name
+            end
 
             if entry.match(/\.\./) # Checks for two or more consecutive periods
               base_name = File.basename(entry, File.extname(entry)).gsub(/\.{2,}/, ".")

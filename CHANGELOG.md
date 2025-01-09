@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.1.3] - 2025-01-09
+- Fixed embeds with consecutive trailing periods
+
 ## [1.1.2] - 2024-09-13
 - Fixed duplicate linked mentions
 - Added text color to linked mention
