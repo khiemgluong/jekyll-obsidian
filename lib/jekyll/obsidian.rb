@@ -101,7 +101,7 @@ module Jekyll
             puts "#{File.basename(file)} currently exists"
           else
             FileUtils.cp(file, dir)
-            puts "#{File.basename(file)} copied over"
+            # puts "#{File.basename(file)} copied over"
           end
         else
           puts "Error: #{file} does not exist"
@@ -139,17 +139,17 @@ module Jekyll
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
 
-            if File.extname(entry) == ".md"
-              new_name = entry.sub(".md", ".mdnote")
-              new_path = File.join(rootdir, new_name)
-              File.rename(entry_path, new_path)
-              entry_path = new_path
-              entry = new_name
-            end
+            # if File.extname(entry) == ".md"
+            #   new_name = entry.sub(".md", ".mdnote")
+            #   new_path = File.join(rootdir, new_name)
+            #   File.rename(entry_path, new_path)
+            #   entry_path = new_path
+            #   entry = new_name
+            # end
 
-
-            if entry.include?(".")
-              base_name = File.basename(entry, File.extname(entry))
+            if entry.match(/\.\./) # Checks for two or more consecutive periods
+              base_name = File.basename(entry, File.extname(entry)).gsub(/\.{2,}/, ".")
+              base_name = base_name.chomp(".")
               trimmed_name = base_name.chomp(".") + File.extname(entry)
               puts "file path: #{trimmed_name} #{entry}"
               if trimmed_name != entry
@@ -178,6 +178,7 @@ module Jekyll
             if file[:name].end_with?(".mdnote", ".canvas")
               begin
                 content = File.read(entry_path)
+                updated = false
               rescue Errno::ENOENT
                 puts "Error reading file: #{entry_path} - No such file"
                 next
@@ -187,12 +188,9 @@ module Jekyll
               end
 
               links = content.scan(/\[\[(.*?)\]\]/).flatten
-
               backlinks[file[:path]] ||= {"backlink_paths" => []}
-
               links.each do |link|
-                lowercase_link = link.downcase
-                matched_entry = find_matching_entry(root_files, lowercase_link)
+                matched_entry = find_matching_entry(root_files, link.downcase)
                 if matched_entry
                   unless matched_entry[:path] == file[:path] ||
                       backlinks[file[:path]]["backlink_paths"].include?(matched_entry[:path])
@@ -200,7 +198,24 @@ module Jekyll
                   end
                 end
               end
-            elsif !file[:name].end_with?(".mdnote", ".canvas")
+
+              embeds_ = content.scan(/!\[\[(.*?)\]\]/).flatten
+              embeds_.each do |embed|
+                if embed.match(/\.\./) 
+                  base_name = File.basename(embed, File.extname(embed)).gsub(/\.\.+/, ".")
+                  base_name = base_name.chomp(".")
+                  trimmed_name = base_name + File.extname(embed)
+                  content = content.gsub("![[#{embed}]]", "![[#{trimmed_name}]]")
+                  puts("trimmed_name #{trimmed_name} #{content}")
+                  updated = true 
+                end
+              end
+              if updated
+                File.write(entry_path, content)
+                puts "Updated file: #{entry_path}"
+              end
+
+            else
               if embeds[file[:path]].nil? || embeds[file[:path]]["embed_paths"].nil?
                 embeds[file[:path]] = {"embed_paths" => [entry_path]}
               else

@@ -1,5 +1,6 @@
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
 </head>
 
 <!-- --------------------------- Data Extractors --------------------------- -->
@@ -146,7 +147,6 @@
 
     function generateCallouts(calloutsArr, cleanedHTML) {
         calloutsArr.forEach(callout => {
-            // Extract the callout type including square brackets, removing "> " part
             const calloutType = callout.slice(2).trim().toLowerCase();
             console.log("calloutType: " + calloutType);
             let svgString = '';
@@ -211,9 +211,9 @@
             const embedsParsed = JSON.parse(embeds.replace(/&quot;/g, '"'));
             embedsArr.forEach(embed => {
                 const fileNameMatch = embed.match(/\[\[(.*?)\]\]/);
-                console.log("fileNameMatch: " + fileNameMatch);
                 if (fileNameMatch) {
                     const fileName = extractFilenameFromPath(fileNameMatch[1]);
+                    console.log("fileNameMatch: " + fileNameMatch + " embed " + embed);
                     for (let key in embedsParsed) {
                         const embedFileName = extractFilenameFromPath(key);
                         if (embedFileName.replace("/:|", "'") === fileName) {
