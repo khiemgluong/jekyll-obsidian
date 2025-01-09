@@ -9,14 +9,6 @@ require_relative "obsidian/version"
 
 module Jekyll
   module Obsidian
-    # Jekyll::Hooks.register :site, :post_write do |site|
-    #   vault = site.config["obsidian_vault"]
-    #   vault_path = File.join(site.dest, vault)
-    #   Dir.glob(File.join(vault_path, "**", "*.md")).each do |md_file|
-    #     new_file_path = md_file.sub(/\.md$/, ".")
-    #     File.rename(md_file, new_file_path)
-    #   end
-    # end
     class FileTreeGenerator < Jekyll::Generator
       safe true
       priority :lowest
@@ -138,6 +130,15 @@ module Jekyll
              children: collect_files(entry_path, File.join(path, entry), counts)}
           else
             next if File.zero?(entry_path) || File.empty?(entry_path)
+
+            if File.extname(entry) == ".md"
+              new_name = entry.sub(".md", ".mdj")
+              # convert markdown to markdownjekyll files
+              new_path = File.join(rootdir, new_name)
+              File.rename(entry_path, new_path)
+              entry_path = new_path
+              entry = new_name
+            end
 
             if /\.\./.match?(entry) # Checks for two or more consecutive periods
               base_name = File.basename(entry, File.extname(entry)).gsub(/\.{2,}/, ".")

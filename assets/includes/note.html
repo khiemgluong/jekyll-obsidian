@@ -79,7 +79,7 @@
         for (const parsedFilePath in backlinks_parsed) {
             const entry = backlinks_parsed[parsedFilePath];
             entry.backlink_paths.forEach(path => {
-                if (path === filePath && parsedFilePath.endsWith('.md')) {
+                if (path === filePath && parsedFilePath.endsWith('.mdj')) {
                     linked_mentions.push(parsedFilePath.replace("/:|", "'"));
                 }
             });
@@ -156,7 +156,9 @@
             console.info('No last file found.');
             let homepage = '{{ site.obsidian_homepage | escape }}';
             if (homepage) {
-                if (homepage.endsWith('.md')) {
+                if (homepage.endsWith('.md'))
+                    homepage = homepage.replace('.md', '.mdj');
+                if (homepage.endsWith('.mdj')) {
                     switchPage(homepage);
                     loadNote(homepage);
                     console.log("note loaded: " + homepage);

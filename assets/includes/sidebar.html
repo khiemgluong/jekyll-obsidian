@@ -49,6 +49,8 @@
         let homepage = '{{ site.obsidian_homepage | escape }}';
         if (homepage) {
             if (homepage.endsWith('.md'))
+                homepage = homepage.replace('.md', '.mdj');
+            if (homepage.endsWith('.mdj'))
             {
                 switchPage(homepage);
                 loadNote(homepage);

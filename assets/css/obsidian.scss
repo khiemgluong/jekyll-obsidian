@@ -94,10 +94,10 @@
     }
 }
 
-@import "obsidian/loading";
-@import "obsidian/modals";
-@import "obsidian/canvas";
-@import "obsidian/explorer";
-@import "obsidian/fileread";
-@import "obsidian/note";
-@import "obsidian/sidebar";
+@forward "obsidian/loading";
+@forward "obsidian/modals";
+@forward "obsidian/canvas";
+@forward "obsidian/explorer";
+@forward "obsidian/fileread";
+@forward "obsidian/note";
+@forward "obsidian/sidebar";
