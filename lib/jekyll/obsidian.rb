@@ -168,7 +168,7 @@ module Jekyll
           elsif file[:type] == "file"
             entry_path = File.join(rootdir, file[:path])
             next if File.zero?(entry_path) || excluded_file_exts(file[:name])
-            if file[:name].end_with?(".md", ".canvas")
+            if file[:name].end_with?(".mdj", ".canvas")
               begin
                 content = File.read(entry_path)
                 updated = false
@@ -228,7 +228,7 @@ module Jekyll
           if file[:type] == "dir"
             result = find_matching_entry(file[:children], lowercase_link)
             return result if result
-          elsif file[:type] == "file" && file[:name].end_with?(".md", ".canvas")
+          elsif file[:type] == "file" && file[:name].end_with?(".mdj", ".canvas")
             file_name_without_extension = file[:name].sub(/\.\w+$/, "").downcase
             return file if file_name_without_extension == stripped_link
           end
