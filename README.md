@@ -63,7 +63,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
     ```
 6. Run `bundle install` or `bundle update jekyll-obsidian`, if you already installed it
 
-7. Run `bundle exec jekyll build` to generate the necessary `.css` and `.json` files, and convert all your `.md` notes to `.mdnote`.
+7. Run `bundle exec jekyll build` to generate the necessary `.css` and `.json` files, and convert all your `.md` notes to `.mdj`.
 
 8. Run `bundle exec jekyll serve`, you should now see your Obsidian page at your given permalink
 
